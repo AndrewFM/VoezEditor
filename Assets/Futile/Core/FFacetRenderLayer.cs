@@ -70,7 +70,7 @@ public class FFacetRenderLayer : FRenderableLayerInterface
 		_material = new Material(_shader.shader);
 		_material.mainTexture = _atlas.texture;
 		
-		_meshRenderer.renderer.material = _material;
+		_meshRenderer.GetComponent<Renderer>().material = _material;
 		
 		#if UNITY_3_0 || UNITY_3_1 || UNITY_3_2 || UNITY_3_3 || UNITY_3_4 || UNITY_3_5
 			_gameObject.active = false;

@@ -86,6 +86,16 @@ public class EditorProcess : MainLoopProcess {
 
         if (musicPlayer.source.isPlaying)
             currentFrame += 1 * musicPlayer.playbackSpeed;
+        if (musicPlayer.hasStarted && musicPlayer.paused) {
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                currentFrame = Mathf.Min(currentFrame + 4, musicPlayer.source.clip.length * framesPerSecond);
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+                currentFrame = Mathf.Max(currentFrame - 4, 0);
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+                currentFrame = Mathf.Min(currentFrame + 15, musicPlayer.source.clip.length * framesPerSecond);
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+                currentFrame = Mathf.Max(currentFrame - 15, 0);
+        }
         currentTime = currentFrame / framesPerSecond;
         songTime = currentTime;
         musicPlayer.SyncTracker(songTime);

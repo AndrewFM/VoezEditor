@@ -84,10 +84,10 @@ public class EditorUI {
         // Update timestamp for current song time
         if (parent.musicPlayer.source.clip != null) {
             playbackSlider.allowScrubbing = true;
-            playbackSlider.progress = parent.musicPlayer.source.time / parent.musicPlayer.source.clip.length;
+            playbackSlider.progress = parent.songTime / parent.musicPlayer.source.clip.length;
             if (!playbackSlider.clicked)
                 // If playback slider is not being dragged, show current song time.
-                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.time).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
+                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)parent.songTime).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
             else
                 // If playback slider is being dragged, show song time at slider's current position
                 playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)(parent.musicPlayer.source.clip.length * playbackSlider.pendingProgress)).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());

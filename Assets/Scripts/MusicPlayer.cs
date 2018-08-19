@@ -38,6 +38,13 @@ public class MusicPlayer {
             source.pitch = playbackSpeed;
     }
 
+    // Tell the music player what time in the song it's supposed to be at, and if there's a mismatch, resync the audio
+    public void SyncTracker(float seconds)
+    {
+        if (source.isPlaying && Mathf.Abs(source.time-seconds) > 1f/15f)
+            source.time = seconds;
+    }
+
     public void PauseSong()
     {
         paused = true;

@@ -82,6 +82,7 @@ public class EditorProcess : MainLoopProcess {
             currentFrame += 1 * musicPlayer.playbackSpeed;
         currentTime = currentFrame / framesPerSecond;
         songTime = currentTime;
+        musicPlayer.SyncTracker(songTime);
 
         // Spawn Tracks
         for (int i = 0; i < project.tracks.Count; i += 1)

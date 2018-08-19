@@ -23,6 +23,14 @@ public class Util {
         return dt_seconds.ToString("mm:ss");
     }
 
+    // JSON parsing
+    public static float ParseJSONFloat(object obj)
+    {
+        if (obj is System.Double)
+            return (float)((double)obj);
+        return (long)obj;
+    }
+
     // Easing Functions
     public static float LerpLinearEase(float start, float end, float perc)
     {

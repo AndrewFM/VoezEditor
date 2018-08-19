@@ -53,9 +53,9 @@ public class ProjectData {
                     NoteData newNote = new NoteData();
                     newNote.id = (int)((long)noteProperties["Id"]);
                     newNote.track = (int)((long)noteProperties["Track"]);
-                    newNote.time = (float)((double)noteProperties["Time"]);
+                    newNote.time = Util.ParseJSONFloat(noteProperties["Time"]);
                     newNote.dir = (int)((long)noteProperties["Dir"]);
-                    newNote.hold = (float)((double)noteProperties["Hold"]);
+                    newNote.hold = Util.ParseJSONFloat(noteProperties["Hold"]);
                     string type = (string)noteProperties["Type"];
                     if (type == "click")
                         newNote.type = NoteData.NoteType.CLICK;
@@ -84,10 +84,10 @@ public class ProjectData {
 
                     TrackData newTrack = new TrackData();
                     newTrack.id = (int)((long)basicTrackProperties["Id"]);
-                    newTrack.x = (float)((double)basicTrackProperties["X"]);
-                    newTrack.size = (float)((double)basicTrackProperties["Size"]);
-                    newTrack.start = (float)((double)basicTrackProperties["Start"]);
-                    newTrack.end = (float)((double)basicTrackProperties["End"]);
+                    newTrack.x = Util.ParseJSONFloat(basicTrackProperties["X"]);
+                    newTrack.size = Util.ParseJSONFloat(basicTrackProperties["Size"]);
+                    newTrack.start = Util.ParseJSONFloat(basicTrackProperties["Start"]);
+                    newTrack.end = Util.ParseJSONFloat(basicTrackProperties["End"]);
                     newTrack.color = (int)((long)basicTrackProperties["Color"]);
                     if (basicTrackProperties.ContainsKey("PositionLock"))
                         newTrack.positionLock = (bool)basicTrackProperties["PositionLock"];
@@ -133,12 +133,9 @@ public class ProjectData {
             trans += (trans.EndsWith("}") ? "" : "}");
             Dictionary<string, object> transProperties = (Dictionary<string, object>)Json.Deserialize(trans);
             TrackTransformation transObj = new TrackTransformation();
-            if (transProperties["To"] is System.Double)
-                transObj.to = (float)((double)transProperties["To"]);
-            else
-                transObj.to = (long)transProperties["To"];
-            transObj.start = (float)((double)transProperties["Start"]);
-            transObj.end = (float)((double)transProperties["End"]);
+            transObj.to = Util.ParseJSONFloat(transProperties["To"]);
+            transObj.start = Util.ParseJSONFloat(transProperties["Start"]);
+            transObj.end = Util.ParseJSONFloat(transProperties["End"]);
             string easeStyle = (string)transProperties["Ease"];
             // TODO: Easing styles: "easeoutback", "easeinback"
             if (easeStyle == "easelinear")
@@ -252,7 +249,7 @@ public class ProjectData {
             else if (transformList[i].ease == Easing.BACK_OUT)
                 retStr += "easeoutback";
             retStr += "\",\"Start\":" + transformList[i].start.ToString() + ",";
-            retStr += "\",\"End\":" + transformList[i].end.ToString();
+            retStr += "\"End\":" + transformList[i].end.ToString();
             if (i == transformList.Count - 1)
                 retStr += "}";
             else

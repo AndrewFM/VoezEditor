@@ -6,6 +6,8 @@ public class MusicPlayer {
     public AudioSource source;
     public AudioClip activeClip;
     public bool readyToPlay;
+    public bool paused;
+    public bool hasStarted;
     public float playbackSpeed;
 
 	public MusicPlayer() {
@@ -14,26 +16,42 @@ public class MusicPlayer {
         playbackSpeed = 1.0f;
     }
 	
+    public bool Ready()
+    {
+        return readyToPlay && activeClip != null && activeClip.loadState == AudioDataLoadState.Loaded;
+    }
+
+    private void StartPlaying()
+    {
+        source.clip = activeClip;
+        source.Play();
+        hasStarted = true;
+        activeClip = null;
+        readyToPlay = false;
+    }
+
     public void Update()
     {
-        if (readyToPlay && activeClip != null && activeClip.loadState == AudioDataLoadState.Loaded) {
-            source.clip = activeClip;
-            source.Play();
-            activeClip = null;
-            readyToPlay = false;
-        }
+        if (Ready() && !paused)
+            StartPlaying();
         if (source.isPlaying)
             source.pitch = playbackSpeed;
+    }
 
-        // TODO: Debug Keys
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            playbackSpeed = 1.0f;
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            playbackSpeed = 0.5f;
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            playbackSpeed = 0.25f;
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-            playbackSpeed = 2.0f;
+    public void PauseSong()
+    {
+        paused = true;
+        if (source.isPlaying)
+            source.Pause();
+    }
+
+    public void ResumeSong()
+    {
+        if (paused) {
+            paused = false;
+            if (hasStarted)
+                source.UnPause();
+        }
     }
 
     public void PlayAudioClip(AudioClip clip)

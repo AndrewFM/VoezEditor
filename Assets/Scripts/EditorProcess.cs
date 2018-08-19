@@ -16,6 +16,7 @@ public class EditorProcess : MainLoopProcess {
     public FContainer foregroundContainer;
     public ProjectData project;
     public MusicPlayer musicPlayer;
+    public EditorUI ui;
 
     public float currentFrame;
     public float currentTime;
@@ -43,7 +44,9 @@ public class EditorProcess : MainLoopProcess {
         Futile.stage.AddChild(foregroundContainer);
 
         musicPlayer = new MusicPlayer();
-        InitiateSong();        
+        ui = new EditorUI(this);
+        InitiateSong();
+        musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
     }
 
     public void InitiateSong()
@@ -62,6 +65,7 @@ public class EditorProcess : MainLoopProcess {
         
         // Update all active objects
         musicPlayer.Update();
+        ui.Update();
         evenUpdate = !evenUpdate;
         int updateIndex = this.updateList.Count - 1;
         while (updateIndex >= 0) {
@@ -120,6 +124,8 @@ public class EditorProcess : MainLoopProcess {
                 sL.AddSpritesToContainer(notesContainer);
             else if (obj is Note.HoldTick)
                 sL.AddSpritesToContainer(ticksContainer);
+            else if (obj is UIElement)
+                sL.AddSpritesToContainer(foregroundContainer);
             else
                 sL.AddSpritesToContainer(backgroundContainer);
         }

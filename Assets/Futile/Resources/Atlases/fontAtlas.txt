@@ -1,0 +1,20 @@
+{"frames": {
+
+"Raleway24.png":
+{
+	"frame": {"x":2,"y":2,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "fontAtlas.png",
+	"format": "RGBA8888",
+	"size": {"w":260,"h":260},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:599291295f3a5be6311a047920008508:cedd14c843e49c0750faad12e04a6b25:7bce6697796edaa9e8fd7f80550e98be$"
+}
+}

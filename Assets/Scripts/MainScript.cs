@@ -19,6 +19,8 @@ public class MainScript : MonoBehaviour {
 
         // Load Resources
         Futile.atlasManager.LoadAtlas("Atlases/mainAtlas");
+        Futile.atlasManager.LoadAtlas("Atlases/fontAtlas");
+        Futile.atlasManager.LoadFont("Raleway24", "Raleway24", "Atlases/Raleway24", 0f, 0f);
 
         activeProcess = new EditorProcess();
     }

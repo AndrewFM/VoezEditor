@@ -5,7 +5,7 @@ public class Track : CosmeticSprite {
     public ProjectData.TrackData data;
     public EditorProcess controller;
     public float trackProgress;
-    public static float TRACK_SCREEN_HEIGHT = 0.9f;
+    public static float TRACK_SCREEN_HEIGHT = 0.85f;
     public static float TRACK_SCREEN_WIDTH = 0.12f; // at size = 1.0f
     public int ID;
 

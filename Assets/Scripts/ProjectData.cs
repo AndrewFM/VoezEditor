@@ -137,7 +137,6 @@ public class ProjectData {
             transObj.start = Util.ParseJSONFloat(transProperties["Start"]);
             transObj.end = Util.ParseJSONFloat(transProperties["End"]);
             string easeStyle = (string)transProperties["Ease"];
-            // TODO: Easing styles: "easeoutback", "easeinback"
             if (easeStyle == "easelinear")
                 transObj.ease = Easing.LINEAR;
             else if (easeStyle == "easeinexpo")
@@ -154,6 +153,10 @@ public class ProjectData {
                 transObj.ease = Easing.CIRC_IN;
             else if (easeStyle == "easeoutcirc")
                 transObj.ease = Easing.CIRC_OUT;
+            else if (easeStyle == "easeoutback")
+                transObj.ease = Easing.BACK_OUT;
+            else if (easeStyle == "easeinback")
+                transObj.ease = Easing.BACK_IN;
             else {
                 Debug.Log("UNKNOWN EASING STYLE: " + easeStyle);
             }
@@ -329,6 +332,7 @@ public class ProjectData {
 
         public System.Func<float, float, float, float> GetEaseFunction()
         {
+            // TODO: Easing styles: Easing.BACK_IN, Easing.BACK_OUT
             if (ease == Easing.LINEAR)
                 return Util.LerpLinearEase;
             if (ease == Easing.EXP_IN)

@@ -78,6 +78,12 @@ public class EditorProcess : MainLoopProcess {
             updateIndex--;
         }
 
+        if (!musicPlayer.source.isPlaying && musicPlayer.hasStarted && !musicPlayer.paused) {
+            currentFrame = 0f;
+            if (project.songClip != null)
+                musicPlayer.PlayAudioClip(project.songClip);
+        }
+
         if (musicPlayer.source.isPlaying)
             currentFrame += 1 * musicPlayer.playbackSpeed;
         currentTime = currentFrame / framesPerSecond;
@@ -91,7 +97,7 @@ public class EditorProcess : MainLoopProcess {
 
         // Spawn Notes
         for (int i = 0; i < project.notes.Count; i += 1) {
-            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime < project.notes[i].time && !NoteSpawned(project.notes[i].id)) {
+            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime < project.notes[i].time + project.notes[i].hold && !NoteSpawned(project.notes[i].id)) {
                 AddObject(new Note(this, project.notes[i]));
             }
         }

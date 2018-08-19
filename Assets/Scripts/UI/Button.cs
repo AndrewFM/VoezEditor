@@ -9,6 +9,7 @@ public class Button : UIElement {
     public bool diamond;
     public bool visible;
     public bool clicked;
+    public bool rightClicked;
     public bool toggled;
 
     public Button(string symbolName, Vector2 pos, float size, bool diamond)
@@ -52,7 +53,9 @@ public class Button : UIElement {
     public override void Update(bool eu)
     {
         if (Input.GetMouseButtonDown(0) && visible && MouseOver)
-            this.clicked = true;
+            clicked = true;
+        if (Input.GetMouseButtonDown(1) && visible && MouseOver)
+            rightClicked = true;
         base.Update(eu);
     }
 

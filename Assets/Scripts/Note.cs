@@ -57,6 +57,8 @@ public class Note : CosmeticSprite {
         if (linkedTrack != null) {
             pos.x = linkedTrack.pos.x;
             pos.y = MainScript.windowRes.y - (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
+            if (noteProgress < 0f)
+                slatedForDeletetion = true;
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
                 slatedForDeletetion = true;
                 linkedTrack.flashEffectTime = 5;
@@ -171,7 +173,7 @@ public class Note : CosmeticSprite {
             pos.x = desiredX;
             pos.y = parentNote.pos.y + pixelsPerSecond * (time - parentNote.data.time);
 
-            if (parentNote.slatedForDeletetion || parentNote.controller.songTime > time)
+            if (parentNote.slatedForDeletetion)
                 slatedForDeletetion = true;
             base.Update(eu);
         }
@@ -184,7 +186,7 @@ public class Note : CosmeticSprite {
 
         public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
         {
-            if (lastPos == Vector2.zero || pos == Vector2.zero) {
+            if (lastPos == Vector2.zero || pos == Vector2.zero || parentNote.controller.songTime > time) {
               sLeaser.sprites[0].isVisible = false;
             } else {
               sLeaser.sprites[0].isVisible = true;

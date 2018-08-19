@@ -74,11 +74,27 @@ public class EditorUI {
 
     public void Update()
     {
-        if (parent.musicPlayer.source.clip != null) {
-            playbackSlider.progress = parent.musicPlayer.source.time / parent.musicPlayer.source.clip.length;
-            playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.time).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
+        // Handle Playback Slider Dragged
+        if (playbackSlider.progressUpdate) {
+            parent.musicPlayer.source.time = parent.musicPlayer.source.clip.length * Mathf.Clamp(playbackSlider.progress, 0f, 0.99f);
+            parent.currentFrame = (int)(parent.musicPlayer.source.time * parent.framesPerSecond);
+            playbackSlider.progressUpdate = false;
         }
 
+        // Update timestamp for current song time
+        if (parent.musicPlayer.source.clip != null) {
+            playbackSlider.allowScrubbing = true;
+            playbackSlider.progress = parent.musicPlayer.source.time / parent.musicPlayer.source.clip.length;
+            if (!playbackSlider.clicked)
+                // If playback slider is not being dragged, show current song time.
+                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.time).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
+            else
+                // If playback slider is being dragged, show song time at slider's current position
+                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)(parent.musicPlayer.source.clip.length * playbackSlider.pendingProgress)).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
+        } else
+            playbackSlider.allowScrubbing = false;
+
+        // Play/Pause
         if (playButton.clicked || Input.GetKeyDown(KeyCode.Space)) {
             if (parent.musicPlayer.paused) {
                 parent.musicPlayer.ResumeSong();
@@ -89,6 +105,24 @@ public class EditorUI {
             }
             playButton.clicked = false;
         }
+
+        // Toggle Loop Point
+        if (playbackSlider.rightClicked) {
+            if (playbackSlider.loopPoint >= 0f)
+                playbackSlider.loopPoint = -1;
+            else
+                playbackSlider.loopPoint = Mathf.Clamp(playbackSlider.progress, 0f, 0.99f);
+            playbackSlider.rightClicked = false;
+        }
+
+        // Jump Playback To Loop Point
+        if (playbackSlider.loopPoint >= 0f && (playButton.rightClicked || Input.GetKeyDown(KeyCode.Return))) {
+            parent.musicPlayer.source.time = parent.musicPlayer.source.clip.length * Mathf.Clamp(playbackSlider.loopPoint, 0f, 0.99f);
+            parent.currentFrame = (int)(parent.musicPlayer.source.time * parent.framesPerSecond);
+            playButton.rightClicked = false;
+        }
+
+        // Open Playback Speed Menu
         if (playbackTimeButton.clicked) {
             if (notesButton.toggled && !playbackTimeButton.toggled)
                 notesButton.clicked = true;
@@ -97,6 +131,8 @@ public class EditorUI {
             playbackTimeButton.toggled = playbackTimes[0].visible;
             playbackTimeButton.clicked = false;
         }
+
+        // Open Notes Selection Menu
         if (notesButton.clicked) {
             if (playbackTimeButton.toggled && !notesButton.toggled)
                 playbackTimeButton.clicked = true;
@@ -105,10 +141,14 @@ public class EditorUI {
             notesButton.toggled = noteTypes[0].visible;
             notesButton.clicked = false;
         }
+
+        // Save Project
         if (saveButton.clicked) {
             parent.project.ExportActiveProject();
             saveButton.clicked = false;
         }
+
+        // Set Playback Speed
         for(int i=0; i<playbackTimes.Length; i+=1) {
             if (playbackTimes[i].clicked) {
                 for (int j = 0; j < playbackTimes.Length; j += 1)
@@ -125,6 +165,8 @@ public class EditorUI {
                 playbackTimes[i].clicked = false;
             }
         }
+
+        // Set Selected Note Type
         for (int i = 0; i < noteTypes.Length; i += 1) {
             if (noteTypes[i].clicked) {
                 for (int j = 0; j < noteTypes.Length; j += 1)
@@ -134,5 +176,4 @@ public class EditorUI {
             }
         }
     }
-
 }

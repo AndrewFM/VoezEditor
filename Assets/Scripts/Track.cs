@@ -32,7 +32,7 @@ public class Track : CosmeticSprite {
         float desiredX = GetXAtTime(controller.songTime);
         pos.x = Util.ScreenPosX(desiredX);
 
-        if (trackProgress > 1f)
+        if (trackProgress > 1f || trackProgress < 0f)
             slatedForDeletetion = true;
         if (flashEffectTime > 0)
             flashEffectTime -= 1;

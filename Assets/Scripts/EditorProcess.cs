@@ -9,7 +9,8 @@ public class EditorProcess : MainLoopProcess {
     public List<Note> activeNotes;
     public bool evenUpdate;
     public FContainer backgroundContainer;
-    public FContainer tracksContainer;
+    public FContainer tracksBottomContainer;
+    public FContainer tracksTopContainer;
     public FContainer notesContainer;
     public FContainer foregroundContainer;
     public ProjectData project;
@@ -28,11 +29,13 @@ public class EditorProcess : MainLoopProcess {
 
         // Setup drawing layers (order matters here)
         backgroundContainer = new FContainer();
-        tracksContainer = new FContainer();
+        tracksBottomContainer = new FContainer();
+        tracksTopContainer = new FContainer();
         notesContainer = new FContainer();
         foregroundContainer = new FContainer();
         Futile.stage.AddChild(backgroundContainer);
-        Futile.stage.AddChild(tracksContainer);
+        Futile.stage.AddChild(tracksBottomContainer);
+        Futile.stage.AddChild(tracksTopContainer);
         Futile.stage.AddChild(notesContainer);
         Futile.stage.AddChild(foregroundContainer);
 
@@ -111,7 +114,7 @@ public class EditorProcess : MainLoopProcess {
             SpriteLeaser sL = new SpriteLeaser(obj as IDrawable);
             spriteLeasers.Add(sL);
             if (obj is Track)
-                sL.AddSpritesToContainer(tracksContainer);
+                sL.AddSpritesToContainer(tracksBottomContainer);
             else if (obj is Note)
                 sL.AddSpritesToContainer(notesContainer);
             else

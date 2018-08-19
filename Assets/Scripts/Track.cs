@@ -70,17 +70,17 @@ public class Track : CosmeticSprite {
         sLeaser.sprites[Spr_BackGradient].anchorY = 0f;
         sLeaser.sprites[Spr_BackGradient].alpha = 0.9f;
 
-        sLeaser.sprites[Spr_BottomGradFade] = new FSprite("trackGradient");
-        sLeaser.sprites[Spr_BottomGradFade].scaleY = sLeaser.sprites[Spr_BackGradient].scaleY * 0.25f;
-        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX * 0.95f;
+        sLeaser.sprites[Spr_BottomGradFade] = new FSprite("evenGradient");
+        sLeaser.sprites[Spr_BottomGradFade].scaleY = sLeaser.sprites[Spr_BackGradient].scaleY * 0.065f;
+        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX;
         sLeaser.sprites[Spr_BottomGradFade].color = Color.white;
         sLeaser.sprites[Spr_BottomGradFade].anchorY = 0f;
-        sLeaser.sprites[Spr_BottomGradFade].alpha = 0.6f;
+        sLeaser.sprites[Spr_BottomGradFade].alpha = 0.9f;
 
         for (int i=Spr_LeftGradLine; i<=Spr_MiddleGradLine; i+=1) {
             sLeaser.sprites[i] = new FSprite("trackGradient");
             sLeaser.sprites[i].scaleY = sLeaser.sprites[Spr_BackGradient].scaleY;
-            sLeaser.sprites[i].scaleX = 1f;
+            sLeaser.sprites[i].scaleX = 0.5f;
             if (i == Spr_MiddleGradLine)
                 sLeaser.sprites[i].color = Color.black;
             else
@@ -91,6 +91,19 @@ public class Track : CosmeticSprite {
         sLeaser.sprites[Spr_BottomDiamond] = new FSprite("slide");
         sLeaser.sprites[Spr_BottomDiamond].color = Color.black;
         sLeaser.sprites[Spr_BottomDiamond].rotation = 45f;
+        sLeaser.sprites[Spr_BottomDiamond].scale = 0.5f;
+    }
+
+    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContatiner)
+    {
+        foreach (FSprite fsprite in sLeaser.sprites)
+            fsprite.RemoveFromContainer();
+        controller.tracksBottomContainer.AddChild(sLeaser.sprites[Spr_BackGradient]);
+        controller.tracksBottomContainer.AddChild(sLeaser.sprites[Spr_BottomGradFade]);
+        controller.tracksTopContainer.AddChild(sLeaser.sprites[Spr_LeftGradLine]);
+        controller.tracksTopContainer.AddChild(sLeaser.sprites[Spr_RightGradLine]);
+        controller.tracksTopContainer.AddChild(sLeaser.sprites[Spr_MiddleGradLine]);
+        controller.tracksTopContainer.AddChild(sLeaser.sprites[Spr_BottomDiamond]);
     }
 
     public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
@@ -139,7 +152,7 @@ public class Track : CosmeticSprite {
                 currentWidth = MainScript.windowRes.x * TRACK_SCREEN_WIDTH * data.scale[i].to;
         }
         sLeaser.sprites[Spr_BackGradient].scaleX = currentWidth / sLeaser.sprites[Spr_BackGradient].element.sourceRect.width;
-        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX * 0.95f;
+        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX;
 
         Vector2 lerpPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, timeStacker), Mathf.Lerp(lastPos.y, pos.y, timeStacker));
         sLeaser.sprites[Spr_BackGradient].x = lerpPos.x;

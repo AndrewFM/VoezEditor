@@ -31,6 +31,14 @@ public class Util {
         return -(end - start) * perc * (perc - 2f) + start;
     }
 
+    public static float LerpQuadEaseInOut(float start, float end, float perc)
+    {
+        if (perc < 0.5)
+            return (end - start) * perc * perc * 2f + start;
+        else
+            return (end - start) * (-1 + (4-2*perc) * perc) + start;
+    }
+
     public static float LerpSinEaseInOut(float start, float end, float perc)
     {
         return -(end - start) / 2f * (Mathf.Cos(perc * Mathf.PI) - 1f) + start;

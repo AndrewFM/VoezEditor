@@ -136,6 +136,12 @@ public class ProjectData {
                 transObj.ease = Easing.EXP_IN;
             else if (easeStyle == "easeoutexpo")
                 transObj.ease = Easing.EXP_OUT;
+            else if (easeStyle == "easeinquad")
+                transObj.ease = Easing.QUAD_IN;
+            else if (easeStyle == "easeoutquad")
+                transObj.ease = Easing.QUAD_OUT;
+            else if (easeStyle == "easeinoutquad")
+                transObj.ease = Easing.QUAD_INOUT;
             else if (easeStyle == "easeoutback")
                 transObj.ease = Easing.BACK_OUT;
             else {
@@ -150,6 +156,9 @@ public class ProjectData {
         LINEAR,
         EXP_IN,
         EXP_OUT,
+        QUAD_IN,
+        QUAD_OUT,
+        QUAD_INOUT,
         BACK_OUT
     };
 
@@ -217,6 +226,12 @@ public class ProjectData {
                 return Util.LerpExpEaseIn;
             if (ease == Easing.EXP_OUT)
                 return Util.LerpExpEaseOut;
+            if (ease == Easing.QUAD_IN)
+                return Util.LerpQuadEaseIn;
+            if (ease == Easing.QUAD_OUT)
+                return Util.LerpQuadEaseOut;
+            if (ease == Easing.QUAD_INOUT)
+                return Util.LerpQuadEaseInOut;
             return Util.LerpQuadEaseOut;
         }
     }

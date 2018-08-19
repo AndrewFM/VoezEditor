@@ -81,8 +81,10 @@ public class ProjectData {
                     newTrack.start = (float)((double)basicTrackProperties["Start"]);
                     newTrack.end = (float)((double)basicTrackProperties["End"]);
                     newTrack.color = (int)((long)basicTrackProperties["Color"]);
-                    newTrack.positionLock = (bool)basicTrackProperties["PositionLock"];
-                    newTrack.entranceOn = (bool)basicTrackProperties["EntranceOn"];
+                    if (basicTrackProperties.ContainsKey("PositionLock"))
+                        newTrack.positionLock = (bool)basicTrackProperties["PositionLock"];
+                    if (basicTrackProperties.ContainsKey("EntranceOn"))
+                        newTrack.entranceOn = (bool)basicTrackProperties["EntranceOn"];
 
                     ind = indTracks[j];
                     int moveStart = ind.IndexOf("[");
@@ -142,6 +144,10 @@ public class ProjectData {
                 transObj.ease = Easing.QUAD_OUT;
             else if (easeStyle == "easeinoutquad")
                 transObj.ease = Easing.QUAD_INOUT;
+            else if (easeStyle == "easeincirc")
+                transObj.ease = Easing.CIRC_IN;
+            else if (easeStyle == "easeoutcirc")
+                transObj.ease = Easing.CIRC_OUT;
             else if (easeStyle == "easeoutback")
                 transObj.ease = Easing.BACK_OUT;
             else {
@@ -159,6 +165,8 @@ public class ProjectData {
         QUAD_IN,
         QUAD_OUT,
         QUAD_INOUT,
+        CIRC_IN,
+        CIRC_OUT,
         BACK_OUT
     };
 
@@ -232,6 +240,10 @@ public class ProjectData {
                 return Util.LerpQuadEaseOut;
             if (ease == Easing.QUAD_INOUT)
                 return Util.LerpQuadEaseInOut;
+            if (ease == Easing.CIRC_IN)
+                return Util.LerpCircEaseIn;
+            if (ease == Easing.CIRC_OUT)
+                return Util.LerpCircEaseOut;
             return Util.LerpQuadEaseOut;
         }
     }

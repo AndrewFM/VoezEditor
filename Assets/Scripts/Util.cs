@@ -44,6 +44,16 @@ public class Util {
         return -(end - start) / 2f * (Mathf.Cos(perc * Mathf.PI) - 1f) + start;
     }
 
+    public static float LerpCircEaseIn(float start, float end, float perc)
+    {
+        return (end - start) * (1 - Mathf.Sqrt(1 - perc*perc)) + start;
+    }
+
+    public static float LerpCircEaseOut(float start, float end, float perc)
+    {
+        return (end - start) * ((perc - 1) * Mathf.Sqrt(1 - perc*perc))  + start;
+    }
+
     public static float LerpExpEaseIn(float start, float end, float perc)
     {
         //return (end - start) * Mathf.Pow(2, 10f * (perc - 1)) + start;

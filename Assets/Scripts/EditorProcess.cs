@@ -12,6 +12,7 @@ public class EditorProcess : MainLoopProcess {
     public FContainer tracksBottomContainer;
     public FContainer tracksTopContainer;
     public FContainer notesContainer;
+    public FContainer ticksContainer;
     public FContainer foregroundContainer;
     public ProjectData project;
     public MusicPlayer musicPlayer;
@@ -32,11 +33,13 @@ public class EditorProcess : MainLoopProcess {
         tracksBottomContainer = new FContainer();
         tracksTopContainer = new FContainer();
         notesContainer = new FContainer();
+        ticksContainer = new FContainer();
         foregroundContainer = new FContainer();
         Futile.stage.AddChild(backgroundContainer);
         Futile.stage.AddChild(tracksBottomContainer);
         Futile.stage.AddChild(tracksTopContainer);
         Futile.stage.AddChild(notesContainer);
+        Futile.stage.AddChild(ticksContainer);
         Futile.stage.AddChild(foregroundContainer);
 
         musicPlayer = new MusicPlayer();
@@ -115,6 +118,8 @@ public class EditorProcess : MainLoopProcess {
                 sL.AddSpritesToContainer(tracksBottomContainer);
             else if (obj is Note)
                 sL.AddSpritesToContainer(notesContainer);
+            else if (obj is Note.HoldTick)
+                sL.AddSpritesToContainer(ticksContainer);
             else
                 sL.AddSpritesToContainer(backgroundContainer);
         }

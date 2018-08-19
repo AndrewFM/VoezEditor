@@ -10,8 +10,6 @@ public class Track : CosmeticSprite {
     public int ID;
 
     public float currentWidth;
-    public float lastSubMove;
-    public int lastSubMoveInd = -1;
     public int lastSubColor;
     public int lastSubColorInd = -1;
     public float lastSubScale;
@@ -31,30 +29,33 @@ public class Track : CosmeticSprite {
         base.Update(eu);
         trackProgress = (controller.songTime - data.start) / (data.end - data.start);
         pos.y = MainScript.windowRes.y * (1.0f - TRACK_SCREEN_HEIGHT);
-
-        // Move Tweening
-        float desiredX = data.x;
-        for(int i=0; i<data.move.Count; i+=1) {
-            if (controller.songTime >= data.move[i].start && controller.songTime < data.move[i].end) {
-                if (i != lastSubMoveInd) {
-                    if (i == 0)
-                        lastSubMove = data.x;
-                    else
-                        lastSubMove = data.move[i - 1].to;
-                    lastSubMoveInd = i;
-                }
-                float subMoveProgress = (controller.songTime - data.move[i].start) / (data.move[i].end - data.move[i].start);
-                desiredX = data.move[i].GetEaseFunction()(lastSubMove, data.move[i].to, Mathf.Clamp(subMoveProgress, 0, 1));
-            } else if ((i < data.move.Count - 1 && controller.songTime >= data.move[i].end && controller.songTime < data.move[i + 1].start)
-                   || ((i == data.move.Count - 1 && controller.songTime >= data.move[i].end && controller.songTime < data.end)))
-                desiredX = data.move[i].to;
-        }
+        float desiredX = GetXAtTime(controller.songTime);
         pos.x = Util.ScreenPosX(desiredX);
 
         if (trackProgress > 1f)
             slatedForDeletetion = true;
         if (flashEffectTime > 0)
             flashEffectTime -= 1;
+    }
+
+    // Move Tweening
+    public float GetXAtTime(float time)
+    {
+        float desiredX = data.x;
+        float lastSubMove = data.x;
+        for (int i = 0; i < data.move.Count; i += 1) {
+            if (time >= data.move[i].start && time < data.move[i].end) {
+                if (i == 0)
+                    lastSubMove = data.x;
+                else
+                    lastSubMove = data.move[i - 1].to;
+                float subMoveProgress = (time - data.move[i].start) / (data.move[i].end - data.move[i].start);
+                desiredX = data.move[i].GetEaseFunction()(lastSubMove, data.move[i].to, Mathf.Clamp(subMoveProgress, 0, 1));
+            } else if ((i < data.move.Count - 1 && time >= data.move[i].end && time < data.move[i + 1].start)
+                   || ((i == data.move.Count - 1 && time >= data.move[i].end && time < data.end)))
+                desiredX = data.move[i].to;
+        }
+        return desiredX;
     }
 
     public int Spr_BackGradient { get { return 0; } }
@@ -74,12 +75,12 @@ public class Track : CosmeticSprite {
         sLeaser.sprites[Spr_BackGradient].anchorY = 0f;
         sLeaser.sprites[Spr_BackGradient].alpha = 0.9f;
 
-        sLeaser.sprites[Spr_BottomGradFade] = new FSprite("evenGradient");
-        sLeaser.sprites[Spr_BottomGradFade].scaleY = sLeaser.sprites[Spr_BackGradient].scaleY * 0.065f;
-        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX;
+        sLeaser.sprites[Spr_BottomGradFade] = new FSprite("bottomGradient");
+        sLeaser.sprites[Spr_BottomGradFade].scaleY = 1f;
+        sLeaser.sprites[Spr_BottomGradFade].scaleX = (MainScript.windowRes.x / sLeaser.sprites[Spr_BottomGradFade].width) * TRACK_SCREEN_WIDTH * data.size;
         sLeaser.sprites[Spr_BottomGradFade].color = Color.white;
         sLeaser.sprites[Spr_BottomGradFade].anchorY = 0f;
-        sLeaser.sprites[Spr_BottomGradFade].alpha = 0.9f;
+        sLeaser.sprites[Spr_BottomGradFade].alpha = 1f;
 
         for (int i=Spr_LeftGradLine; i<=Spr_MiddleGradLine; i+=1) {
             sLeaser.sprites[i] = new FSprite("trackGradient");
@@ -98,7 +99,7 @@ public class Track : CosmeticSprite {
         sLeaser.sprites[Spr_BottomDiamond].scale = 0.5f;
     }
 
-    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContatiner)
+    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContainer)
     {
         foreach (FSprite fsprite in sLeaser.sprites)
             fsprite.RemoveFromContainer();
@@ -156,7 +157,7 @@ public class Track : CosmeticSprite {
                 currentWidth = MainScript.windowRes.x * TRACK_SCREEN_WIDTH * data.scale[i].to;
         }
         sLeaser.sprites[Spr_BackGradient].scaleX = currentWidth / sLeaser.sprites[Spr_BackGradient].element.sourceRect.width;
-        sLeaser.sprites[Spr_BottomGradFade].scaleX = sLeaser.sprites[Spr_BackGradient].scaleX;
+        sLeaser.sprites[Spr_BottomGradFade].scaleX = (currentWidth-14f) / (sLeaser.sprites[Spr_BottomGradFade].element.sourceRect.width);
 
         Vector2 lerpPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, timeStacker), Mathf.Lerp(lastPos.y, pos.y, timeStacker));
         sLeaser.sprites[Spr_BackGradient].x = lerpPos.x;

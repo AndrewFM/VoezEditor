@@ -65,7 +65,7 @@ public class Button : UIElement {
 
         sLeaser.sprites[0] = new FSprite("Futile_White");
         sLeaser.sprites[0].color = DefaultColor();
-        sLeaser.sprites[0].alpha = 0.8f;
+        sLeaser.sprites[0].alpha = 0.75f;
         if (diamond) {
             sLeaser.sprites[0].rotation = 45f;
             float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[0].width, 2));

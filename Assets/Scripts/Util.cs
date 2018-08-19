@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Util {
     // RGB value with components in range 0-255
@@ -13,6 +14,13 @@ public class Util {
     {
         int margin = 120;
         return (int)(margin + ((MainScript.windowRes.x - margin * 2) * xFactor));
+    }
+
+    // MM:SS timestamp from number of seconds
+    public static string MinuteTimeStampFromSeconds(int seconds)
+    {
+        DateTime dt_seconds = DateTime.Today.AddSeconds(seconds);
+        return dt_seconds.ToString("mm:ss");
     }
 
     // Easing Functions

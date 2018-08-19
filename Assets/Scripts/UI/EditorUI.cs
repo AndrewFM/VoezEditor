@@ -7,6 +7,8 @@ public class EditorUI {
     Button playButton;
     Button playbackTimeButton;
     Button[] playbackTimes;
+    Slider playbackSlider;
+    DropshadowLabel playbackTimeLabel;
 
 	public EditorUI(EditorProcess parent)
     {
@@ -37,10 +39,22 @@ public class EditorUI {
                 playbackTimes[i].toggled = true;
             this.parent.AddObject(playbackTimes[i]);
         }
+
+        float sliderStart = bbPad * 3 + bbSize * 2 + 64f;
+        float sliderEnd = MainScript.windowRes.x - 250f;
+        playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, bbPad + bbSize * 0.5f), sliderEnd - sliderStart);
+        this.parent.AddObject(playbackSlider);
+        playbackTimeLabel = new DropshadowLabel("Raleway24", "00:00/00:00", new Vector2(MainScript.windowRes.x - 110f, bbPad + bbSize * 0.5f), new Vector2(2f, -2f));
+        this.parent.AddObject(playbackTimeLabel);
     }
 
     public void Update()
     {
+        if (parent.musicPlayer.source.clip != null) {
+            playbackSlider.progress = parent.musicPlayer.source.time / parent.musicPlayer.source.clip.length;
+            playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.time).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)parent.musicPlayer.source.clip.length).ToString());
+        }
+
         if (playButton.clicked || Input.GetKeyDown(KeyCode.Space)) {
             if (parent.musicPlayer.paused) {
                 parent.musicPlayer.ResumeSong();

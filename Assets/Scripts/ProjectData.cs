@@ -9,16 +9,22 @@ public class ProjectData {
     public AudioClip songClip;
     public List<NoteData> notes;
     public List<TrackData> tracks;
+    public string projectFolder;
+    public string notesFileName;
+    public string tracksFileName;
 
     public ProjectData()
     {
+        projectFolder = Application.dataPath + "/../ActiveProject";
+        notesFileName = projectFolder + "/note_default.txt";
+        tracksFileName = projectFolder + "/track_default.txt";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
 
+    // Load Project from disk
     public void LoadFromActiveProject()
     {
-        string projectFolder = Application.dataPath + "/../ActiveProject";
         string[] projectFiles = Directory.GetFiles(projectFolder, "*.*", SearchOption.TopDirectoryOnly);
         for (int i = 0; i < projectFiles.Length; i += 1) {
             // Audio File
@@ -36,6 +42,7 @@ public class ProjectData {
 
             // Notes Mapping File
             if (projectFiles[i].Contains("note_")) {
+                notesFileName = projectFiles[i];
                 string notesString = File.ReadAllText(projectFiles[i]);
                 notesString = notesString.Substring(1, notesString.Length - 2);
                 notesString = Regex.Replace(notesString, @"\t|\n|\r", "");
@@ -64,6 +71,7 @@ public class ProjectData {
 
             // Tracks Mapping File
             if (projectFiles[i].Contains("track_")) {
+                tracksFileName = projectFiles[i];
                 string tracksString = File.ReadAllText(projectFiles[i]);
                 tracksString = tracksString.Substring(1, tracksString.Length - 2);
                 tracksString = Regex.Replace(tracksString, @"\t|\n|\r", "");
@@ -132,6 +140,7 @@ public class ProjectData {
             transObj.start = (float)((double)transProperties["Start"]);
             transObj.end = (float)((double)transProperties["End"]);
             string easeStyle = (string)transProperties["Ease"];
+            // TODO: Easing styles: "easeoutback", "easeinback"
             if (easeStyle == "easelinear")
                 transObj.ease = Easing.LINEAR;
             else if (easeStyle == "easeinexpo")
@@ -148,14 +157,108 @@ public class ProjectData {
                 transObj.ease = Easing.CIRC_IN;
             else if (easeStyle == "easeoutcirc")
                 transObj.ease = Easing.CIRC_OUT;
-            else if (easeStyle == "easeoutback")
-                transObj.ease = Easing.BACK_OUT;
             else {
                 Debug.Log("UNKNOWN EASING STYLE: " + easeStyle);
             }
             transformList.Add(transObj);
         }
         return transformList;
+    }
+
+    // Save Project back to disk
+    public void ExportActiveProject()
+    {
+        // Notes Mapping File
+        string notesString = "[";
+        for (int i = 0; i < notes.Count; i += 1) {
+            notesString += "{";
+            notesString += "\"Id\":" + notes[i].id.ToString() + ",";
+            notesString += "\"Type\":\"";
+            if (notes[i].type == NoteData.NoteType.CLICK)
+                notesString += "click";
+            else if (notes[i].type == NoteData.NoteType.HOLD)
+                notesString += "hold";
+            else if (notes[i].type == NoteData.NoteType.SWIPE)
+                notesString += "swipe";
+            else if (notes[i].type == NoteData.NoteType.SLIDE)
+                notesString += "slide";
+            notesString += "\",\"Track\":" + notes[i].track.ToString() + ",";
+            notesString += "\"Time\":" + notes[i].time.ToString() + ",";
+            notesString += "\"Hold\":" + notes[i].hold.ToString() + ",";
+            notesString += "\"Dir\":" + notes[i].dir.ToString();
+            if (i == notes.Count - 1)
+                notesString += "}";
+            else
+                notesString += "},";
+        }
+        notesString += "]";
+        File.WriteAllText(notesFileName, notesString);
+
+        // Track Mapping File
+        string tracksString = "[";
+        for (int i = 0; i < tracks.Count; i += 1) {
+            tracksString += "{";
+            tracksString += "\"Id\":" + tracks[i].id.ToString() + ",";
+            tracksString += "\"EntranceOn\":" + (tracks[i].entranceOn ? "true" : "false") + ",";
+            tracksString += "\"PositionLock\":" + (tracks[i].positionLock ? "true" : "false") + ",";
+            tracksString += "\"X\":" + tracks[i].x.ToString() + ",";
+            tracksString += "\"Size\":" + tracks[i].size.ToString() + ",";
+            tracksString += "\"Start\":" + tracks[i].start.ToString() + ",";
+            tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
+            tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
+            tracksString += "\"Move\":[";
+            tracksString += TransformationsListToString(tracks[i].move, false);
+            tracksString += "],\"Scale\":[";
+            tracksString += TransformationsListToString(tracks[i].scale, false);
+            tracksString += "],\"ColorChange\":[";
+            tracksString += TransformationsListToString(tracks[i].colorChange, true);
+            if (i == tracks.Count - 1)
+                tracksString += "]}";
+            else
+                tracksString += "]},";
+        }
+        tracksString += "]";
+        File.WriteAllText(tracksFileName, tracksString);
+    }
+
+    private string TransformationsListToString(List<TrackTransformation> transformList, bool intValue)
+    {
+        string retStr = "";
+        for (int i = 0; i < transformList.Count; i += 1) {
+            retStr += "{";
+            if (intValue)
+                retStr += "\"To\":" + ((int)transformList[i].to).ToString() + ",";
+            else
+                retStr += "\"To\":" + transformList[i].to.ToString() + ",";
+            retStr += "\"Ease\":\"";
+            if (transformList[i].ease == Easing.LINEAR)
+                retStr += "easelinear";
+            else if (transformList[i].ease == Easing.EXP_IN)
+                retStr += "easeinexpo";
+            else if (transformList[i].ease == Easing.EXP_OUT)
+                retStr += "easeoutexpo";
+            else if (transformList[i].ease == Easing.QUAD_IN)
+                retStr += "easeinquad";
+            else if (transformList[i].ease == Easing.QUAD_OUT)
+                retStr += "easeoutquad";
+            else if (transformList[i].ease == Easing.QUAD_INOUT)
+                retStr += "easeinoutquad";
+            else if (transformList[i].ease == Easing.CIRC_IN)
+                retStr += "easeincirc";
+            else if (transformList[i].ease == Easing.CIRC_OUT)
+                retStr += "easeoutcirc";
+            else if (transformList[i].ease == Easing.BACK_IN)
+                retStr += "easeinback";
+            else if (transformList[i].ease == Easing.BACK_OUT)
+                retStr += "easeoutback";
+            retStr += "\",\"Start\":" + transformList[i].start.ToString() + ",";
+            retStr += "\",\"End\":" + transformList[i].end.ToString();
+            if (i == transformList.Count - 1)
+                retStr += "}";
+            else
+                retStr += "},";
+        }
+        return retStr;
     }
 
     public enum Easing {
@@ -167,6 +270,7 @@ public class ProjectData {
         QUAD_INOUT,
         CIRC_IN,
         CIRC_OUT,
+        BACK_IN,
         BACK_OUT
     };
 

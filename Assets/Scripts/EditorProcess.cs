@@ -17,7 +17,7 @@ public class EditorProcess : MainLoopProcess {
     public ProjectData project;
     public MusicPlayer musicPlayer;
 
-    public int currentFrame;
+    public float currentFrame;
     public float currentTime;
     public float songTime;
 
@@ -75,8 +75,8 @@ public class EditorProcess : MainLoopProcess {
         }
 
         if (musicPlayer.source.isPlaying)
-            currentFrame += 1;
-        currentTime = (float)currentFrame / (float)framesPerSecond;
+            currentFrame += 1 * musicPlayer.playbackSpeed;
+        currentTime = currentFrame / framesPerSecond;
         songTime = currentTime;
 
         // Spawn Tracks

@@ -7,8 +7,10 @@ public class Note : CosmeticSprite {
     public Track linkedTrack;
     public float noteProgress;
     public float holdProgress;
+    public bool hovered;
     public int ID;
     public static float NOTE_DURATION = 1.5f; // number of seconds to transition from top of track to bottom of track
+    public static float SELECTION_RADIUS = 85f;
     public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
     public List<HoldTick> holdTicks;
 
@@ -24,6 +26,27 @@ public class Note : CosmeticSprite {
                 HoldTick tick = new HoldTick(this, data.time + i);
                 holdTicks.Add(tick);
                 controller.AddObject(tick);
+            }
+        }
+    }
+
+    public bool MouseOver
+    {
+        get {
+            Vector3 mouse = Input.mousePosition;
+            if (data.type == ProjectData.NoteData.NoteType.HOLD) {
+                float pixelsPerSecond = (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
+                float holdPixels = pixelsPerSecond * data.hold;
+                float dx = Mathf.Abs(mouse.x - pos.x);
+                float dy = Mathf.Abs(mouse.y - pos.y);
+                float dx2 = Mathf.Abs(mouse.x - pos.x);
+                float dy2 = Mathf.Abs(mouse.y - (pos.y + holdPixels));
+                return (dx / SELECTION_RADIUS + dy / SELECTION_RADIUS) <= 0.5f || (dx2 / SELECTION_RADIUS + dy2 / SELECTION_RADIUS) <= 0.5f
+                    || (mouse.y > pos.y && mouse.y < pos.y + holdPixels && mouse.x > pos.x - SELECTION_RADIUS * 0.5f && mouse.x < pos.x + SELECTION_RADIUS * 0.5f);
+            } else {
+                float dx = Mathf.Abs(mouse.x - pos.x);
+                float dy = Mathf.Abs(mouse.y - pos.y);
+                return (dx / SELECTION_RADIUS + dy / SELECTION_RADIUS) <= 0.5f;
             }
         }
     }
@@ -52,6 +75,11 @@ public class Note : CosmeticSprite {
                 }
             }
             pos.x = tempNoteX;
+        }
+
+        if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
+            controller.project.DeleteNote(data.id);
+            controller.RefreshSpawns();
         }
 
         if (linkedTrack != null) {
@@ -135,6 +163,21 @@ public class Note : CosmeticSprite {
         } else {
             for (int i = 0; i < sLeaser.sprites.Length; i += 1)
                 sLeaser.sprites[i].isVisible = true;
+        }
+
+        if (controller.musicPlayer.paused && !hovered && MouseOver) {
+            for (int i = 0; i < sLeaser.sprites.Length; i += 1)
+                sLeaser.sprites[i].color = Color.red;
+            hovered = true;
+        }
+        else if (hovered && !MouseOver) {
+            for (int i = 0; i < sLeaser.sprites.Length; i += 1) {
+                if (i == 1)
+                    sLeaser.sprites[i].color = Color.black;
+                else
+                    sLeaser.sprites[i].color = Color.white;
+            }
+            hovered = false;
         }
 
         sLeaser.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, timeStacker);

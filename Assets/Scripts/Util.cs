@@ -31,6 +31,11 @@ public class Util {
         return (long)obj;
     }
 
+    public static bool ShiftDown()
+    {
+        return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+    }
+
     // Easing Functions
     public static float LerpLinearEase(float start, float end, float perc)
     {

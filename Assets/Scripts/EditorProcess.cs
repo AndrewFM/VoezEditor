@@ -21,6 +21,7 @@ public class EditorProcess : MainLoopProcess {
     public float currentFrame;
     public float currentTime;
     public float songTime;
+    public int tempNoteID = -1;
 
     public EditorProcess()
     {
@@ -86,16 +87,19 @@ public class EditorProcess : MainLoopProcess {
 
         if (musicPlayer.source.isPlaying)
             currentFrame += 1 * musicPlayer.playbackSpeed;
+
+        // Frame Advancing while Paused
         if (musicPlayer.hasStarted && musicPlayer.paused) {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            if (Input.GetKeyDown(KeyCode.RightArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 currentFrame = Mathf.Min(currentFrame + 4, musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 currentFrame = Mathf.Max(currentFrame - 4, 0);
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (Input.GetKeyDown(KeyCode.UpArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 currentFrame = Mathf.Min(currentFrame + 15, musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (Input.GetKeyDown(KeyCode.DownArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 currentFrame = Mathf.Max(currentFrame - 15, 0);
         }
+
         currentTime = currentFrame / framesPerSecond;
         songTime = currentTime;
         musicPlayer.SyncTracker(songTime);
@@ -111,6 +115,20 @@ public class EditorProcess : MainLoopProcess {
                 AddObject(new Note(this, project.notes[i]));
             }
         }
+    }
+
+    public void RefreshSpawns()
+    {
+        for (int i = 0; i < activeTracks.Count; i += 1)
+            activeTracks[i].slatedForDeletetion = true;
+        for (int i = 0; i < activeNotes.Count; i += 1)
+            activeNotes[i].slatedForDeletetion = true;
+    }
+
+    public int GetUniqueTempNoteID()
+    {
+        tempNoteID -= 1;
+        return tempNoteID;
     }
 
     public bool TrackSpawned(int id)

@@ -22,6 +22,21 @@ public class ProjectData {
         tracks = new List<TrackData>();
     }
 
+    public void DeleteNote(int ID)
+    {
+        for(int i=0; i<notes.Count; i+=1) {
+            if (notes[i].id == ID) {
+                notes.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
+    public void AddNote(NoteData data)
+    {
+        notes.Add(data);
+    }
+
     // Load Project from disk
     public void LoadFromActiveProject()
     {
@@ -169,10 +184,11 @@ public class ProjectData {
     public void ExportActiveProject()
     {
         // Notes Mapping File
+        notes.Sort((a, b) => (a.time.CompareTo(b.time)));
         string notesString = "[";
         for (int i = 0; i < notes.Count; i += 1) {
             notesString += "{";
-            notesString += "\"Id\":" + notes[i].id.ToString() + ",";
+            notesString += "\"Id\":" + i.ToString() + ",";
             notesString += "\"Type\":\"";
             if (notes[i].type == NoteData.NoteType.CLICK)
                 notesString += "click";

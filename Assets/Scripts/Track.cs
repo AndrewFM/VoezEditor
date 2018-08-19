@@ -17,6 +17,8 @@ public class Track : CosmeticSprite {
     public float lastSubScale;
     public int lastSubScaleInd = -1;
 
+    public float flashEffectTime;
+
     public Track(EditorProcess parent, ProjectData.TrackData data)
     {
         this.data = data;
@@ -51,6 +53,8 @@ public class Track : CosmeticSprite {
 
         if (trackProgress > 1f)
             slatedForDeletetion = true;
+        if (flashEffectTime > 0)
+            flashEffectTime -= 1;
     }
 
     public int Spr_BackGradient { get { return 0; } }
@@ -156,13 +160,20 @@ public class Track : CosmeticSprite {
 
         Vector2 lerpPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, timeStacker), Mathf.Lerp(lastPos.y, pos.y, timeStacker));
         sLeaser.sprites[Spr_BackGradient].x = lerpPos.x;
-        sLeaser.sprites[Spr_LeftGradLine].x = lerpPos.x - currentWidth * 0.45f;
-        sLeaser.sprites[Spr_RightGradLine].x = lerpPos.x + currentWidth * 0.45f;
+        sLeaser.sprites[Spr_LeftGradLine].x = lerpPos.x - currentWidth * 0.5f + 7f;
+        sLeaser.sprites[Spr_RightGradLine].x = lerpPos.x + currentWidth * 0.5f - 7f;
         sLeaser.sprites[Spr_MiddleGradLine].x = lerpPos.x;
         sLeaser.sprites[Spr_BottomGradFade].x = lerpPos.x;
         sLeaser.sprites[Spr_BottomDiamond].x = lerpPos.x;
         for (int i = 0; i < sLeaser.sprites.Length; i += 1)
             sLeaser.sprites[i].y = lerpPos.y;
+
+        if (flashEffectTime > 0) {
+            sLeaser.sprites[Spr_BottomDiamond].scale = 1.25f;
+        }
+        else {
+            sLeaser.sprites[Spr_BottomDiamond].scale = 0.5f;
+        }
 
         base.DrawSprites(sLeaser, timeStacker);
     }

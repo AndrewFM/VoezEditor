@@ -82,13 +82,11 @@ public class EditorProcess : MainLoopProcess {
                 AddObject(new Track(this, project.tracks[i]));
 
         // Spawn Notes
-        /*
         for (int i = 0; i < project.notes.Count; i += 1) {
             if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime < project.notes[i].time && !NoteSpawned(project.notes[i].id)) {
                 AddObject(new Note(this, project.notes[i]));
             }
         }
-        */
     }
 
     public bool TrackSpawned(int id)

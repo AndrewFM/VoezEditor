@@ -8,6 +8,7 @@ public class Note : CosmeticSprite {
     public float noteProgress;
     public int ID;
     public static float NOTE_DURATION = 1.5f; // number of seconds to transition from top of track to bottom of track
+    public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
 
     public Note(EditorProcess parent, ProjectData.NoteData data)
     {
@@ -20,7 +21,9 @@ public class Note : CosmeticSprite {
     public override void Update(bool eu)
     {
         base.Update(eu);
-        noteProgress = (controller.songTime - data.time - NOTE_DURATION) / (data.time - (data.time - NOTE_DURATION));
+        float spawnTime = data.time - NOTE_DURATION;
+        float hitTime = data.time;
+        noteProgress = (controller.songTime - spawnTime) / (hitTime - spawnTime);
 
         if (linkedTrack == null) {
             for (int i = 0; i < controller.activeTracks.Count; i += 1) {
@@ -29,12 +32,24 @@ public class Note : CosmeticSprite {
                     break;
                 }
             }
-            pos.x = -1000f; // keep offscreen until track is available
+            if (linkedTrack == null && tempNoteX < 0) {
+                for(int i=0; i<controller.project.tracks.Count; i+=1) {
+                    if (controller.project.tracks[i].id == data.track) {
+                        tempNoteX = Util.ScreenPosX(controller.project.tracks[i].x);
+                        break;
+                    }
+                }
+            }
+            pos.x = tempNoteX;
         }
 
         if (linkedTrack != null) {
             pos.x = linkedTrack.pos.x;
             pos.y = MainScript.windowRes.y - (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
+            if (noteProgress > 1f) {
+                slatedForDeletetion = true;
+                linkedTrack.flashEffectTime = 5;
+            }
             if (linkedTrack.slatedForDeletetion)
                 linkedTrack = null;
         }
@@ -52,7 +67,10 @@ public class Note : CosmeticSprite {
         } else {
             sLeaser.sprites[0] = new FSprite("click");
         }
-        sLeaser.sprites[0].rotation = 45f;
+        if (data.dir == 0)
+            sLeaser.sprites[0].rotation = 180f + 45f;
+        else
+            sLeaser.sprites[0].rotation = 45f;
     }
 
     public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)

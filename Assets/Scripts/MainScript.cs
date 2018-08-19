@@ -4,7 +4,7 @@ using System.Collections;
 public class MainScript : MonoBehaviour {
 
     public MainLoopProcess activeProcess;
-    public static Vector2 windowRes = new Vector2(1366f, 768f);
+    public static Vector2 windowRes = new Vector2(1280f, 720f);
 
 	// Use this for initialization
 	void Start() {

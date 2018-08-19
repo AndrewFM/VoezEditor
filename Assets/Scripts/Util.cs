@@ -11,7 +11,7 @@ public class Util {
     // X position in pixels of screen element given positioning factor from 0.0 - 1.0
     public static int ScreenPosX(float xFactor)
     {
-        int margin = 100;
+        int margin = 120;
         return (int)(margin + ((MainScript.windowRes.x - margin * 2) * xFactor));
     }
 

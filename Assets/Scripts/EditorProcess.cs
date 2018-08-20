@@ -15,6 +15,7 @@ public class EditorProcess : MainLoopProcess {
     public FContainer ticksContainer;
     public FContainer foregroundContainer;
     public ProjectData project;
+    public NoteEditor noteEditor;
     public MusicPlayer musicPlayer;
     public EditorUI ui;
     public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
@@ -49,6 +50,16 @@ public class EditorProcess : MainLoopProcess {
         ui = new EditorUI(this);
         InitiateSong();
         musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
+    }
+
+    public bool EditMode
+    {
+        get { return musicPlayer.hasStarted && musicPlayer.paused; }
+    }
+
+    public bool MenuOpen
+    {
+        get { return noteEditor != null; }
     }
 
     public void InitiateSong()
@@ -90,15 +101,15 @@ public class EditorProcess : MainLoopProcess {
             currentFrame += 1 * musicPlayer.playbackSpeed;
 
         // Frame Advancing while Paused
-        if (musicPlayer.hasStarted && musicPlayer.paused) {
+        if (EditMode && !MenuOpen) {
             if (Input.GetKeyDown(KeyCode.RightArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 currentFrame = Mathf.Min(currentFrame + 4, musicPlayer.source.clip.length * framesPerSecond);
             if (Input.GetKeyDown(KeyCode.LeftArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 currentFrame = Mathf.Max(currentFrame - 4, 0);
             if (Input.GetKeyDown(KeyCode.UpArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-                currentFrame = Mathf.Min(currentFrame + 15, musicPlayer.source.clip.length * framesPerSecond);
+                currentFrame = Mathf.Min(currentFrame + 16, musicPlayer.source.clip.length * framesPerSecond);
             if (Input.GetKeyDown(KeyCode.DownArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-                currentFrame = Mathf.Max(currentFrame - 15, 0);
+                currentFrame = Mathf.Max(currentFrame - 16, 0);
         }
 
         currentTime = currentFrame / framesPerSecond;
@@ -120,7 +131,7 @@ public class EditorProcess : MainLoopProcess {
         // Find track mouse is hovering over (or track closest to mouse if hovering over multiple)
         for (int i = 0; i < activeTracks.Count; i += 1)
             activeTracks[i].activeHover = false;
-        if (musicPlayer.hasStarted && musicPlayer.paused) {
+        if (EditMode && !MenuOpen) {
             float nearestDist = int.MaxValue;
             Track nearestTrack = null;
             for (int i = 0; i < activeTracks.Count; i += 1) {
@@ -141,18 +152,32 @@ public class EditorProcess : MainLoopProcess {
                     newNote.track = nearestTrack.ID;
                     newNote.type = selectedNoteType;
                     project.notes.Add(newNote);
-                    RefreshSpawns();
+                    RefreshAllNotes();
                 }
             }
         }
     }
 
-    public void RefreshSpawns()
+    public void RefreshAllTracks()
     {
         for (int i = 0; i < activeTracks.Count; i += 1)
             activeTracks[i].slatedForDeletetion = true;
+    }
+
+    public void RefreshAllNotes()
+    {
         for (int i = 0; i < activeNotes.Count; i += 1)
             activeNotes[i].slatedForDeletetion = true;
+    }
+
+    public void RefreshNote(int id)
+    {
+        for (int i = 0; i < activeNotes.Count; i += 1) {
+            if (activeNotes[i].ID == id) {
+                activeNotes[i].slatedForDeletetion = true;
+                break;
+            }
+        }
     }
 
     public bool HoveringOverAnyNote()

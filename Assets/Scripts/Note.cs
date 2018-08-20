@@ -77,9 +77,22 @@ public class Note : CosmeticSprite {
             pos.x = tempNoteX;
         }
 
-        if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
-            controller.project.DeleteNote(data.id);
-            controller.RefreshSpawns();
+        if (controller.EditMode && !controller.MenuOpen) {
+            // Delete Note
+            if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
+                controller.project.DeleteNote(data.id);
+                controller.RefreshAllNotes();
+            }
+            // Edit Note
+            if (MouseOver && Input.GetMouseButtonDown(0)) {
+                float noteEditWindowX = 0f;
+                if (pos.x > MainScript.windowRes.x * 0.5f)
+                    noteEditWindowX = pos.x - NoteEditor.WIDTH * 0.5f - 64f;
+                else
+                    noteEditWindowX = pos.x + NoteEditor.WIDTH * 0.5f + 64f;
+                controller.noteEditor = new NoteEditor(controller, new Vector2(noteEditWindowX, MainScript.windowRes.y * 0.5f), data);
+                controller.AddObject(controller.noteEditor);
+            }
         }
 
         if (linkedTrack != null) {
@@ -165,12 +178,13 @@ public class Note : CosmeticSprite {
                 sLeaser.sprites[i].isVisible = true;
         }
 
-        if (controller.musicPlayer.paused && !hovered && MouseOver) {
+        bool highlightCondition = (MouseOver && !controller.MenuOpen) || (controller.noteEditor != null && controller.noteEditor.data.id == ID);
+        if (controller.EditMode && !hovered && highlightCondition) {
             for (int i = 0; i < sLeaser.sprites.Length; i += 1)
                 sLeaser.sprites[i].color = Color.red;
             hovered = true;
         }
-        else if (hovered && !MouseOver) {
+        else if (hovered && !highlightCondition) {
             for (int i = 0; i < sLeaser.sprites.Length; i += 1) {
                 if (i == 1)
                     sLeaser.sprites[i].color = Color.black;
@@ -183,7 +197,7 @@ public class Note : CosmeticSprite {
         sLeaser.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, timeStacker);
         sLeaser.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, timeStacker);
 
-        if (data.type == ProjectData.NoteData.NoteType.HOLD) {
+        if (data.type == ProjectData.NoteData.NoteType.HOLD && sLeaser.sprites.Length > 2) {
             float pixelsPerSecond = (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
             float holdPixels = pixelsPerSecond * data.hold;
             sLeaser.sprites[2].y = sLeaser.sprites[0].y + holdPixels;

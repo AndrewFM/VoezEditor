@@ -72,6 +72,17 @@ public class EditorUI {
         this.parent.AddObject(playbackTimeLabel);
     }
 
+    public bool HoveringOverSubmenuItem()
+    {
+        for (int i = 0; i < noteTypes.Length; i += 1)
+            if (noteTypes[i].visible && noteTypes[i].MouseOver)
+                return true;
+        for (int i = 0; i < playbackTimes.Length; i += 1)
+            if (playbackTimes[i].visible && playbackTimes[i].MouseOver)
+                return true;
+        return false;
+    }
+
     public void Update()
     {
         // Handle Playback Slider Dragged
@@ -173,6 +184,12 @@ public class EditorUI {
                     noteTypes[j].toggled = false;
                 noteTypes[i].toggled = true;
                 noteTypes[i].clicked = false;
+                if (i == 0)
+                    parent.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
+                else if (i == 1)
+                    parent.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
+                else if (i == 2)
+                    parent.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
             }
         }
     }

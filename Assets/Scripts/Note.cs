@@ -237,6 +237,10 @@ public class Note : CosmeticSprite {
 
             sLeaser.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, timeStacker);
             sLeaser.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, timeStacker);
+            if (parentNote.hovered)
+                sLeaser.sprites[0].color = Color.red;
+            else
+                sLeaser.sprites[0].color = Color.white;
 
             base.DrawSprites(sLeaser, timeStacker);
         }

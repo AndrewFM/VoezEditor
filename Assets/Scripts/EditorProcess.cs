@@ -17,6 +17,7 @@ public class EditorProcess : MainLoopProcess {
     public ProjectData project;
     public MusicPlayer musicPlayer;
     public EditorUI ui;
+    public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
 
     public float currentFrame;
     public float currentTime;
@@ -106,13 +107,42 @@ public class EditorProcess : MainLoopProcess {
 
         // Spawn Tracks
         for (int i = 0; i < project.tracks.Count; i += 1)
-            if (songTime >= project.tracks[i].start && songTime < project.tracks[i].end && !TrackSpawned(project.tracks[i].id))
+            if (songTime >= project.tracks[i].start && songTime <= project.tracks[i].end && !TrackSpawned(project.tracks[i].id))
                 AddObject(new Track(this, project.tracks[i]));
 
         // Spawn Notes
         for (int i = 0; i < project.notes.Count; i += 1) {
-            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime < project.notes[i].time + project.notes[i].hold && !NoteSpawned(project.notes[i].id)) {
+            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime <= project.notes[i].time + project.notes[i].hold && !NoteSpawned(project.notes[i].id)) {
                 AddObject(new Note(this, project.notes[i]));
+            }
+        }
+
+        // Find track mouse is hovering over (or track closest to mouse if hovering over multiple)
+        for (int i = 0; i < activeTracks.Count; i += 1)
+            activeTracks[i].activeHover = false;
+        if (musicPlayer.hasStarted && musicPlayer.paused) {
+            float nearestDist = int.MaxValue;
+            Track nearestTrack = null;
+            for (int i = 0; i < activeTracks.Count; i += 1) {
+                float dist = Mathf.Abs(Input.mousePosition.x - activeTracks[i].pos.x);
+                if (activeTracks[i].MouseOver && dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestTrack = activeTracks[i];
+                }
+            }
+            if (nearestTrack != null) {
+                nearestTrack.activeHover = true;
+
+                // Add New Note to Hovered Track
+                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !TrackOccupiedAtTime(nearestTrack.ID, songTime)) {
+                    ProjectData.NoteData newNote = new ProjectData.NoteData();
+                    newNote.id = GetUniqueTempNoteID();
+                    newNote.time = songTime;
+                    newNote.track = nearestTrack.ID;
+                    newNote.type = selectedNoteType;
+                    project.notes.Add(newNote);
+                    RefreshSpawns();
+                }
             }
         }
     }
@@ -123,6 +153,28 @@ public class EditorProcess : MainLoopProcess {
             activeTracks[i].slatedForDeletetion = true;
         for (int i = 0; i < activeNotes.Count; i += 1)
             activeNotes[i].slatedForDeletetion = true;
+    }
+
+    public bool HoveringOverAnyNote()
+    {
+        for (int i = 0; i < activeNotes.Count; i += 1)
+            if (activeNotes[i].hovered)
+                return true;
+        return false;
+    }
+
+    public bool TrackOccupiedAtTime(int trackID, float time)
+    {
+        float timePadding = 1f / framesPerSecond;
+        for(int i=0; i<project.notes.Count; i+=1) {
+            if (project.notes[i].track == trackID) {
+                if (project.notes[i].type == ProjectData.NoteData.NoteType.HOLD && time >= project.notes[i].time - timePadding && time <= project.notes[i].time + project.notes[i].hold + timePadding)
+                    return true;
+                if (project.notes[i].type != ProjectData.NoteData.NoteType.HOLD && time >= project.notes[i].time - timePadding && time <= project.notes[i].time + timePadding)
+                    return true;
+            }
+        }
+        return false;
     }
 
     public int GetUniqueTempNoteID()

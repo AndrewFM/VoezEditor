@@ -8,13 +8,8 @@ public class Track : CosmeticSprite {
     public static float TRACK_SCREEN_HEIGHT = 0.85f;
     public static float TRACK_SCREEN_WIDTH = 0.12f; // at size = 1.0f
     public int ID;
-
+    public bool activeHover;
     public float currentWidth;
-    public int lastSubColor;
-    public int lastSubColorInd = -1;
-    public float lastSubScale;
-    public int lastSubScaleInd = -1;
-
     public float flashEffectTime;
 
     public Track(EditorProcess parent, ProjectData.TrackData data)
@@ -22,6 +17,14 @@ public class Track : CosmeticSprite {
         this.data = data;
         controller = parent;
         ID = data.id; 
+    }
+
+    public bool MouseOver
+    {
+        get {
+            Vector3 mouse = Input.mousePosition;
+            return mouse.x >= pos.x - currentWidth * 0.5f && mouse.x <= pos.x + currentWidth * 0.5f && mouse.y > MainScript.windowRes.y * (1f - TRACK_SCREEN_HEIGHT);
+        }
     }
 
     public override void Update(bool eu)
@@ -122,33 +125,35 @@ public class Track : CosmeticSprite {
         }
 
         // Color Tweening
+        int lastSubColor = data.color;
+        bool appliedColor = false;
         for (int i = 0; i < data.colorChange.Count; i += 1) {
             if (controller.songTime >= data.colorChange[i].start && controller.songTime < data.colorChange[i].end) {
-                if (i != lastSubColorInd) {
-                    if (i == 0)
-                        lastSubColor = data.color;
-                    else
-                        lastSubColor = (int)data.colorChange[i - 1].to;
-                    lastSubColorInd = i;
-                }
+                if (i == 0)
+                    lastSubColor = data.color;
+                else
+                    lastSubColor = (int)data.colorChange[i - 1].to;
                 float subColorProgress = (controller.songTime - data.colorChange[i].start) / (data.colorChange[i].end - data.colorChange[i].start);
                 sLeaser.sprites[Spr_BackGradient].color = Color.Lerp(ProjectData.colors[lastSubColor], ProjectData.colors[(int)data.colorChange[i].to], data.colorChange[i].GetEaseFunction()(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
+                appliedColor = true;
             } else if ((i < data.colorChange.Count - 1 && controller.songTime >= data.colorChange[i].end && controller.songTime < data.colorChange[i + 1].start)
-                   || ((i == data.colorChange.Count - 1 && controller.songTime >= data.colorChange[i].end && controller.songTime < data.end)))
+                   || ((i == data.colorChange.Count - 1 && controller.songTime >= data.colorChange[i].end && controller.songTime < data.end))) {
                 sLeaser.sprites[Spr_BackGradient].color = ProjectData.colors[(int)data.colorChange[i].to];
+                appliedColor = true;
+            }
         }
+        if (!appliedColor)
+            sLeaser.sprites[Spr_BackGradient].color = ProjectData.colors[lastSubColor];
 
         // Scale Tweening
         currentWidth = MainScript.windowRes.x * TRACK_SCREEN_WIDTH * data.size;
+        float lastSubScale = data.size;
         for (int i = 0; i < data.scale.Count; i += 1) {
             if (controller.songTime >= data.scale[i].start && controller.songTime < data.scale[i].end) {
-                if (i != lastSubScaleInd) {
-                    if (i == 0)
-                        lastSubScale = data.size;
-                    else
-                        lastSubScale = (int)data.scale[i - 1].to;
-                    lastSubScaleInd = i;
-                }
+                if (i == 0)
+                    lastSubScale = data.size;
+                else
+                    lastSubScale = (int)data.scale[i - 1].to;
                 float subScaleProgress = (controller.songTime - data.scale[i].start) / (data.scale[i].end - data.scale[i].start);
                 currentWidth = MainScript.windowRes.x * TRACK_SCREEN_WIDTH;
                 currentWidth *= data.scale[i].GetEaseFunction()(lastSubScale, data.scale[i].to, Mathf.Clamp(subScaleProgress, 0, 1));
@@ -174,6 +179,16 @@ public class Track : CosmeticSprite {
         }
         else {
             sLeaser.sprites[Spr_BottomDiamond].scale = 0.5f;
+        }
+
+        if (activeHover) {
+            sLeaser.sprites[Spr_MiddleGradLine].color = Color.red;
+            sLeaser.sprites[Spr_BottomDiamond].color = Color.red;
+            sLeaser.sprites[Spr_BackGradient].alpha = 1f;
+        } else {
+            sLeaser.sprites[Spr_MiddleGradLine].color = Color.black;
+            sLeaser.sprites[Spr_BottomDiamond].color = Color.black;
+            sLeaser.sprites[Spr_BackGradient].alpha = 0.9f;
         }
 
         base.DrawSprites(sLeaser, timeStacker);

@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SpriteLeaser {
-    public SpriteLeaser(IDrawable obj)
+public class SpriteGroup {
+    public SpriteGroup(IDrawable obj)
     {
         this.drawableObject = obj;
         this.drawableObject.InitiateSprites(this);
     }
 
-    public void Update(float timeStacker)
+    public void Update(float frameProgress)
     {
-        drawableObject.DrawSprites(this, timeStacker);
+        drawableObject.DrawSprites(this, frameProgress);
     }
 
     public void CleanSpritesAndRemove()

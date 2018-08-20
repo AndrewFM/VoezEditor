@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BackgroundImage : CosmeticSprite {
+public class BackgroundImage : DrawableObject {
     //public FShader blurShader;
 
     public BackgroundImage(Texture2D image)
@@ -12,14 +12,14 @@ public class BackgroundImage : CosmeticSprite {
         //blurShader = FShader.CreateShader("GaussianBlur", Shader.Find("Futile/GaussianBlur"));
     }
 
-    public override void InitiateSprites(SpriteLeaser sLeaser)
+    public override void InitiateSprites(SpriteGroup sGroup)
     {
-        sLeaser.sprites = new FSprite[1];
-        sLeaser.sprites[0] = new FSprite("background");
-        sLeaser.sprites[0].anchorX = 0f;
-        sLeaser.sprites[0].anchorY = 0f;
-        sLeaser.sprites[0].scaleX = MainScript.windowRes.x / sLeaser.sprites[0].width;
-        sLeaser.sprites[0].scaleY = MainScript.windowRes.y / sLeaser.sprites[0].height;
-        //sLeaser.sprites[0].shader = blurShader;
+        sGroup.sprites = new FSprite[1];
+        sGroup.sprites[0] = new FSprite("background");
+        sGroup.sprites[0].anchorX = 0f;
+        sGroup.sprites[0].anchorY = 0f;
+        sGroup.sprites[0].scaleX = VoezEditor.windowRes.x / sGroup.sprites[0].width;
+        sGroup.sprites[0].scaleY = VoezEditor.windowRes.y / sGroup.sprites[0].height;
+        //sGroup.sprites[0].shader = blurShader;
     }
 }

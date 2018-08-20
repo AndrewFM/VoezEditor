@@ -3,9 +3,9 @@ using System.Collections;
 using System.IO;
 using System;
 
-public class MainScript : MonoBehaviour {
+public class VoezEditor : MonoBehaviour {
 
-    public MainLoopProcess activeProcess;
+    public static MainLoopProcess activeProcess;
     public static Vector2 windowRes = new Vector2(1280f, 720f);
 
     // Use this for initialization
@@ -29,6 +29,10 @@ public class MainScript : MonoBehaviour {
     void Update()
     {
         activeProcess.RawUpdate(Time.deltaTime);
+    }
+
+    public static EditorProcess Editor {
+        get { return (activeProcess != null && activeProcess is EditorProcess) ? (activeProcess as EditorProcess) : null;  }
     }
 
     private void Awake()

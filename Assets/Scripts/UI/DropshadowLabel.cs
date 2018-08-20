@@ -25,17 +25,17 @@ public class DropshadowLabel : UIElement {
         shadowText.text = text;
     }
 
-    public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+    public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, timeStacker), Mathf.Lerp(this.lastPos.y, this.pos.y, timeStacker));
+        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, frameProgress), Mathf.Lerp(this.lastPos.y, this.pos.y, frameProgress));
         normalText.x = drawPos.x;
         normalText.y = drawPos.y;
         shadowText.x = drawPos.x + offset.x;
         shadowText.y = drawPos.y + offset.y;
-        base.DrawSprites(sLeaser, timeStacker);
+        base.DrawSprites(sGroup, frameProgress);
     }
 
-    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContainer)
+    public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
     {
         newContainer.AddChild(shadowText);
         newContainer.AddChild(normalText);

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 public interface IDrawable {
-    void InitiateSprites(SpriteLeaser sLeaser);
-    void DrawSprites(SpriteLeaser sLeaser, float timeStacker);
-    void AddToContainer(SpriteLeaser sLeaser, FContainer newContatiner);
+    void InitiateSprites(SpriteGroup sGroup);
+    void DrawSprites(SpriteGroup sGroup, float frameProgress);
+    void AddToContainer(SpriteGroup sGroup, FContainer newContatiner);
 }

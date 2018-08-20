@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Note : CosmeticSprite {
+public class Note : DrawableObject {
     public ProjectData.NoteData data;
-    public EditorProcess controller;
     public Track linkedTrack;
     public float noteProgress;
     public float holdProgress;
@@ -14,10 +13,9 @@ public class Note : CosmeticSprite {
     public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
     public List<HoldTick> holdTicks;
 
-    public Note(EditorProcess parent, ProjectData.NoteData data)
+    public Note(ProjectData.NoteData data)
     {
         this.data = data;
-        controller = parent;
         linkedTrack = null;
         ID = this.data.id;
         if (data.type == ProjectData.NoteData.NoteType.HOLD) {
@@ -25,7 +23,7 @@ public class Note : CosmeticSprite {
             for(float i=0.1f; i<=data.hold; i+=0.1f) {
                 HoldTick tick = new HoldTick(this, data.time + i);
                 holdTicks.Add(tick);
-                controller.AddObject(tick);
+                VoezEditor.Editor.AddObject(tick);
             }
         }
     }
@@ -35,7 +33,7 @@ public class Note : CosmeticSprite {
         get {
             Vector3 mouse = Input.mousePosition;
             if (data.type == ProjectData.NoteData.NoteType.HOLD) {
-                float pixelsPerSecond = (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
+                float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
                 float holdPixels = pixelsPerSecond * data.hold;
                 float dx = Mathf.Abs(mouse.x - pos.x);
                 float dy = Mathf.Abs(mouse.y - pos.y);
@@ -51,25 +49,25 @@ public class Note : CosmeticSprite {
         }
     }
 
-    public override void Update(bool eu)
+    public override void Update()
     {
-        base.Update(eu);
+        base.Update();
         float spawnTime = data.time - NOTE_DURATION;
         float hitTime = data.time;
-        noteProgress = (controller.songTime - spawnTime) / (hitTime - spawnTime);
-        holdProgress = (controller.songTime - spawnTime) / ((hitTime+data.hold) - spawnTime);
+        noteProgress = (VoezEditor.Editor.songTime - spawnTime) / (hitTime - spawnTime);
+        holdProgress = (VoezEditor.Editor.songTime - spawnTime) / ((hitTime+data.hold) - spawnTime);
 
         if (linkedTrack == null) {
-            for (int i = 0; i < controller.activeTracks.Count; i += 1) {
-                if (controller.activeTracks[i].ID == data.track) {
-                    linkedTrack = controller.activeTracks[i];
+            for (int i = 0; i < VoezEditor.Editor.activeTracks.Count; i += 1) {
+                if (VoezEditor.Editor.activeTracks[i].ID == data.track) {
+                    linkedTrack = VoezEditor.Editor.activeTracks[i];
                     break;
                 }
             }
             if (linkedTrack == null && tempNoteX < 0) {
-                for(int i=0; i<controller.project.tracks.Count; i+=1) {
-                    if (controller.project.tracks[i].id == data.track) {
-                        tempNoteX = Util.ScreenPosX(controller.project.tracks[i].x);
+                for(int i=0; i< VoezEditor.Editor.project.tracks.Count; i+=1) {
+                    if (VoezEditor.Editor.project.tracks[i].id == data.track) {
+                        tempNoteX = Util.ScreenPosX(VoezEditor.Editor.project.tracks[i].x);
                         break;
                     }
                 }
@@ -77,34 +75,34 @@ public class Note : CosmeticSprite {
             pos.x = tempNoteX;
         }
 
-        if (controller.EditMode && !controller.MenuOpen) {
+        if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen) {
             // Delete Note
             if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
-                controller.project.DeleteNote(data.id);
-                controller.RefreshAllNotes();
+                VoezEditor.Editor.project.DeleteNote(data.id);
+                VoezEditor.Editor.RefreshAllNotes();
             }
             // Edit Note
             if (MouseOver && Input.GetMouseButtonDown(0)) {
                 float noteEditWindowX = 0f;
-                if (pos.x > MainScript.windowRes.x * 0.5f)
+                if (pos.x > VoezEditor.windowRes.x * 0.5f)
                     noteEditWindowX = pos.x - NoteEditor.WIDTH * 0.5f - 64f;
                 else
                     noteEditWindowX = pos.x + NoteEditor.WIDTH * 0.5f + 64f;
-                controller.noteEditor = new NoteEditor(controller, new Vector2(noteEditWindowX, MainScript.windowRes.y * 0.5f), data);
-                controller.AddObject(controller.noteEditor);
+                VoezEditor.Editor.noteEditor = new NoteEditor(new Vector2(noteEditWindowX, VoezEditor.windowRes.y * 0.5f), data);
+                VoezEditor.Editor.AddObject(VoezEditor.Editor.noteEditor);
             }
         }
 
         if (linkedTrack != null) {
             pos.x = linkedTrack.pos.x;
-            pos.y = MainScript.windowRes.y - (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
+            pos.y = VoezEditor.windowRes.y - (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
             if (noteProgress < 0f)
-                slatedForDeletetion = true;
+                readyForDeletion = true;
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
-                slatedForDeletetion = true;
+                readyForDeletion = true;
                 linkedTrack.flashEffectTime = 5;
             }
-            if (linkedTrack.slatedForDeletetion)
+            if (linkedTrack.readyForDeletion)
                 linkedTrack = null;
 
             // For hold tracks, determine whether hold ticks should be displayed or not
@@ -118,7 +116,7 @@ public class Note : CosmeticSprite {
                 }
                 if (holdTicksAllSame) {
                     for(int i=0; i<holdTicks.Count; i+=1) {
-                        holdTicks[i].slatedForDeletetion = true;
+                        holdTicks[i].readyForDeletion = true;
                     }
                     holdTicks = null;
                 }
@@ -126,91 +124,91 @@ public class Note : CosmeticSprite {
         }
     }
 
-    public override void InitiateSprites(SpriteLeaser sLeaser)
+    public override void InitiateSprites(SpriteGroup sGroup)
     {
         if (data.type == ProjectData.NoteData.NoteType.HOLD)
-            sLeaser.sprites = new FSprite[3];
+            sGroup.sprites = new FSprite[3];
         else
-            sLeaser.sprites = new FSprite[1];
+            sGroup.sprites = new FSprite[1];
 
         if (data.type == ProjectData.NoteData.NoteType.CLICK) {
-            sLeaser.sprites[0] = new FSprite("click");
+            sGroup.sprites[0] = new FSprite("click");
         } else if (data.type == ProjectData.NoteData.NoteType.SLIDE) {
-            sLeaser.sprites[0] = new FSprite("slide");
+            sGroup.sprites[0] = new FSprite("slide");
         } else if (data.type == ProjectData.NoteData.NoteType.SWIPE) {
-            sLeaser.sprites[0] = new FSprite("swipe");
+            sGroup.sprites[0] = new FSprite("swipe");
         } else if (data.type == ProjectData.NoteData.NoteType.HOLD) {
-            sLeaser.sprites[0] = new FSprite("click");
-            sLeaser.sprites[1] = new FSprite("Futile_White");
-            sLeaser.sprites[1].color = Color.black;
-            sLeaser.sprites[1].scaleX = Mathf.Sqrt(Mathf.Pow(sLeaser.sprites[0].width,2)*2f) / sLeaser.sprites[1].width;
-            sLeaser.sprites[1].anchorY = 0f;
-            sLeaser.sprites[2] = new FSprite("click");
-            sLeaser.sprites[2].rotation = 45f;
+            sGroup.sprites[0] = new FSprite("click");
+            sGroup.sprites[1] = new FSprite("Futile_White");
+            sGroup.sprites[1].color = Color.black;
+            sGroup.sprites[1].scaleX = Mathf.Sqrt(Mathf.Pow(sGroup.sprites[0].width,2)*2f) / sGroup.sprites[1].width;
+            sGroup.sprites[1].anchorY = 0f;
+            sGroup.sprites[2] = new FSprite("click");
+            sGroup.sprites[2].rotation = 45f;
         }
 
         if (data.dir == 0)
-            sLeaser.sprites[0].rotation = 180f + 45f;
+            sGroup.sprites[0].rotation = 180f + 45f;
         else
-            sLeaser.sprites[0].rotation = 45f;
+            sGroup.sprites[0].rotation = 45f;
     }
 
-    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContainer)
+    public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
     {
-        foreach (FSprite fsprite in sLeaser.sprites)
+        foreach (FSprite fsprite in sGroup.sprites)
             fsprite.RemoveFromContainer();
         if (data.type == ProjectData.NoteData.NoteType.HOLD) {
-            newContainer.AddChild(sLeaser.sprites[1]);
-            newContainer.AddChild(sLeaser.sprites[0]);
-            newContainer.AddChild(sLeaser.sprites[2]);
+            newContainer.AddChild(sGroup.sprites[1]);
+            newContainer.AddChild(sGroup.sprites[0]);
+            newContainer.AddChild(sGroup.sprites[2]);
         }
         else
-            newContainer.AddChild(sLeaser.sprites[0]);
+            newContainer.AddChild(sGroup.sprites[0]);
     }
 
-    public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+    public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
         if (lastPos == Vector2.zero || pos == Vector2.zero) {
-            for (int i = 0; i < sLeaser.sprites.Length; i += 1)
-                sLeaser.sprites[i].isVisible = false;
+            for (int i = 0; i < sGroup.sprites.Length; i += 1)
+                sGroup.sprites[i].isVisible = false;
         } else {
-            for (int i = 0; i < sLeaser.sprites.Length; i += 1)
-                sLeaser.sprites[i].isVisible = true;
+            for (int i = 0; i < sGroup.sprites.Length; i += 1)
+                sGroup.sprites[i].isVisible = true;
         }
 
-        bool highlightCondition = (MouseOver && !controller.MenuOpen) || (controller.noteEditor != null && controller.noteEditor.data.id == ID);
-        if (controller.EditMode && !hovered && highlightCondition) {
-            for (int i = 0; i < sLeaser.sprites.Length; i += 1)
-                sLeaser.sprites[i].color = Color.red;
+        bool highlightCondition = (MouseOver && !VoezEditor.Editor.MenuOpen) || (VoezEditor.Editor.noteEditor != null && VoezEditor.Editor.noteEditor.data.id == ID);
+        if (VoezEditor.Editor.EditMode && !hovered && highlightCondition) {
+            for (int i = 0; i < sGroup.sprites.Length; i += 1)
+                sGroup.sprites[i].color = Color.red;
             hovered = true;
         }
         else if (hovered && !highlightCondition) {
-            for (int i = 0; i < sLeaser.sprites.Length; i += 1) {
+            for (int i = 0; i < sGroup.sprites.Length; i += 1) {
                 if (i == 1)
-                    sLeaser.sprites[i].color = Color.black;
+                    sGroup.sprites[i].color = Color.black;
                 else
-                    sLeaser.sprites[i].color = Color.white;
+                    sGroup.sprites[i].color = Color.white;
             }
             hovered = false;
         }
 
-        sLeaser.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, timeStacker);
-        sLeaser.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, timeStacker);
+        sGroup.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, frameProgress);
+        sGroup.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, frameProgress);
 
-        if (data.type == ProjectData.NoteData.NoteType.HOLD && sLeaser.sprites.Length > 2) {
-            float pixelsPerSecond = (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
+        if (data.type == ProjectData.NoteData.NoteType.HOLD && sGroup.sprites.Length > 2) {
+            float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
             float holdPixels = pixelsPerSecond * data.hold;
-            sLeaser.sprites[2].y = sLeaser.sprites[0].y + holdPixels;
-            sLeaser.sprites[2].x = sLeaser.sprites[0].x;
-            sLeaser.sprites[1].y = sLeaser.sprites[0].y;
-            sLeaser.sprites[1].x = sLeaser.sprites[0].x;
-            sLeaser.sprites[1].scaleY = (holdPixels) / sLeaser.sprites[1].element.sourceRect.height;
+            sGroup.sprites[2].y = sGroup.sprites[0].y + holdPixels;
+            sGroup.sprites[2].x = sGroup.sprites[0].x;
+            sGroup.sprites[1].y = sGroup.sprites[0].y;
+            sGroup.sprites[1].x = sGroup.sprites[0].x;
+            sGroup.sprites[1].scaleY = (holdPixels) / sGroup.sprites[1].element.sourceRect.height;
         }
 
-        base.DrawSprites(sLeaser, timeStacker);
+        base.DrawSprites(sGroup, frameProgress);
     }
 
-    public class HoldTick : CosmeticSprite
+    public class HoldTick : DrawableObject
     {
         public float time;
         public Note parentNote;
@@ -222,41 +220,41 @@ public class Note : CosmeticSprite {
             this.parentNote = parentNote;
         }
 
-        public override void Update(bool eu)
+        public override void Update()
         {
-            float pixelsPerSecond = (MainScript.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
+            float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
             if (desiredX < 0 && parentNote.linkedTrack != null)
                 desiredX = Util.ScreenPosX(parentNote.linkedTrack.GetXAtTime(time));
             pos.x = desiredX;
             pos.y = parentNote.pos.y + pixelsPerSecond * (time - parentNote.data.time);
 
-            if (parentNote.slatedForDeletetion)
-                slatedForDeletetion = true;
-            base.Update(eu);
+            if (parentNote.readyForDeletion)
+                readyForDeletion = true;
+            base.Update();
         }
 
-        public override void InitiateSprites(SpriteLeaser sLeaser)
+        public override void InitiateSprites(SpriteGroup sGroup)
         {
-            sLeaser.sprites = new FSprite[1];
-            sLeaser.sprites[0] = new FSprite("holdTick");
+            sGroup.sprites = new FSprite[1];
+            sGroup.sprites[0] = new FSprite("holdTick");
         }
 
-        public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+        public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
         {
-            if (lastPos == Vector2.zero || pos == Vector2.zero || parentNote.controller.songTime > time) {
-              sLeaser.sprites[0].isVisible = false;
+            if (lastPos == Vector2.zero || pos == Vector2.zero || VoezEditor.Editor.songTime > time) {
+              sGroup.sprites[0].isVisible = false;
             } else {
-              sLeaser.sprites[0].isVisible = true;
+              sGroup.sprites[0].isVisible = true;
             }
 
-            sLeaser.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, timeStacker);
-            sLeaser.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, timeStacker);
+            sGroup.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, frameProgress);
+            sGroup.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, frameProgress);
             if (parentNote.hovered)
-                sLeaser.sprites[0].color = Color.red;
+                sGroup.sprites[0].color = Color.red;
             else
-                sLeaser.sprites[0].color = Color.white;
+                sGroup.sprites[0].color = Color.white;
 
-            base.DrawSprites(sLeaser, timeStacker);
+            base.DrawSprites(sGroup, frameProgress);
         }
     }
 }

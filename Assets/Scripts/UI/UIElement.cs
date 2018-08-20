@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIElement : CosmeticSprite {
+public class UIElement : DrawableObject {
 
 }

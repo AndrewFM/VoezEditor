@@ -13,7 +13,7 @@ public class Util {
     public static int ScreenPosX(float xFactor)
     {
         int margin = 120;
-        return (int)(margin + ((MainScript.windowRes.x - margin * 2) * xFactor));
+        return (int)(margin + ((VoezEditor.windowRes.x - margin * 2) * xFactor));
     }
 
     // MM:SS timestamp from number of seconds

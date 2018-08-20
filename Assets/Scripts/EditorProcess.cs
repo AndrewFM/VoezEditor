@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 public class EditorProcess : MainLoopProcess {
 
-    public List<UpdatableAndDeletable> updateList;
-    public List<SpriteLeaser> spriteLeasers;
+    public List<UpdatableObject> updateList;
+    public List<SpriteGroup> spriteGroups;
     public List<Track> activeTracks;
     public List<Note> activeNotes;
-    public bool evenUpdate;
     public FContainer backgroundContainer;
     public FContainer tracksBottomContainer;
     public FContainer tracksTopContainer;
@@ -27,8 +26,8 @@ public class EditorProcess : MainLoopProcess {
 
     public EditorProcess()
     {
-        updateList = new List<UpdatableAndDeletable>();
-        spriteLeasers = new List<SpriteLeaser>();
+        updateList = new List<UpdatableObject>();
+        spriteGroups = new List<SpriteGroup>();
         activeNotes = new List<Note>();
         activeTracks = new List<Track>();
 
@@ -47,7 +46,7 @@ public class EditorProcess : MainLoopProcess {
         Futile.stage.AddChild(foregroundContainer);
 
         musicPlayer = new MusicPlayer();
-        ui = new EditorUI(this);
+        ui = new EditorUI();
         InitiateSong();
         musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
     }
@@ -79,15 +78,13 @@ public class EditorProcess : MainLoopProcess {
         // Update all active objects
         musicPlayer.Update();
         ui.Update();
-        evenUpdate = !evenUpdate;
-        int updateIndex = this.updateList.Count - 1;
+        int updateIndex = updateList.Count - 1;
         while (updateIndex >= 0) {
-            UpdatableAndDeletable updatableAndDeletable = updateList[updateIndex];
-            if (updatableAndDeletable.slatedForDeletetion) {
-                PurgeObject(updatableAndDeletable);
-            } else {
-                updatableAndDeletable.Update(evenUpdate);
-            }
+            UpdatableObject obj = updateList[updateIndex];
+            if (obj.readyForDeletion)
+                PurgeObject(obj);
+            else
+                obj.Update();
             updateIndex--;
         }
 
@@ -119,12 +116,12 @@ public class EditorProcess : MainLoopProcess {
         // Spawn Tracks
         for (int i = 0; i < project.tracks.Count; i += 1)
             if (songTime >= project.tracks[i].start && songTime <= project.tracks[i].end && !TrackSpawned(project.tracks[i].id))
-                AddObject(new Track(this, project.tracks[i]));
+                AddObject(new Track(project.tracks[i]));
 
         // Spawn Notes
         for (int i = 0; i < project.notes.Count; i += 1) {
             if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime <= project.notes[i].time + project.notes[i].hold && !NoteSpawned(project.notes[i].id)) {
-                AddObject(new Note(this, project.notes[i]));
+                AddObject(new Note(project.notes[i]));
             }
         }
 
@@ -161,20 +158,20 @@ public class EditorProcess : MainLoopProcess {
     public void RefreshAllTracks()
     {
         for (int i = 0; i < activeTracks.Count; i += 1)
-            activeTracks[i].slatedForDeletetion = true;
+            activeTracks[i].readyForDeletion = true;
     }
 
     public void RefreshAllNotes()
     {
         for (int i = 0; i < activeNotes.Count; i += 1)
-            activeNotes[i].slatedForDeletetion = true;
+            activeNotes[i].readyForDeletion = true;
     }
 
     public void RefreshNote(int id)
     {
         for (int i = 0; i < activeNotes.Count; i += 1) {
             if (activeNotes[i].ID == id) {
-                activeNotes[i].slatedForDeletetion = true;
+                activeNotes[i].readyForDeletion = true;
                 break;
             }
         }
@@ -224,22 +221,22 @@ public class EditorProcess : MainLoopProcess {
         return false;
     }
 
-    public void AddObject(UpdatableAndDeletable obj)
+    public void AddObject(UpdatableObject obj)
     {
         this.updateList.Add(obj);
         if (obj is IDrawable) {
-            SpriteLeaser sL = new SpriteLeaser(obj as IDrawable);
-            spriteLeasers.Add(sL);
+            SpriteGroup group = new SpriteGroup(obj as IDrawable);
+            spriteGroups.Add(group);
             if (obj is Track)
-                sL.AddSpritesToContainer(tracksBottomContainer);
+                group.AddSpritesToContainer(tracksBottomContainer);
             else if (obj is Note)
-                sL.AddSpritesToContainer(notesContainer);
+                group.AddSpritesToContainer(notesContainer);
             else if (obj is Note.HoldTick)
-                sL.AddSpritesToContainer(ticksContainer);
+                group.AddSpritesToContainer(ticksContainer);
             else if (obj is UIElement)
-                sL.AddSpritesToContainer(foregroundContainer);
+                group.AddSpritesToContainer(foregroundContainer);
             else
-                sL.AddSpritesToContainer(backgroundContainer);
+                group.AddSpritesToContainer(backgroundContainer);
         }
         if (obj is Track)
             activeTracks.Add(obj as Track);
@@ -247,13 +244,13 @@ public class EditorProcess : MainLoopProcess {
             activeNotes.Add(obj as Note);
     }
 
-    public void PurgeObject(UpdatableAndDeletable obj)
+    public void PurgeObject(UpdatableObject obj)
     {
         updateList.Remove(obj);
         if (obj is IDrawable) {
-            for (int i = spriteLeasers.Count - 1; i >= 0; i--) {
-                if (spriteLeasers[i].drawableObject == obj) {
-                    spriteLeasers[i].CleanSpritesAndRemove();
+            for (int i = spriteGroups.Count - 1; i >= 0; i--) {
+                if (spriteGroups[i].drawableObject == obj) {
+                    spriteGroups[i].CleanSpritesAndRemove();
                     break;
                 }
             }
@@ -264,13 +261,13 @@ public class EditorProcess : MainLoopProcess {
             activeNotes.Remove(obj as Note);
     }
 
-    public override void GrafUpdate(float timeStacker)
+    public override void DrawUpdate(float frameProgress)
     {
-        base.GrafUpdate(timeStacker);
-        for (int i = spriteLeasers.Count - 1; i >= 0; i--) {
-            this.spriteLeasers[i].Update(timeStacker);
-            if (this.spriteLeasers[i].deleteMeNextFrame)
-                this.spriteLeasers.RemoveAt(i);
+        base.DrawUpdate(frameProgress);
+        for (int i = spriteGroups.Count - 1; i >= 0; i--) {
+            this.spriteGroups[i].Update(frameProgress);
+            if (this.spriteGroups[i].deleteMeNextFrame)
+                this.spriteGroups.RemoveAt(i);
         }
     }
 }

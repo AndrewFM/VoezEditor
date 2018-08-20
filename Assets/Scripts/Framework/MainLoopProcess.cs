@@ -8,23 +8,22 @@ public abstract class MainLoopProcess {
 
     public virtual void RawUpdate(float dt)
     {
-        myTimeStacker += dt * (float)framesPerSecond;
-        if (myTimeStacker > 1f) {
+        cumulativeDelta += dt * framesPerSecond;
+        if (cumulativeDelta > 1f) {
             Update();
-            myTimeStacker -= 1f;
-            if (myTimeStacker >= 2f) {
-                myTimeStacker = 0f;
-            }
+            cumulativeDelta -= 1f;
+            if (cumulativeDelta >= 1f)
+                cumulativeDelta = 0f;
         }
         framesSinceStart += 1;
-        GrafUpdate(myTimeStacker);
+        DrawUpdate(cumulativeDelta);
     }
 
     public virtual void Update()
     {
     }
 
-    public virtual void GrafUpdate(float timeStacker)
+    public virtual void DrawUpdate(float frameProgress)
     {
     }
 
@@ -37,6 +36,6 @@ public abstract class MainLoopProcess {
     }
 
     public int framesPerSecond;
-    private float myTimeStacker;
+    private float cumulativeDelta;
     public int framesSinceStart;
 }

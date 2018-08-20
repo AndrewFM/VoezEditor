@@ -45,7 +45,7 @@ public class Slider : UIElement {
             return pos.x - width * 0.5f + progress * width;
     }
 
-    public override void Update(bool eu)
+    public override void Update()
     {
         if (Input.GetMouseButtonDown(0) && allowScrubbing && MouseOver)
             clicked = true;
@@ -58,77 +58,77 @@ public class Slider : UIElement {
             progress = pendingProgress;
             progressUpdate = true;
         }
-        base.Update(eu);
+        base.Update();
     }
 
-    public override void InitiateSprites(SpriteLeaser sLeaser)
+    public override void InitiateSprites(SpriteGroup sGroup)
     {
-        sLeaser.sprites = new FSprite[6];
+        sGroup.sprites = new FSprite[6];
 
-        sLeaser.sprites[Spr_SliderBack] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_SliderBack].color = Color.black;
-        sLeaser.sprites[Spr_SliderBack].scaleX = (width + 4f) / sLeaser.sprites[Spr_SliderBack].width;
-        sLeaser.sprites[Spr_SliderBack].scaleY = 10f / sLeaser.sprites[Spr_SliderBack].height;
-        sLeaser.sprites[Spr_SliderFront] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_SliderFront].scaleX = width / sLeaser.sprites[Spr_SliderFront].width;
-        sLeaser.sprites[Spr_SliderFront].scaleY = 10f / sLeaser.sprites[Spr_SliderFront].height;
+        sGroup.sprites[Spr_SliderBack] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_SliderBack].color = Color.black;
+        sGroup.sprites[Spr_SliderBack].scaleX = (width + 4f) / sGroup.sprites[Spr_SliderBack].width;
+        sGroup.sprites[Spr_SliderBack].scaleY = 10f / sGroup.sprites[Spr_SliderBack].height;
+        sGroup.sprites[Spr_SliderFront] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_SliderFront].scaleX = width / sGroup.sprites[Spr_SliderFront].width;
+        sGroup.sprites[Spr_SliderFront].scaleY = 10f / sGroup.sprites[Spr_SliderFront].height;
 
-        sLeaser.sprites[Spr_SliderScrubberBack] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_SliderScrubberBack].scaleX = SCRUBBER_SIZE / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_SliderScrubberBack].width, 2f));
-        sLeaser.sprites[Spr_SliderScrubberBack].scaleY = SCRUBBER_SIZE / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_SliderScrubberBack].height, 2f));
-        sLeaser.sprites[Spr_SliderScrubberBack].rotation = 45f;
-        sLeaser.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
-        sLeaser.sprites[Spr_SliderScrubberBack].color = Color.black;
-        sLeaser.sprites[Spr_SliderScrubberFront] = new FSprite("outlineBoxMed");
-        sLeaser.sprites[Spr_SliderScrubberFront].scaleX = (SCRUBBER_SIZE - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_SliderScrubberFront].width, 2f));
-        sLeaser.sprites[Spr_SliderScrubberFront].scaleY = (SCRUBBER_SIZE - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_SliderScrubberFront].height, 2f));
-        sLeaser.sprites[Spr_SliderScrubberFront].rotation = 45f;
+        sGroup.sprites[Spr_SliderScrubberBack] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_SliderScrubberBack].scaleX = SCRUBBER_SIZE / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_SliderScrubberBack].width, 2f));
+        sGroup.sprites[Spr_SliderScrubberBack].scaleY = SCRUBBER_SIZE / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_SliderScrubberBack].height, 2f));
+        sGroup.sprites[Spr_SliderScrubberBack].rotation = 45f;
+        sGroup.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
+        sGroup.sprites[Spr_SliderScrubberBack].color = Color.black;
+        sGroup.sprites[Spr_SliderScrubberFront] = new FSprite("outlineBoxMed");
+        sGroup.sprites[Spr_SliderScrubberFront].scaleX = (SCRUBBER_SIZE - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_SliderScrubberFront].width, 2f));
+        sGroup.sprites[Spr_SliderScrubberFront].scaleY = (SCRUBBER_SIZE - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_SliderScrubberFront].height, 2f));
+        sGroup.sprites[Spr_SliderScrubberFront].rotation = 45f;
 
-        sLeaser.sprites[Spr_LoopPointBack] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_LoopPointBack].scaleX = (SCRUBBER_SIZE * 0.5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_LoopPointBack].width, 2f));
-        sLeaser.sprites[Spr_LoopPointBack].scaleY = (SCRUBBER_SIZE * 0.5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_LoopPointBack].height, 2f));
-        sLeaser.sprites[Spr_LoopPointBack].rotation = 45f;
-        sLeaser.sprites[Spr_LoopPointBack].color = Color.red;
-        sLeaser.sprites[Spr_LoopPointFront] = new FSprite("outlineBoxMed");
-        sLeaser.sprites[Spr_LoopPointFront].scaleX = ((SCRUBBER_SIZE * 0.5f) - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_LoopPointFront].width, 2f));
-        sLeaser.sprites[Spr_LoopPointFront].scaleY = ((SCRUBBER_SIZE * 0.5f) - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[Spr_LoopPointFront].height, 2f));
-        sLeaser.sprites[Spr_LoopPointFront].rotation = 45f;
-        sLeaser.sprites[Spr_LoopPointFront].color = Color.white;
+        sGroup.sprites[Spr_LoopPointBack] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_LoopPointBack].scaleX = (SCRUBBER_SIZE * 0.5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_LoopPointBack].width, 2f));
+        sGroup.sprites[Spr_LoopPointBack].scaleY = (SCRUBBER_SIZE * 0.5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_LoopPointBack].height, 2f));
+        sGroup.sprites[Spr_LoopPointBack].rotation = 45f;
+        sGroup.sprites[Spr_LoopPointBack].color = Color.red;
+        sGroup.sprites[Spr_LoopPointFront] = new FSprite("outlineBoxMed");
+        sGroup.sprites[Spr_LoopPointFront].scaleX = ((SCRUBBER_SIZE * 0.5f) - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_LoopPointFront].width, 2f));
+        sGroup.sprites[Spr_LoopPointFront].scaleY = ((SCRUBBER_SIZE * 0.5f) - 5f) / Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[Spr_LoopPointFront].height, 2f));
+        sGroup.sprites[Spr_LoopPointFront].rotation = 45f;
+        sGroup.sprites[Spr_LoopPointFront].color = Color.white;
     }
 
-    public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+    public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, timeStacker), Mathf.Lerp(this.lastPos.y, this.pos.y, timeStacker));
-        sLeaser.sprites[Spr_SliderBack].x = drawPos.x;
-        sLeaser.sprites[Spr_SliderBack].y = drawPos.y-4f;
-        sLeaser.sprites[Spr_SliderFront].x = drawPos.x;
-        sLeaser.sprites[Spr_SliderFront].y = drawPos.y;
+        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, frameProgress), Mathf.Lerp(this.lastPos.y, this.pos.y, frameProgress));
+        sGroup.sprites[Spr_SliderBack].x = drawPos.x;
+        sGroup.sprites[Spr_SliderBack].y = drawPos.y-4f;
+        sGroup.sprites[Spr_SliderFront].x = drawPos.x;
+        sGroup.sprites[Spr_SliderFront].y = drawPos.y;
 
-        sLeaser.sprites[Spr_SliderScrubberBack].x = (int)ProgressX();
-        sLeaser.sprites[Spr_SliderScrubberBack].y = (int)(sLeaser.sprites[Spr_SliderFront].y);
-        sLeaser.sprites[Spr_SliderScrubberFront].x = (int)(sLeaser.sprites[Spr_SliderScrubberBack].x);
-        sLeaser.sprites[Spr_SliderScrubberFront].y = (int)(sLeaser.sprites[Spr_SliderScrubberBack].y);
+        sGroup.sprites[Spr_SliderScrubberBack].x = (int)ProgressX();
+        sGroup.sprites[Spr_SliderScrubberBack].y = (int)(sGroup.sprites[Spr_SliderFront].y);
+        sGroup.sprites[Spr_SliderScrubberFront].x = (int)(sGroup.sprites[Spr_SliderScrubberBack].x);
+        sGroup.sprites[Spr_SliderScrubberFront].y = (int)(sGroup.sprites[Spr_SliderScrubberBack].y);
 
         if ((MouseOver || clicked) && allowScrubbing) {
-            sLeaser.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sLeaser.sprites[Spr_SliderScrubberBack].color, Color.red, 0.15f);
-            sLeaser.sprites[Spr_SliderScrubberBack].alpha = 1f;
+            sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.red, 0.15f);
+            sGroup.sprites[Spr_SliderScrubberBack].alpha = 1f;
         } else {
-            sLeaser.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sLeaser.sprites[Spr_SliderScrubberBack].color, Color.black, 0.15f);
-            sLeaser.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
+            sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.black, 0.15f);
+            sGroup.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
         }
 
         if (loopPoint >= 0f) {
-            sLeaser.sprites[Spr_LoopPointBack].isVisible = true;
-            sLeaser.sprites[Spr_LoopPointFront].isVisible = true;
-            sLeaser.sprites[Spr_LoopPointBack].x = (int)(pos.x - width * 0.5f + loopPoint * width);
-            sLeaser.sprites[Spr_LoopPointBack].y = (int)(sLeaser.sprites[Spr_SliderFront].y);
-            sLeaser.sprites[Spr_LoopPointFront].x = (int)(sLeaser.sprites[Spr_LoopPointBack].x);
-            sLeaser.sprites[Spr_LoopPointFront].y = (int)(sLeaser.sprites[Spr_LoopPointBack].y);
+            sGroup.sprites[Spr_LoopPointBack].isVisible = true;
+            sGroup.sprites[Spr_LoopPointFront].isVisible = true;
+            sGroup.sprites[Spr_LoopPointBack].x = (int)(pos.x - width * 0.5f + loopPoint * width);
+            sGroup.sprites[Spr_LoopPointBack].y = (int)(sGroup.sprites[Spr_SliderFront].y);
+            sGroup.sprites[Spr_LoopPointFront].x = (int)(sGroup.sprites[Spr_LoopPointBack].x);
+            sGroup.sprites[Spr_LoopPointFront].y = (int)(sGroup.sprites[Spr_LoopPointBack].y);
         }
         else {
-            sLeaser.sprites[Spr_LoopPointBack].isVisible = false;
-            sLeaser.sprites[Spr_LoopPointFront].isVisible = false;
+            sGroup.sprites[Spr_LoopPointBack].isVisible = false;
+            sGroup.sprites[Spr_LoopPointFront].isVisible = false;
         }
-        base.DrawSprites(sLeaser, timeStacker);
+        base.DrawSprites(sGroup, frameProgress);
     }
 }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NoteEditor : UIElement {
-
-    public EditorProcess parent;
     public Button clickNote;
     public Button slideNote;
     public Button swipeNote;
@@ -29,10 +27,9 @@ public class NoteEditor : UIElement {
     public int Spr_Selector { get { return 3; } }
     public int Spr_SelectorBorder { get { return 4; } }
 
-    public NoteEditor(EditorProcess parent, Vector2 pos, ProjectData.NoteData data)
+    public NoteEditor(Vector2 pos, ProjectData.NoteData data)
     {
         this.data = data;
-        this.parent = parent;
         this.pos = pos;
 
         typeLabel = new FLabel("Raleway24", "Type:");
@@ -92,39 +89,39 @@ public class NoteEditor : UIElement {
         }
     }
 
-    public override void InitiateSprites(SpriteLeaser sLeaser)
+    public override void InitiateSprites(SpriteGroup sGroup)
     {
-        sLeaser.sprites = new FSprite[5];
+        sGroup.sprites = new FSprite[5];
 
-        sLeaser.sprites[Spr_Back] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_Back].color = Color.black;
-        sLeaser.sprites[Spr_Back].scaleX = (WIDTH+5) / sLeaser.sprites[Spr_Back].width;
-        sLeaser.sprites[Spr_Back].scaleY = (HEIGHT+5) / sLeaser.sprites[Spr_Back].height;
-        sLeaser.sprites[Spr_Back].alpha = 0.8f;
-        sLeaser.sprites[Spr_BackBorder] = new FSprite("outlineBoxLarge");
-        sLeaser.sprites[Spr_BackBorder].scaleX = WIDTH / sLeaser.sprites[Spr_BackBorder].width;
-        sLeaser.sprites[Spr_BackBorder].scaleY = HEIGHT / sLeaser.sprites[Spr_BackBorder].height;
+        sGroup.sprites[Spr_Back] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_Back].color = Color.black;
+        sGroup.sprites[Spr_Back].scaleX = (WIDTH+5) / sGroup.sprites[Spr_Back].width;
+        sGroup.sprites[Spr_Back].scaleY = (HEIGHT+5) / sGroup.sprites[Spr_Back].height;
+        sGroup.sprites[Spr_Back].alpha = 0.8f;
+        sGroup.sprites[Spr_BackBorder] = new FSprite("outlineBoxLarge");
+        sGroup.sprites[Spr_BackBorder].scaleX = WIDTH / sGroup.sprites[Spr_BackBorder].width;
+        sGroup.sprites[Spr_BackBorder].scaleY = HEIGHT / sGroup.sprites[Spr_BackBorder].height;
 
-        sLeaser.sprites[Spr_Selector] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_Selector].scaleX = WIDTH / sLeaser.sprites[Spr_Selector].width;
-        sLeaser.sprites[Spr_Selector].scaleY = (LINE_HEIGHT+4) / sLeaser.sprites[Spr_Selector].height;
-        sLeaser.sprites[Spr_Selector].alpha = 0.5f;
-        sLeaser.sprites[Spr_Selector].color = Color.red;
-        sLeaser.sprites[Spr_Selector].anchorY = 1f;
-        sLeaser.sprites[Spr_SelectorBorder] = new FSprite("outlineBoxLarge");
-        sLeaser.sprites[Spr_SelectorBorder].scaleX = WIDTH / sLeaser.sprites[Spr_SelectorBorder].width;
-        sLeaser.sprites[Spr_SelectorBorder].scaleY = LINE_HEIGHT / sLeaser.sprites[Spr_SelectorBorder].height;
-        sLeaser.sprites[Spr_SelectorBorder].anchorY = 1f;
+        sGroup.sprites[Spr_Selector] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_Selector].scaleX = WIDTH / sGroup.sprites[Spr_Selector].width;
+        sGroup.sprites[Spr_Selector].scaleY = (LINE_HEIGHT+4) / sGroup.sprites[Spr_Selector].height;
+        sGroup.sprites[Spr_Selector].alpha = 0.5f;
+        sGroup.sprites[Spr_Selector].color = Color.red;
+        sGroup.sprites[Spr_Selector].anchorY = 1f;
+        sGroup.sprites[Spr_SelectorBorder] = new FSprite("outlineBoxLarge");
+        sGroup.sprites[Spr_SelectorBorder].scaleX = WIDTH / sGroup.sprites[Spr_SelectorBorder].width;
+        sGroup.sprites[Spr_SelectorBorder].scaleY = LINE_HEIGHT / sGroup.sprites[Spr_SelectorBorder].height;
+        sGroup.sprites[Spr_SelectorBorder].anchorY = 1f;
 
-        sLeaser.sprites[Spr_Hover] = new FSprite("Futile_White");
-        sLeaser.sprites[Spr_Hover].scaleX = WIDTH / sLeaser.sprites[Spr_Hover].width;
-        sLeaser.sprites[Spr_Hover].scaleY = LINE_HEIGHT / sLeaser.sprites[Spr_Hover].height;
-        sLeaser.sprites[Spr_Hover].alpha = 0.8f;
-        sLeaser.sprites[Spr_Hover].color = Color.gray;
-        sLeaser.sprites[Spr_Hover].anchorY = 1f;
+        sGroup.sprites[Spr_Hover] = new FSprite("Futile_White");
+        sGroup.sprites[Spr_Hover].scaleX = WIDTH / sGroup.sprites[Spr_Hover].width;
+        sGroup.sprites[Spr_Hover].scaleY = LINE_HEIGHT / sGroup.sprites[Spr_Hover].height;
+        sGroup.sprites[Spr_Hover].alpha = 0.8f;
+        sGroup.sprites[Spr_Hover].color = Color.gray;
+        sGroup.sprites[Spr_Hover].anchorY = 1f;
     }
 
-    public override void Update(bool eu)
+    public override void Update()
     {
         if (!init) {
             init = true;
@@ -135,16 +132,16 @@ public class NoteEditor : UIElement {
             clickNote.mySymbol.rotation = 45f;
             slideNote.mySymbol.rotation = 45f;
             swipeNote.mySymbol.rotation = 45f;
-            parent.AddObject(clickNote);
-            parent.AddObject(slideNote);
-            parent.AddObject(swipeNote);
+            VoezEditor.Editor.AddObject(clickNote);
+            VoezEditor.Editor.AddObject(slideNote);
+            VoezEditor.Editor.AddObject(swipeNote);
 
             leftDir = new Button("swipe", new Vector2(pos.x - WIDTH * 0.5f + 10f + buttonSize * 0.5f + 150f, pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * 1.5f - 16f), buttonSize, false);
             rightDir = new Button("swipe", new Vector2(pos.x - WIDTH * 0.5f + 20f + buttonSize * 0.5f + buttonSize + 150f, pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * 1.5f - 16f), buttonSize, false);
             leftDir.mySymbol.rotation = 45f + 180f;
             rightDir.mySymbol.rotation = 45f;
-            parent.AddObject(leftDir);
-            parent.AddObject(rightDir);
+            VoezEditor.Editor.AddObject(leftDir);
+            VoezEditor.Editor.AddObject(rightDir);
 
             if (data.type == ProjectData.NoteData.NoteType.SLIDE)
                 SetPage(1);
@@ -156,7 +153,7 @@ public class NoteEditor : UIElement {
 
         if (Input.GetMouseButtonDown(0) && !MouseOver)
             Delete();
-        if (!parent.musicPlayer.paused)
+        if (!VoezEditor.Editor.musicPlayer.paused)
             Delete();
 
         if (clickNote.clicked) {
@@ -165,31 +162,31 @@ public class NoteEditor : UIElement {
                 data.type = ProjectData.NoteData.NoteType.HOLD;
             else
                 data.type = ProjectData.NoteData.NoteType.CLICK;
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
             clickNote.clicked = false;
         }
         if (slideNote.clicked) {
             SetPage(1);
             data.type = ProjectData.NoteData.NoteType.SLIDE;
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
             slideNote.clicked = false;
         }
         if (swipeNote.clicked) {
             SetPage(2);
             data.type = ProjectData.NoteData.NoteType.SWIPE;
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
             swipeNote.clicked = false;
         }
         if (leftDir.clicked) {
             data.dir = 0;
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
             leftDir.clicked = false;
             leftDir.toggled = true;
             rightDir.toggled = false;
         }
         if (rightDir.clicked) {
             data.dir = 1;
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
             leftDir.toggled = false;
             rightDir.toggled = true;
             rightDir.clicked = false;
@@ -197,36 +194,36 @@ public class NoteEditor : UIElement {
 
         float delta = 0;
         if (Input.GetKeyDown(KeyCode.RightArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-            delta = 1f / parent.framesPerSecond;
+            delta = 1f / VoezEditor.Editor.framesPerSecond;
         if (Input.GetKeyDown(KeyCode.LeftArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-            delta = -1f / parent.framesPerSecond;
+            delta = -1f / VoezEditor.Editor.framesPerSecond;
         if (Input.GetKeyDown(KeyCode.UpArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-            delta = 8f / parent.framesPerSecond;
+            delta = 8f / VoezEditor.Editor.framesPerSecond;
         if (Input.GetKeyDown(KeyCode.DownArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-            delta = -8f / parent.framesPerSecond;
+            delta = -8f / VoezEditor.Editor.framesPerSecond;
 
         if (delta != 0) {
             if (selectedLine == 0) {
-                data.time = Mathf.Clamp(data.time + delta, 0f, parent.musicPlayer.source.clip.length - data.hold);
+                data.time = Mathf.Clamp(data.time + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.hold);
                 timeLabel.text = "Spawn Time: " + data.time.ToString();
             }
             if (selectedLine == 1) {
-                data.hold = Mathf.Clamp(data.hold + delta, 0f, parent.musicPlayer.source.clip.length - data.time);
+                data.hold = Mathf.Clamp(data.hold + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.time);
                 if (data.hold > 0)
                     data.type = ProjectData.NoteData.NoteType.HOLD;
                 else
                     data.type = ProjectData.NoteData.NoteType.CLICK;
                 holdLabel.text = "Hold Duration: " + data.hold.ToString(); 
             }
-            parent.RefreshNote(data.id);
+            VoezEditor.Editor.RefreshNote(data.id);
         }
 
-        base.Update(eu);
+        base.Update();
     }
 
-    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContainer)
+    public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
     {
-        foreach (FSprite fsprite in sLeaser.sprites) {
+        foreach (FSprite fsprite in sGroup.sprites) {
             fsprite.RemoveFromContainer();
             newContainer.AddChild(fsprite);
         }
@@ -236,33 +233,33 @@ public class NoteEditor : UIElement {
         newContainer.AddChild(dirLabel);
     }
 
-    public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+    public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, timeStacker), Mathf.Lerp(this.lastPos.y, this.pos.y, timeStacker));
-        sLeaser.sprites[Spr_Back].x = drawPos.x;
-        sLeaser.sprites[Spr_Back].y = drawPos.y;
-        sLeaser.sprites[Spr_BackBorder].x = drawPos.x;
-        sLeaser.sprites[Spr_BackBorder].y = drawPos.y;
-        sLeaser.sprites[Spr_BackBorder].isVisible = false;
+        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, frameProgress), Mathf.Lerp(this.lastPos.y, this.pos.y, frameProgress));
+        sGroup.sprites[Spr_Back].x = drawPos.x;
+        sGroup.sprites[Spr_Back].y = drawPos.y;
+        sGroup.sprites[Spr_BackBorder].x = drawPos.x;
+        sGroup.sprites[Spr_BackBorder].y = drawPos.y;
+        sGroup.sprites[Spr_BackBorder].isVisible = false;
 
         Vector3 mouse = Input.mousePosition;
-        sLeaser.sprites[Spr_Hover].isVisible = false;
+        sGroup.sprites[Spr_Hover].isVisible = false;
         for (int i=0; i<numLines; i+=1) {
             if (mouse.x >= pos.x - WIDTH * 0.5f && mouse.x <= pos.x + WIDTH * 0.5f && mouse.y < pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i && mouse.y >= pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * (i+1)) {
-                sLeaser.sprites[Spr_Hover].isVisible = true;
-                sLeaser.sprites[Spr_Hover].x = drawPos.x;
-                sLeaser.sprites[Spr_Hover].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i;
+                sGroup.sprites[Spr_Hover].isVisible = true;
+                sGroup.sprites[Spr_Hover].x = drawPos.x;
+                sGroup.sprites[Spr_Hover].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i;
 
                 if (Input.GetMouseButtonDown(0))
                     selectedLine = i;
             }
         }
 
-        sLeaser.sprites[Spr_Selector].x = drawPos.x;
-        sLeaser.sprites[Spr_Selector].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine;
-        sLeaser.sprites[Spr_SelectorBorder].x = drawPos.x;
-        sLeaser.sprites[Spr_SelectorBorder].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine + 2f;
-        sLeaser.sprites[Spr_SelectorBorder].isVisible = false;
+        sGroup.sprites[Spr_Selector].x = drawPos.x;
+        sGroup.sprites[Spr_Selector].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine;
+        sGroup.sprites[Spr_SelectorBorder].x = drawPos.x;
+        sGroup.sprites[Spr_SelectorBorder].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine + 2f;
+        sGroup.sprites[Spr_SelectorBorder].isVisible = false;
 
         timeLabel.x = pos.x - WIDTH * 0.5f + 10f + timeLabel.textRect.width * 0.5f;
         dirLabel.x = pos.x - WIDTH * 0.5f + 10f + dirLabel.textRect.width * 0.5f;
@@ -275,21 +272,21 @@ public class NoteEditor : UIElement {
         holdLabel.y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * 1.5f;
         dirLabel.y = holdLabel.y - 16f;
 
-        base.DrawSprites(sLeaser, timeStacker);
+        base.DrawSprites(sGroup, frameProgress);
     }
 
     public void Delete()
     {
-        slatedForDeletetion = true;
-        clickNote.slatedForDeletetion = true;
-        slideNote.slatedForDeletetion = true;
-        swipeNote.slatedForDeletetion = true;
-        leftDir.slatedForDeletetion = true;
-        rightDir.slatedForDeletetion = true;
+        readyForDeletion = true;
+        clickNote.readyForDeletion = true;
+        slideNote.readyForDeletion = true;
+        swipeNote.readyForDeletion = true;
+        leftDir.readyForDeletion = true;
+        rightDir.readyForDeletion = true;
         holdLabel.RemoveFromContainer();
         timeLabel.RemoveFromContainer();
         dirLabel.RemoveFromContainer();
         typeLabel.RemoveFromContainer();
-        parent.noteEditor = null;
+        VoezEditor.Editor.noteEditor = null;
     }
 }

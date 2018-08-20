@@ -50,50 +50,50 @@ public class Button : UIElement {
             return Color.black;
     }
 
-    public override void Update(bool eu)
+    public override void Update()
     {
         if (Input.GetMouseButtonDown(0) && visible && MouseOver)
             clicked = true;
         if (Input.GetMouseButtonDown(1) && visible && MouseOver)
             rightClicked = true;
-        base.Update(eu);
+        base.Update();
     }
 
-    public override void InitiateSprites(SpriteLeaser sLeaser)
+    public override void InitiateSprites(SpriteGroup sGroup)
     {
         if (mySymbol != null)
-            sLeaser.sprites = new FSprite[3];
+            sGroup.sprites = new FSprite[3];
         else
-            sLeaser.sprites = new FSprite[2];
+            sGroup.sprites = new FSprite[2];
 
-        sLeaser.sprites[0] = new FSprite("Futile_White");
-        sLeaser.sprites[0].color = DefaultColor();
-        sLeaser.sprites[0].alpha = 0.75f;
+        sGroup.sprites[0] = new FSprite("Futile_White");
+        sGroup.sprites[0].color = DefaultColor();
+        sGroup.sprites[0].alpha = 0.75f;
         if (diamond) {
-            sLeaser.sprites[0].rotation = 45f;
-            float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[0].width, 2));
-            sLeaser.sprites[0].scale = size / newEffectiveWidth;
+            sGroup.sprites[0].rotation = 45f;
+            float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[0].width, 2));
+            sGroup.sprites[0].scale = size / newEffectiveWidth;
         } else
-            sLeaser.sprites[0].scale = size / sLeaser.sprites[0].width;
+            sGroup.sprites[0].scale = size / sGroup.sprites[0].width;
         if (size > 350f)
-            sLeaser.sprites[1] = new FSprite("outlineBoxLarge");
+            sGroup.sprites[1] = new FSprite("outlineBoxLarge");
         else
-            sLeaser.sprites[1] = new FSprite("outlineBoxMed");
+            sGroup.sprites[1] = new FSprite("outlineBoxMed");
         if (diamond) {
-            sLeaser.sprites[1].rotation = 45f;
-            float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sLeaser.sprites[1].width, 2));
-            sLeaser.sprites[1].scale = (size - 7f) / newEffectiveWidth;
+            sGroup.sprites[1].rotation = 45f;
+            float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[1].width, 2));
+            sGroup.sprites[1].scale = (size - 7f) / newEffectiveWidth;
         } else
-            sLeaser.sprites[1].scale = (size - 7f) / sLeaser.sprites[1].width;
+            sGroup.sprites[1].scale = (size - 7f) / sGroup.sprites[1].width;
         if (mySymbol != null) { 
-            sLeaser.sprites[2] = mySymbol;
-            sLeaser.sprites[2].scale = (size * 0.5f) / sLeaser.sprites[2].width;
+            sGroup.sprites[2] = mySymbol;
+            sGroup.sprites[2].scale = (size * 0.5f) / sGroup.sprites[2].width;
         }
     }
 
-    public override void AddToContainer(SpriteLeaser sLeaser, FContainer newContainer)
+    public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
     {
-        foreach (FSprite fsprite in sLeaser.sprites) {
+        foreach (FSprite fsprite in sGroup.sprites) {
             fsprite.RemoveFromContainer();
             newContainer.AddChild(fsprite);
         }
@@ -101,29 +101,29 @@ public class Button : UIElement {
             newContainer.AddChild(myText);
     }
 
-    public override void DrawSprites(SpriteLeaser sLeaser, float timeStacker)
+    public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        for (int i = 0; i < sLeaser.sprites.Length; i += 1) {
-            sLeaser.sprites[i].isVisible = visible;
+        for (int i = 0; i < sGroup.sprites.Length; i += 1) {
+            sGroup.sprites[i].isVisible = visible;
             if (myText != null)
                 myText.isVisible = visible;
         }
 
         if (visible) {
-            for (int i = 0; i < sLeaser.sprites.Length; i += 1) {
-                sLeaser.sprites[i].x = Mathf.Lerp(this.lastPos.x, this.pos.x, timeStacker);
-                sLeaser.sprites[i].y = Mathf.Lerp(this.lastPos.y, this.pos.y, timeStacker);
+            for (int i = 0; i < sGroup.sprites.Length; i += 1) {
+                sGroup.sprites[i].x = Mathf.Lerp(this.lastPos.x, this.pos.x, frameProgress);
+                sGroup.sprites[i].y = Mathf.Lerp(this.lastPos.y, this.pos.y, frameProgress);
             }
             if (myText != null) {
-                myText.x = sLeaser.sprites[0].x;
-                myText.y = sLeaser.sprites[1].y;
+                myText.x = sGroup.sprites[0].x;
+                myText.y = sGroup.sprites[1].y;
             }
 
             if (MouseOver)
-                sLeaser.sprites[0].color = Color.Lerp(sLeaser.sprites[0].color, Color.gray, 0.15f);
+                sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, Color.gray, 0.15f);
             else
-                sLeaser.sprites[0].color = Color.Lerp(sLeaser.sprites[0].color, DefaultColor(), 0.15f);
+                sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, DefaultColor(), 0.15f);
         }
-        base.DrawSprites(sLeaser, timeStacker);
+        base.DrawSprites(sGroup, frameProgress);
     }
 }

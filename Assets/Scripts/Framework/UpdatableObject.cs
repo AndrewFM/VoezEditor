@@ -9,6 +9,6 @@ public class UpdatableObject {
 
     public virtual void Destroy()
     {
-        this.readyForDeletion = true;
+        readyForDeletion = true;
     }
 }

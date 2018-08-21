@@ -12,6 +12,7 @@ public class NoteEditor : UIElement {
     public FLabel timeLabel;
     public FLabel holdLabel;
     public FLabel dirLabel;
+    public RectangleBorder border;
     public ProjectData.NoteData data;
     public static float WIDTH = 350f;
     public static float HEIGHT = 250f;
@@ -143,6 +144,9 @@ public class NoteEditor : UIElement {
             VoezEditor.Editor.AddObject(leftDir);
             VoezEditor.Editor.AddObject(rightDir);
 
+            border = new RectangleBorder(new Rect(new Vector2(pos.x - WIDTH * 0.5f + 5, pos.y - HEIGHT * 0.5f + 5), new Vector2(WIDTH - 10, HEIGHT - 10)), 3f);
+            VoezEditor.Editor.AddObject(border);
+
             if (data.type == ProjectData.NoteData.NoteType.SLIDE)
                 SetPage(1);
             else if (data.type == ProjectData.NoteData.NoteType.SWIPE)
@@ -150,11 +154,12 @@ public class NoteEditor : UIElement {
             else
                 SetPage(0);
         }
+        border.pos = pos;
 
         if (Input.GetMouseButtonDown(0) && !MouseOver)
-            Delete();
+            Destroy();
         if (!VoezEditor.Editor.musicPlayer.paused)
-            Delete();
+            Destroy();
 
         if (clickNote.clicked) {
             SetPage(0);
@@ -246,7 +251,7 @@ public class NoteEditor : UIElement {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        Vector2 drawPos = new Vector2(Mathf.Lerp(this.lastPos.x, this.pos.x, frameProgress), Mathf.Lerp(this.lastPos.y, this.pos.y, frameProgress));
+        Vector2 drawPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, frameProgress), Mathf.Lerp(lastPos.y, pos.y, frameProgress));
         sGroup.sprites[Spr_Back].x = drawPos.x;
         sGroup.sprites[Spr_Back].y = drawPos.y;
         sGroup.sprites[Spr_BackBorder].x = drawPos.x;
@@ -286,14 +291,15 @@ public class NoteEditor : UIElement {
         base.DrawSprites(sGroup, frameProgress);
     }
 
-    public void Delete()
+    public override void Destroy()
     {
-        readyForDeletion = true;
-        clickNote.readyForDeletion = true;
-        slideNote.readyForDeletion = true;
-        swipeNote.readyForDeletion = true;
-        leftDir.readyForDeletion = true;
-        rightDir.readyForDeletion = true;
+        base.Destroy();
+        clickNote.Destroy();
+        slideNote.Destroy();
+        swipeNote.Destroy();
+        leftDir.Destroy();
+        rightDir.Destroy();
+        border.Destroy();
         holdLabel.RemoveFromContainer();
         timeLabel.RemoveFromContainer();
         dirLabel.RemoveFromContainer();

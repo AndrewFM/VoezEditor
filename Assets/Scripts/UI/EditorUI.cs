@@ -54,18 +54,23 @@ public class EditorUI {
             VoezEditor.Editor.AddObject(playbackTimes[i]);
         }
 
-        noteTypes = new Button[3];
+        noteTypes = new Button[4];
         for(int i=0; i< noteTypes.Length; i+=1) {
             string noteSymbol = "click";
             if (i == 1)
                 noteSymbol = "slide";
             if (i == 2)
                 noteSymbol = "swipe";
+            if (i == 3)
+                noteSymbol = "track";
             noteTypes[i] = new Button(noteSymbol
                 , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
             noteTypes[i].visible = false;
-            noteTypes[i].mySymbol.rotation = 45f;
+            if (i != 3)
+                noteTypes[i].mySymbol.rotation = 45f;
+            else
+                noteTypes[i].mySymbol.scale = 1.5f;
             if (i == 0)
                 noteTypes[i].toggled = true;
             VoezEditor.Editor.AddObject(noteTypes[i]);
@@ -266,6 +271,11 @@ public class EditorUI {
                     VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
                 else if (i == 2)
                     VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
+
+                if (i == 3)
+                    VoezEditor.Editor.trackEditMode = true;
+                else
+                    VoezEditor.Editor.trackEditMode = false;
 
                 // Automatically close the note type selector after a choice has been made.
                 for (int j = 0; j < noteTypes.Length; j += 1)

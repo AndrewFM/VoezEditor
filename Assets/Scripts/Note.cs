@@ -75,7 +75,7 @@ public class Note : DrawableObject {
             pos.x = tempNoteX;
         }
 
-        if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen) {
+        if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && !VoezEditor.Editor.trackEditMode) {
             // Delete Note
             if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
                 VoezEditor.Editor.project.DeleteNote(data.id);
@@ -97,9 +97,9 @@ public class Note : DrawableObject {
             pos.x = linkedTrack.pos.x;
             pos.y = VoezEditor.windowRes.y - (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
             if (noteProgress < 0f)
-                readyForDeletion = true;
+                Destroy();
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
-                readyForDeletion = true;
+                Destroy();
                 linkedTrack.flashEffectTime = 5;
             }
             if (linkedTrack.readyForDeletion)
@@ -116,7 +116,7 @@ public class Note : DrawableObject {
                 }
                 if (holdTicksAllSame) {
                     for(int i=0; i<holdTicks.Count; i+=1) {
-                        holdTicks[i].readyForDeletion = true;
+                        holdTicks[i].Destroy();
                     }
                     holdTicks = null;
                 }
@@ -177,7 +177,7 @@ public class Note : DrawableObject {
         }
 
         bool highlightCondition = (MouseOver && !VoezEditor.Editor.MenuOpen) || (VoezEditor.Editor.noteEditor != null && VoezEditor.Editor.noteEditor.data.id == ID);
-        if (VoezEditor.Editor.EditMode && !hovered && highlightCondition) {
+        if (VoezEditor.Editor.EditMode && !hovered && highlightCondition && !VoezEditor.Editor.trackEditMode) {
             for (int i = 0; i < sGroup.sprites.Length; i += 1)
                 sGroup.sprites[i].color = Color.red;
             hovered = true;
@@ -229,7 +229,7 @@ public class Note : DrawableObject {
             pos.y = parentNote.pos.y + pixelsPerSecond * (time - parentNote.data.time);
 
             if (parentNote.readyForDeletion)
-                readyForDeletion = true;
+                Destroy();
             base.Update();
         }
 

@@ -24,6 +24,8 @@ public class EditorProcess : MainLoopProcess {
     public float currentTime;
     public float songTime;
     public int tempNoteID = -1;
+    public bool trackEditMode;
+    public bool confirmBoxOpen;
     public bool init;
 
     public EditorProcess()
@@ -57,7 +59,7 @@ public class EditorProcess : MainLoopProcess {
 
     public bool MenuOpen
     {
-        get { return noteEditor != null; }
+        get { return noteEditor != null || confirmBoxOpen; }
     }
 
     public void InitiateSong()
@@ -160,7 +162,7 @@ public class EditorProcess : MainLoopProcess {
                 nearestTrack.activeHover = true;
 
                 // Add New Note to Hovered Track
-                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !TrackOccupiedAtTime(nearestTrack.ID, songTime)) {
+                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !TrackOccupiedAtTime(nearestTrack.ID, songTime) && !trackEditMode) {
                     ProjectData.NoteData newNote = new ProjectData.NoteData();
                     newNote.id = GetUniqueTempNoteID();
                     newNote.time = songTime;
@@ -176,20 +178,20 @@ public class EditorProcess : MainLoopProcess {
     public void RefreshAllTracks()
     {
         for (int i = 0; i < activeTracks.Count; i += 1)
-            activeTracks[i].readyForDeletion = true;
+            activeTracks[i].Destroy();
     }
 
     public void RefreshAllNotes()
     {
         for (int i = 0; i < activeNotes.Count; i += 1)
-            activeNotes[i].readyForDeletion = true;
+            activeNotes[i].Destroy();
     }
 
     public void RefreshNote(int id)
     {
         for (int i = 0; i < activeNotes.Count; i += 1) {
             if (activeNotes[i].ID == id) {
-                activeNotes[i].readyForDeletion = true;
+                activeNotes[i].Destroy();
                 break;
             }
         }

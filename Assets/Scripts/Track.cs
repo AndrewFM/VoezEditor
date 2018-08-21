@@ -11,6 +11,7 @@ public class Track : DrawableObject {
     public float currentWidth;
     public float flashEffectTime;
     public float pulseFlashEffectTime;
+    public ConfirmBox deletionConfirm;
 
     public Track(ProjectData.TrackData data)
     {
@@ -35,7 +36,7 @@ public class Track : DrawableObject {
         pos.x = Util.ScreenPosX(desiredX);
 
         if (trackProgress > 1f || trackProgress < 0f)
-            readyForDeletion = true;
+            Destroy();
         if (flashEffectTime > 0)
             flashEffectTime -= 1;
         if (pulseFlashEffectTime > 0)
@@ -53,6 +54,42 @@ public class Track : DrawableObject {
 
             if (offset <= 1f / VoezEditor.Editor.framesPerSecond)
                 pulseFlashEffectTime = 5;
+        }
+
+        if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.trackEditMode) {
+            // Delete Track
+            if (activeHover && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
+                Vector2 windowCenter = new Vector2(VoezEditor.windowRes.x * 0.5f, VoezEditor.windowRes.y * 0.5f);
+                int damageCount = 0;
+                for(int i=0; i<VoezEditor.Editor.project.notes.Count; i+=1) {
+                    if (VoezEditor.Editor.project.notes[i].track == data.id)
+                        damageCount += 1;
+                }
+                if (damageCount > 0) {
+                    // There are notes attached to this track. Warn the user before deleting it!
+                    deletionConfirm = new ConfirmBox(new Rect(new Vector2(windowCenter.x - 300f, windowCenter.y - 150f), new Vector2(600f, 300f)), "Warning:\nThere are notes attached to this track!\nDeleting it will also delete "+damageCount.ToString()+" note"+(damageCount != 1 ? "s" : "")+".\nAre you sure you want to delete?");
+                    VoezEditor.Editor.AddObject(deletionConfirm);
+                }
+                else {
+                    // Empty track, delete it immediately.
+                    VoezEditor.Editor.project.DeleteTrack(data.id);
+                    VoezEditor.Editor.RefreshAllTracks();
+                }
+            }
+        }
+
+        if (deletionConfirm != null) {
+            if (deletionConfirm.yesButton != null && deletionConfirm.yesButton.clicked) {
+                deletionConfirm.Destroy();
+                deletionConfirm = null;
+                VoezEditor.Editor.project.DeleteTrack(data.id);
+                VoezEditor.Editor.RefreshAllNotes();
+                VoezEditor.Editor.RefreshAllTracks();
+            }
+            if (deletionConfirm.noButton != null && deletionConfirm.noButton.clicked) {
+                deletionConfirm.Destroy();
+                deletionConfirm = null;
+            }
         }
     }
 

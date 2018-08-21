@@ -39,6 +39,23 @@ public class ProjectData {
         notes.Add(data);
     }
 
+    public void DeleteTrack(int ID)
+    {
+        for (int i = 0; i < tracks.Count; i += 1) {
+            if (tracks[i].id == ID) {
+                List<int> noteIDsToDelete = new List<int>();
+                for(int j = 0; j<notes.Count; j+=1) {
+                    if (notes[j].track == ID)
+                        noteIDsToDelete.Add(notes[j].id);
+                }
+                for (int j = 0; j < noteIDsToDelete.Count; j += 1)
+                    DeleteNote(noteIDsToDelete[j]);
+                tracks.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
     // Load Project from disk
     public void LoadFromActiveProject()
     {

@@ -127,4 +127,11 @@ public class Button : UIElement {
         }
         base.DrawSprites(sGroup, frameProgress);
     }
+
+    public override void Destroy()
+    {
+        base.Destroy();
+        if (myText != null)
+            myText.RemoveFromContainer();
+    }
 }

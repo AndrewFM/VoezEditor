@@ -106,7 +106,7 @@ public class EditorProcess : MainLoopProcess {
             currentFrame += 1 * musicPlayer.playbackSpeed;
 
         // Frame Advancing while Paused
-        if (EditMode && !MenuOpen) {
+        if (EditMode && !MenuOpen && !ui.bpmButton.toggled) {
             float delta = 1;
             if (selectedTimeSnap > 0) {
                 if (project.songBPM > 0) {

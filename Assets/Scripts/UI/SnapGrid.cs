@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-class SnapGrid : UIElement {
+public class SnapGrid : UIElement {
     public float lastSnapGridSetting;
+    public int lastBPM;
+    public bool despawned;
 
     public SnapGrid() {
         lastSnapGridSetting = VoezEditor.Editor.selectedTimeSnap;
+        lastBPM = VoezEditor.Editor.project.songBPM;
     }
 
     public override void Update() {
@@ -50,17 +53,24 @@ class SnapGrid : UIElement {
     }
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress) {
-        if (lastSnapGridSetting != VoezEditor.Editor.selectedTimeSnap) {
+        if (VoezEditor.Editor.selectedTimeSnap == 0 || !VoezEditor.Editor.EditMode) {
+            foreach (FSprite fsprite in sGroup.sprites)
+                fsprite.RemoveFromContainer();
+            despawned = true;
+        }
+        else if (despawned) {
             ReInitiateSprites(sGroup);
             lastSnapGridSetting = VoezEditor.Editor.selectedTimeSnap;
+            despawned = false;
         }
 
-        if (VoezEditor.Editor.selectedTimeSnap == 0 || !VoezEditor.Editor.EditMode) {
-            // No Grid
-            for (int i = 0; i < sGroup.sprites.Length; i += 1) {
-                sGroup.sprites[i].isVisible = false;
+        if (!despawned)
+        {
+            if (lastSnapGridSetting != VoezEditor.Editor.selectedTimeSnap || lastBPM != VoezEditor.Editor.project.songBPM) {
+                ReInitiateSprites(sGroup);
+                lastSnapGridSetting = VoezEditor.Editor.selectedTimeSnap;
             }
-        } else {
+
             float timeIncrement = 0;
             if (VoezEditor.Editor.project.songBPM > 0) {
                 float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
@@ -78,7 +88,7 @@ class SnapGrid : UIElement {
                 else {
                     sGroup.sprites[i].isVisible = true;
                     sGroup.sprites[i].x = VoezEditor.windowRes.x * 0.5f;
-                    sGroup.sprites[i].y = (VoezEditor.windowRes.y * (1f - Track.TRACK_SCREEN_HEIGHT)) + (offset * pixelsPerSecond) + (i * timeIncrement * pixelsPerSecond);
+                    sGroup.sprites[i].y = (VoezEditor.windowRes.y * (1f - Track.TRACK_SCREEN_HEIGHT)) - (offset * pixelsPerSecond) + (i * timeIncrement * pixelsPerSecond);
                 }
             }
         }

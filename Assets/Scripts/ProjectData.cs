@@ -4,7 +4,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 public class ProjectData {
-
     public Texture2D background;
     public AudioClip songClip;
     public List<NoteData> notes;
@@ -12,8 +11,9 @@ public class ProjectData {
     public string projectFolder;
     public string notesFileName;
     public string tracksFileName;
-    public int songBPM = 0;
+    public string infoFileName;
     public string infoString;
+    public int songBPM = 120;
 
     public ProjectData()
     {
@@ -59,12 +59,14 @@ public class ProjectData {
 
             // Info File
             if (projectFiles[i].Contains("info_")) {
+                infoFileName = projectFiles[i];
                 infoString = File.ReadAllText(projectFiles[i]);
                 if (infoString.Contains("\"bpm\"")) {
                     string bpmPart = infoString.Substring(infoString.IndexOf("\"bpm\""));
                     int bpmStartInd = bpmPart.IndexOf(":");
                     int bpmEndInd = bpmPart.IndexOf(",");
                     songBPM = int.Parse(bpmPart.Substring(bpmStartInd + 1, bpmEndInd - bpmStartInd - 1));
+                    songBPM = Mathf.Clamp(songBPM, 10, 250);
                 }
             }
 
@@ -196,6 +198,14 @@ public class ProjectData {
     // Save Project back to disk
     public void ExportActiveProject()
     {
+        // Info File
+        if (infoFileName == null) {
+            File.WriteAllText(projectFolder+"/info_song.txt", "{\"bpm\":"+songBPM.ToString()+",\"id\":0}");
+        } else {
+            infoString = Regex.Replace(infoString, "\"bpm\":[0-9]+,", "\"bpm\":" + songBPM.ToString() + ",");
+            File.WriteAllText(infoFileName, infoString);
+        }
+
         // Notes Mapping File
         notes.Sort((a, b) => (a.time.CompareTo(b.time)));
         string notesString = "[";

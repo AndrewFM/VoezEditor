@@ -17,7 +17,7 @@ public class Button : UIElement {
         this.pos = pos;
         this.size = size;
         this.diamond = diamond;
-        this.visible = true;
+        visible = true;
         mySymbol = new FSprite(symbolName);
     }
 
@@ -26,6 +26,7 @@ public class Button : UIElement {
         this.pos = pos;
         this.size = size;
         this.diamond = diamond;
+        visible = true;
         myText = new FLabel(fontName, text);
     }
 

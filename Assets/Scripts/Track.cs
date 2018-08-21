@@ -10,6 +10,7 @@ public class Track : DrawableObject {
     public bool activeHover;
     public float currentWidth;
     public float flashEffectTime;
+    public float pulseFlashEffectTime;
 
     public Track(ProjectData.TrackData data)
     {
@@ -37,6 +38,22 @@ public class Track : DrawableObject {
             readyForDeletion = true;
         if (flashEffectTime > 0)
             flashEffectTime -= 1;
+        if (pulseFlashEffectTime > 0)
+            pulseFlashEffectTime -= 1;
+
+        // BPM Pulsing in BPM Edit Mode
+        if (VoezEditor.Editor.ui.bpmButton.toggled && VoezEditor.Editor.musicPlayer.source.isPlaying) {
+            float timeIncrement = 0;
+            if (VoezEditor.Editor.project.songBPM > 0) {
+                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
+                timeIncrement = secondsPerBeat; // BPM data available; set time snap to match BPM
+            } else
+                timeIncrement = 1f; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
+            float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
+
+            if (offset <= 1f / VoezEditor.Editor.framesPerSecond)
+                pulseFlashEffectTime = 5;
+        }
     }
 
     // Move Tweening
@@ -172,11 +189,12 @@ public class Track : DrawableObject {
         for (int i = 0; i < sGroup.sprites.Length; i += 1)
             sGroup.sprites[i].y = lerpPos.y;
 
-        if (flashEffectTime > 0) {
+        if (flashEffectTime > 0 || pulseFlashEffectTime > 0) {
             sGroup.sprites[Spr_BottomDiamond].scale = 1.25f;
         }
         else {
             sGroup.sprites[Spr_BottomDiamond].scale = 0.5f;
+            sGroup.sprites[Spr_BottomDiamond].color = Color.black;
         }
 
         if (activeHover) {
@@ -188,6 +206,9 @@ public class Track : DrawableObject {
             sGroup.sprites[Spr_BottomDiamond].color = Color.black;
             sGroup.sprites[Spr_BackGradient].alpha = 0.9f;
         }
+
+        if (pulseFlashEffectTime > 0)
+            sGroup.sprites[Spr_BottomDiamond].color = Color.white;
 
         base.DrawSprites(sGroup, frameProgress);
     }

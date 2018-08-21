@@ -198,15 +198,7 @@ public class NoteEditor : UIElement {
         }
 
         float delta = 0;
-        float baseDelta = 1f / VoezEditor.Editor.framesPerSecond;
-        if (VoezEditor.Editor.selectedTimeSnap > 0) {
-            if (VoezEditor.Editor.project.songBPM > 0) {
-                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
-                baseDelta = secondsPerBeat / VoezEditor.Editor.selectedTimeSnap; // BPM data available; set time snap to match BPM
-            }
-            else
-                baseDelta = 1f / VoezEditor.Editor.selectedTimeSnap;  // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-        }
+        float baseDelta = VoezEditor.Editor.GetBPMTimeIncrement();
         if (!VoezEditor.Editor.ui.bpmButton.toggled) {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 delta = baseDelta;

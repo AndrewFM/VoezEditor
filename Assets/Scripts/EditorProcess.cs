@@ -109,16 +109,7 @@ public class EditorProcess : MainLoopProcess {
 
         // Frame Advancing while Paused
         if (EditMode && !MenuOpen && !ui.bpmButton.toggled) {
-            float delta = 1;
-            if (selectedTimeSnap > 0) {
-                if (project.songBPM > 0) {
-                    float secondsPerBeat = 60f / project.songBPM;
-                    float framesPerBeat = secondsPerBeat * framesPerSecond;
-                    delta = framesPerBeat / selectedTimeSnap; // BPM data available; set time snap to match BPM
-                }
-                else
-                    delta = framesPerSecond / selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-            }
+            float delta = GetBPMTimeIncrement() * framesPerSecond;
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 currentFrame = Mathf.Min(currentFrame + delta, musicPlayer.source.clip.length * framesPerSecond);
             if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
@@ -168,7 +159,7 @@ public class EditorProcess : MainLoopProcess {
                     newNote.time = songTime;
                     newNote.track = nearestTrack.ID;
                     newNote.type = selectedNoteType;
-                    project.notes.Add(newNote);
+                    project.AddNote(newNote);
                     RefreshAllNotes();
                 }
             }
@@ -241,21 +232,26 @@ public class EditorProcess : MainLoopProcess {
         return false;
     }
 
+    public float GetBPMTimeIncrement()
+    {
+        if (selectedTimeSnap == 0)
+            return 1f / framesPerSecond;
+        float timeIncrement = 0;
+        if (project.songBPM > 0) {
+            float secondsPerBeat = 60f / project.songBPM;
+            timeIncrement = secondsPerBeat / selectedTimeSnap; // BPM data available; set time snap to match BPM
+        } else
+            timeIncrement = 1f / selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
+        return timeIncrement;
+    }
+
     public void AddObject(UpdatableObject obj)
     {
         this.updateList.Add(obj);
         if (obj is IDrawable) {
             SpriteGroup group = new SpriteGroup(obj as IDrawable);
             spriteGroups.Add(group);
-            if (obj is Track)
-                group.AddSpritesToContainer(tracksBottomContainer);
-            else if (obj is Note)
-                group.AddSpritesToContainer(notesContainer);
-            else if (obj is Note.HoldTick)
-                group.AddSpritesToContainer(ticksContainer);
-            else if (obj is SnapGrid)
-                group.AddSpritesToContainer(gridContainer);
-            else if (obj is UIElement)
+            if (obj is UIElement)
                 group.AddSpritesToContainer(foregroundContainer);
             else
                 group.AddSpritesToContainer(backgroundContainer);
@@ -266,7 +262,7 @@ public class EditorProcess : MainLoopProcess {
             activeNotes.Add(obj as Note);
     }
 
-    public void PurgeObject(UpdatableObject obj)
+    private void PurgeObject(UpdatableObject obj)
     {
         updateList.Remove(obj);
         if (obj is IDrawable) {

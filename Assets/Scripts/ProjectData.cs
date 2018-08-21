@@ -56,6 +56,11 @@ public class ProjectData {
         }
     }
 
+    public void AddTrack(TrackData data)
+    {
+        tracks.Add(data);
+    }
+
     // Load Project from disk
     public void LoadFromActiveProject()
     {
@@ -223,8 +228,48 @@ public class ProjectData {
             File.WriteAllText(infoFileName, infoString);
         }
 
+        // Track Mapping File
+        // WARNING: Order matters here. Track mapping needs to be exported first before notes mapping.
+        tracks.Sort((a, b) => (a.start.CompareTo(b.start))); // Sort tracks ascending by start time.
+        // Track IDs will be changed to match new sorted order. Relink all notes to new track IDs.
+        for (int i=0; i<notes.Count; i+=1) {
+            for(int j=0; j<tracks.Count; j+=1) {
+                if (notes[i].track == tracks[j].id) {
+                    notes[i].track = j;
+                    break;
+                }
+            }
+        }
+        // Apply new track IDs
+        for (int i = 0; i < tracks.Count; i += 1)
+            tracks[i].id = i;
+        string tracksString = "[";
+        for (int i = 0; i < tracks.Count; i += 1) {
+            tracksString += "{";
+            tracksString += "\"Id\":" + tracks[i].id.ToString() + ",";
+            tracksString += "\"EntranceOn\":" + (tracks[i].entranceOn ? "true" : "false") + ",";
+            tracksString += "\"PositionLock\":" + (tracks[i].positionLock ? "true" : "false") + ",";
+            tracksString += "\"X\":" + tracks[i].x.ToString() + ",";
+            tracksString += "\"Size\":" + tracks[i].size.ToString() + ",";
+            tracksString += "\"Start\":" + tracks[i].start.ToString() + ",";
+            tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
+            tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
+            tracksString += "\"Move\":[";
+            tracksString += TransformationsListToString(tracks[i].move, false);
+            tracksString += "],\"Scale\":[";
+            tracksString += TransformationsListToString(tracks[i].scale, false);
+            tracksString += "],\"ColorChange\":[";
+            tracksString += TransformationsListToString(tracks[i].colorChange, true);
+            if (i == tracks.Count - 1)
+                tracksString += "]}";
+            else
+                tracksString += "]},";
+        }
+        tracksString += "]";
+        File.WriteAllText(tracksFileName, tracksString);
+
         // Notes Mapping File
-        notes.Sort((a, b) => (a.time.CompareTo(b.time)));
+        notes.Sort((a, b) => (a.time.CompareTo(b.time))); // Sort notes ascending by time spawned.
         string notesString = "[";
         for (int i = 0; i < notes.Count; i += 1) {
             notesString += "{";
@@ -252,32 +297,8 @@ public class ProjectData {
         }
         notesString += "]";
         File.WriteAllText(notesFileName, notesString);
-
-        // Track Mapping File
-        string tracksString = "[";
-        for (int i = 0; i < tracks.Count; i += 1) {
-            tracksString += "{";
-            tracksString += "\"Id\":" + tracks[i].id.ToString() + ",";
-            tracksString += "\"EntranceOn\":" + (tracks[i].entranceOn ? "true" : "false") + ",";
-            tracksString += "\"PositionLock\":" + (tracks[i].positionLock ? "true" : "false") + ",";
-            tracksString += "\"X\":" + tracks[i].x.ToString() + ",";
-            tracksString += "\"Size\":" + tracks[i].size.ToString() + ",";
-            tracksString += "\"Start\":" + tracks[i].start.ToString() + ",";
-            tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
-            tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
-            tracksString += "\"Move\":[";
-            tracksString += TransformationsListToString(tracks[i].move, false);
-            tracksString += "],\"Scale\":[";
-            tracksString += TransformationsListToString(tracks[i].scale, false);
-            tracksString += "],\"ColorChange\":[";
-            tracksString += TransformationsListToString(tracks[i].colorChange, true);
-            if (i == tracks.Count - 1)
-                tracksString += "]}";
-            else
-                tracksString += "]},";
-        }
-        tracksString += "]";
-        File.WriteAllText(tracksFileName, tracksString);
+        VoezEditor.Editor.RefreshAllNotes();
+        VoezEditor.Editor.RefreshAllTracks();
     }
 
     private string TransformationsListToString(List<TrackTransformation> transformList, bool intValue)

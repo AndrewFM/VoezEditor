@@ -15,6 +15,7 @@ public class EditorUI {
     public Button[] noteTypes;
     public Slider playbackSlider;
     public SnapGrid grid;
+    public TrackAddPreview trackAdder;
     public DropshadowLabel playbackTimeLabel;
 
 	public EditorUI()
@@ -104,6 +105,8 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(playbackSlider);
         grid = new SnapGrid();
         VoezEditor.Editor.AddObject(grid);
+        trackAdder = new TrackAddPreview();
+        VoezEditor.Editor.AddObject(trackAdder);
         playbackTimeLabel = new DropshadowLabel("Raleway24", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, bbPad + bbSize * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
     }
@@ -170,7 +173,7 @@ public class EditorUI {
         }
 
         // Jump Playback To Loop Point
-        if (playbackSlider.loopPoint >= 0f && (playButton.rightClicked || Input.GetKeyDown(KeyCode.Return))) {
+        if (playbackSlider.loopPoint >= 0f && (playButton.rightClicked || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(2))) {
             VoezEditor.Editor.musicPlayer.source.time = VoezEditor.Editor.musicPlayer.source.clip.length * Mathf.Clamp(playbackSlider.loopPoint, 0f, 0.99f);
             VoezEditor.Editor.currentFrame = (int)(VoezEditor.Editor.musicPlayer.source.time * VoezEditor.Editor.framesPerSecond);
             grid.SnapPlaytimeToGrid();

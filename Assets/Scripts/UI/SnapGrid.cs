@@ -21,14 +21,7 @@ public class SnapGrid : UIElement {
     public void SnapPlaytimeToGrid()
     {
         if (VoezEditor.Editor.selectedTimeSnap > 0) {
-            float timeIncrement = 0;
-            if (VoezEditor.Editor.project.songBPM > 0) {
-                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
-                float framesPerBeat = secondsPerBeat * VoezEditor.Editor.framesPerSecond;
-                timeIncrement = framesPerBeat / VoezEditor.Editor.selectedTimeSnap; // BPM data available; set time snap to match BPM
-            } else
-                timeIncrement = VoezEditor.Editor.framesPerSecond / VoezEditor.Editor.selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-
+            float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement()*VoezEditor.Editor.framesPerSecond;
             VoezEditor.Editor.currentFrame = (Mathf.Floor(VoezEditor.Editor.currentFrame / timeIncrement) * timeIncrement);
         }
     }
@@ -71,13 +64,7 @@ public class SnapGrid : UIElement {
                 lastSnapGridSetting = VoezEditor.Editor.selectedTimeSnap;
             }
 
-            float timeIncrement = 0;
-            if (VoezEditor.Editor.project.songBPM > 0) {
-                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
-                timeIncrement = secondsPerBeat / VoezEditor.Editor.selectedTimeSnap; // BPM data available; set time snap to match BPM
-            } else
-                timeIncrement = 1f / VoezEditor.Editor.selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-
+            float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
             float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
             float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / Note.NOTE_DURATION;
             int numVisible = Mathf.CeilToInt(Note.NOTE_DURATION / timeIncrement);
@@ -94,5 +81,13 @@ public class SnapGrid : UIElement {
         }
 
         base.DrawSprites(sGroup, frameProgress);
+    }
+
+    public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
+    {
+        foreach (FSprite fsprite in sGroup.sprites) {
+            fsprite.RemoveFromContainer();
+            VoezEditor.Editor.gridContainer.AddChild(sGroup.sprites[0]);
+        }
     }
 }

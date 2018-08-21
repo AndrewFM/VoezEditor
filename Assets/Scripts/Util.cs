@@ -9,11 +9,19 @@ public class Util {
         return new Color(r / 255f, g / 255f, b / 255f);
     }
 
-    // X position in pixels of screen element given positioning factor from 0.0 - 1.0
+    // Returns X position in pixels of a screen element given positioning factor from 0.0 - 1.0
     public static int ScreenPosX(float xFactor)
     {
         int margin = 120;
         return (int)(margin + ((VoezEditor.windowRes.x - margin * 2) * xFactor));
+    }
+
+    // Inverse of above function. Returns positioning factor from 0.0 - 1.0 based on X position in pixels of a screen element.
+    public static float InvScreenPosX(float xPixels)
+    {
+        int margin = 120;
+        float retval = (xPixels - margin) / (VoezEditor.windowRes.x - margin * 2);
+        return Mathf.Clamp(retval, 0f, 1f);
     }
 
     // MM:SS timestamp from number of seconds

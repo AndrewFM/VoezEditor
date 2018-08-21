@@ -157,13 +157,14 @@ public class Note : DrawableObject {
     {
         foreach (FSprite fsprite in sGroup.sprites)
             fsprite.RemoveFromContainer();
+        FContainer myContainer = VoezEditor.Editor.notesContainer;
         if (data.type == ProjectData.NoteData.NoteType.HOLD) {
-            newContainer.AddChild(sGroup.sprites[1]);
-            newContainer.AddChild(sGroup.sprites[0]);
-            newContainer.AddChild(sGroup.sprites[2]);
+            myContainer.AddChild(sGroup.sprites[1]);
+            myContainer.AddChild(sGroup.sprites[0]);
+            myContainer.AddChild(sGroup.sprites[2]);
         }
         else
-            newContainer.AddChild(sGroup.sprites[0]);
+            myContainer.AddChild(sGroup.sprites[0]);
     }
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
@@ -255,6 +256,15 @@ public class Note : DrawableObject {
                 sGroup.sprites[0].color = Color.white;
 
             base.DrawSprites(sGroup, frameProgress);
+        }
+
+        public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
+        {
+            foreach (FSprite fsprite in sGroup.sprites) 
+            { 
+                fsprite.RemoveFromContainer();
+                VoezEditor.Editor.ticksContainer.AddChild(sGroup.sprites[0]);
+            }
         }
     }
 }

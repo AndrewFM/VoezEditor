@@ -12,6 +12,8 @@ public class ProjectData {
     public string projectFolder;
     public string notesFileName;
     public string tracksFileName;
+    public int songBPM = 0;
+    public string infoString;
 
     public ProjectData()
     {
@@ -53,6 +55,17 @@ public class ProjectData {
                 byte[] fileData = File.ReadAllBytes(projectFiles[i]);
                 background = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 background.LoadImage(fileData);
+            }
+
+            // Info File
+            if (projectFiles[i].Contains("info_")) {
+                infoString = File.ReadAllText(projectFiles[i]);
+                if (infoString.Contains("\"bpm\"")) {
+                    string bpmPart = infoString.Substring(infoString.IndexOf("\"bpm\""));
+                    int bpmStartInd = bpmPart.IndexOf(":");
+                    int bpmEndInd = bpmPart.IndexOf(",");
+                    songBPM = int.Parse(bpmPart.Substring(bpmStartInd + 1, bpmEndInd - bpmStartInd - 1));
+                }
             }
 
             // Notes Mapping File
@@ -200,7 +213,10 @@ public class ProjectData {
                 notesString += "slide";
             notesString += "\",\"Track\":" + notes[i].track.ToString() + ",";
             notesString += "\"Time\":" + notes[i].time.ToString() + ",";
-            notesString += "\"Hold\":" + notes[i].hold.ToString() + ",";
+            if (notes[i].type == NoteData.NoteType.HOLD)
+                notesString += "\"Hold\":" + notes[i].hold.ToString() + ",";
+            else
+                notesString += "\"Hold\":0.0,";
             notesString += "\"Dir\":" + notes[i].dir.ToString();
             if (i == notes.Count - 1)
                 notesString += "}";

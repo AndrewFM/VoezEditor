@@ -12,17 +12,19 @@ public class EditorProcess : MainLoopProcess {
     public FContainer tracksTopContainer;
     public FContainer notesContainer;
     public FContainer ticksContainer;
+    public FContainer gridContainer;
     public FContainer foregroundContainer;
     public ProjectData project;
     public NoteEditor noteEditor;
     public MusicPlayer musicPlayer;
     public EditorUI ui;
     public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
-
+    public float selectedTimeSnap = 4;
     public float currentFrame;
     public float currentTime;
     public float songTime;
     public int tempNoteID = -1;
+    public bool init;
 
     public EditorProcess()
     {
@@ -37,18 +39,15 @@ public class EditorProcess : MainLoopProcess {
         tracksTopContainer = new FContainer();
         notesContainer = new FContainer();
         ticksContainer = new FContainer();
+        gridContainer = new FContainer();
         foregroundContainer = new FContainer();
         Futile.stage.AddChild(backgroundContainer);
         Futile.stage.AddChild(tracksBottomContainer);
         Futile.stage.AddChild(tracksTopContainer);
         Futile.stage.AddChild(notesContainer);
         Futile.stage.AddChild(ticksContainer);
+        Futile.stage.AddChild(gridContainer);
         Futile.stage.AddChild(foregroundContainer);
-
-        musicPlayer = new MusicPlayer();
-        ui = new EditorUI();
-        InitiateSong();
-        musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
     }
 
     public bool EditMode
@@ -63,8 +62,6 @@ public class EditorProcess : MainLoopProcess {
 
     public void InitiateSong()
     {
-        project = new ProjectData();
-        project.LoadFromActiveProject();
         if (project.songClip != null)
             musicPlayer.PlayAudioClip(project.songClip);
         if (project.background != null)
@@ -75,6 +72,17 @@ public class EditorProcess : MainLoopProcess {
     {
         base.Update();
         
+        // Post-Initialization
+        if (!init) {
+            init = true;
+            project = new ProjectData();
+            project.LoadFromActiveProject();
+            musicPlayer = new MusicPlayer();
+            ui = new EditorUI();
+            InitiateSong();
+            musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
+        }
+
         // Update all active objects
         musicPlayer.Update();
         ui.Update();
@@ -99,14 +107,24 @@ public class EditorProcess : MainLoopProcess {
 
         // Frame Advancing while Paused
         if (EditMode && !MenuOpen) {
-            if (Input.GetKeyDown(KeyCode.RightArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-                currentFrame = Mathf.Min(currentFrame + 4, musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-                currentFrame = Mathf.Max(currentFrame - 4, 0);
-            if (Input.GetKeyDown(KeyCode.UpArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-                currentFrame = Mathf.Min(currentFrame + 16, musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.DownArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-                currentFrame = Mathf.Max(currentFrame - 16, 0);
+            float delta = 1;
+            if (selectedTimeSnap > 0) {
+                if (project.songBPM > 0) {
+                    float secondsPerBeat = 60f / project.songBPM;
+                    float framesPerBeat = secondsPerBeat * framesPerSecond;
+                    delta = framesPerBeat / selectedTimeSnap; // BPM data available; set time snap to match BPM
+                }
+                else
+                    delta = framesPerSecond / selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
+            }
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+                currentFrame = Mathf.Min(currentFrame + delta, musicPlayer.source.clip.length * framesPerSecond);
+            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+                currentFrame = Mathf.Max(currentFrame - delta, 0);
+            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+                currentFrame = Mathf.Min(currentFrame + (delta * 4f), musicPlayer.source.clip.length * framesPerSecond);
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+                currentFrame = Mathf.Max(currentFrame - (delta * 4f), 0);
         }
 
         currentTime = currentFrame / framesPerSecond;
@@ -233,6 +251,8 @@ public class EditorProcess : MainLoopProcess {
                 group.AddSpritesToContainer(notesContainer);
             else if (obj is Note.HoldTick)
                 group.AddSpritesToContainer(ticksContainer);
+            else if (obj is SnapGrid)
+                group.AddSpritesToContainer(gridContainer);
             else if (obj is UIElement)
                 group.AddSpritesToContainer(foregroundContainer);
             else

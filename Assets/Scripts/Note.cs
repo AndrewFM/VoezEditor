@@ -82,7 +82,7 @@ public class Note : DrawableObject {
                 VoezEditor.Editor.RefreshAllNotes();
             }
             // Edit Note
-            if (MouseOver && Input.GetMouseButtonDown(0)) {
+            if (MouseOver && Input.GetMouseButtonDown(0) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
                 float noteEditWindowX = 0f;
                 if (pos.x > VoezEditor.windowRes.x * 0.5f)
                     noteEditWindowX = pos.x - NoteEditor.WIDTH * 0.5f - 64f;

@@ -18,14 +18,26 @@ public class DrawableObject : UpdatableObject, IDrawable {
             sGroup.CleanSpritesAndRemove();
     }
 
-    public virtual void AddToContainer(SpriteGroup sGroup, FContainer newContatiner)
+    public virtual void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
     {
+        defaultContainer = newContainer;
         foreach (FSprite fsprite in sGroup.sprites) {
             fsprite.RemoveFromContainer();
-            newContatiner.AddChild(fsprite);
+            newContainer.AddChild(fsprite);
         }
     }
 
+    public virtual void ReInitiateSprites(SpriteGroup sGroup)
+    {
+        foreach (FSprite fsprite in sGroup.sprites) {
+            fsprite.RemoveFromContainer();
+        }
+        sGroup.sprites = null;
+        InitiateSprites(sGroup);
+        AddToContainer(sGroup, defaultContainer);
+    }
+
+    public FContainer defaultContainer;
     public Vector2 pos;
     public Vector2 lastPos;
 }

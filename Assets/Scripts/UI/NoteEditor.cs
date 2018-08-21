@@ -33,8 +33,8 @@ public class NoteEditor : UIElement {
         this.pos = pos;
 
         typeLabel = new FLabel("Raleway24", "Type:");
-        timeLabel = new FLabel("Raleway24", "Spawn Time: "+data.time.ToString());
-        holdLabel = new FLabel("Raleway24", "Hold Duration: "+data.hold.ToString());
+        timeLabel = new FLabel("Raleway24", "Spawn Time: "+data.time.ToString("0.000"));
+        holdLabel = new FLabel("Raleway24", "Hold Duration: "+data.hold.ToString("0.000"));
         dirLabel = new FLabel("Raleway24", "Direction:");
     }
 
@@ -193,19 +193,28 @@ public class NoteEditor : UIElement {
         }
 
         float delta = 0;
-        if (Input.GetKeyDown(KeyCode.RightArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-            delta = 1f / VoezEditor.Editor.framesPerSecond;
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-            delta = -1f / VoezEditor.Editor.framesPerSecond;
-        if (Input.GetKeyDown(KeyCode.UpArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-            delta = 8f / VoezEditor.Editor.framesPerSecond;
-        if (Input.GetKeyDown(KeyCode.DownArrow) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-            delta = -8f / VoezEditor.Editor.framesPerSecond;
+        float baseDelta = 1f / VoezEditor.Editor.framesPerSecond;
+        if (VoezEditor.Editor.selectedTimeSnap > 0) {
+            if (VoezEditor.Editor.project.songBPM > 0) {
+                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
+                baseDelta = secondsPerBeat / VoezEditor.Editor.selectedTimeSnap; // BPM data available; set time snap to match BPM
+            }
+            else
+                baseDelta = 1f / VoezEditor.Editor.selectedTimeSnap;  // No BPM data; treat time snap as beats per second -- ie: 60 BPM
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            delta = baseDelta;
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            delta = -baseDelta;
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            delta = 4f * baseDelta;
+        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            delta = -4f * baseDelta;
 
         if (delta != 0) {
             if (selectedLine == 0) {
                 data.time = Mathf.Clamp(data.time + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.hold);
-                timeLabel.text = "Spawn Time: " + data.time.ToString();
+                timeLabel.text = "Spawn Time: " + data.time.ToString("0.000");
             }
             if (selectedLine == 1) {
                 data.hold = Mathf.Clamp(data.hold + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.time);
@@ -213,7 +222,7 @@ public class NoteEditor : UIElement {
                     data.type = ProjectData.NoteData.NoteType.HOLD;
                 else
                     data.type = ProjectData.NoteData.NoteType.CLICK;
-                holdLabel.text = "Hold Duration: " + data.hold.ToString(); 
+                holdLabel.text = "Hold Duration: " + data.hold.ToString("0.000"); 
             }
             VoezEditor.Editor.RefreshNote(data.id);
         }

@@ -76,6 +76,16 @@ public class Track : DrawableObject {
                     VoezEditor.Editor.RefreshAllTracks();
                 }
             }
+            // Edit Track
+            if (activeHover && Input.GetMouseButtonDown(0) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
+                float trackEditWindowX = 0f;
+                if (pos.x > VoezEditor.windowRes.x * 0.5f)
+                    trackEditWindowX = pos.x - TrackEditor.WIDTH * 0.5f - 64f;
+                else
+                    trackEditWindowX = pos.x + TrackEditor.WIDTH * 0.5f + 64f;
+                VoezEditor.Editor.trackEditor = new TrackEditor(new Vector2(trackEditWindowX, VoezEditor.windowRes.y * 0.55f), data);
+                VoezEditor.Editor.AddObject(VoezEditor.Editor.trackEditor);
+            }
         }
 
         if (deletionConfirm != null) {
@@ -234,7 +244,7 @@ public class Track : DrawableObject {
             sGroup.sprites[Spr_BottomDiamond].color = Color.black;
         }
 
-        if (activeHover) {
+        if (activeHover || (VoezEditor.Editor.trackEditor != null && VoezEditor.Editor.trackEditor.data.id == ID)) {
             sGroup.sprites[Spr_MiddleGradLine].color = Color.red;
             sGroup.sprites[Spr_BottomDiamond].color = Color.red;
             sGroup.sprites[Spr_BackGradient].alpha = 1f;

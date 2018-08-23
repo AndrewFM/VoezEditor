@@ -181,6 +181,7 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">Raleway16.png</key>
             <key type="filename">Raleway24.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -198,6 +199,7 @@
         <key>fileList</key>
         <array>
             <filename>Raleway24.png</filename>
+            <filename>Raleway16.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

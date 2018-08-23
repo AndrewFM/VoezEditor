@@ -16,6 +16,7 @@ public class EditorProcess : MainLoopProcess {
     public FContainer foregroundContainer;
     public ProjectData project;
     public NoteEditor noteEditor;
+    public TrackEditor trackEditor;
     public MusicPlayer musicPlayer;
     public EditorUI ui;
     public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
@@ -59,7 +60,7 @@ public class EditorProcess : MainLoopProcess {
 
     public bool MenuOpen
     {
-        get { return noteEditor != null || confirmBoxOpen; }
+        get { return noteEditor != null || trackEditor != null || confirmBoxOpen; }
     }
 
     public void InitiateSong()
@@ -183,6 +184,16 @@ public class EditorProcess : MainLoopProcess {
         for (int i = 0; i < activeNotes.Count; i += 1) {
             if (activeNotes[i].ID == id) {
                 activeNotes[i].Destroy();
+                break;
+            }
+        }
+    }
+
+    public void RefreshTrack(int id)
+    {
+        for (int i = 0; i < activeTracks.Count; i += 1) {
+            if (activeTracks[i].ID == id) {
+                activeTracks[i].Destroy();
                 break;
             }
         }

@@ -80,17 +80,20 @@ public class Util {
 
     public static float LerpCircEaseOut(float start, float end, float perc)
     {
+        // TODO: Broken formula
         return (end - start) * ((perc - 1) * Mathf.Sqrt(1 - perc*perc))  + start;
     }
 
     public static float LerpExpEaseIn(float start, float end, float perc)
     {
+        // TODO: Update Quint to actual EXP
         //return (end - start) * Mathf.Pow(2, 10f * (perc - 1)) + start;
         return (end - start) * Mathf.Pow(perc, 5) + start;
     }
 
     public static float LerpExpEaseOut(float start, float end, float perc)
     {
+        // TODO: Broken formula
         return (1 + (1-perc)*Mathf.Pow(perc, 4)) * (end-start) + start;
         //return (end - start) * (-Mathf.Pow(2, -10f * (perc - 1)) + 1f) + start;
     }

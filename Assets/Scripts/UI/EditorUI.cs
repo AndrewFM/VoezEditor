@@ -99,8 +99,8 @@ public class EditorUI {
             VoezEditor.Editor.AddObject(snapTimes[i]);
         }
 
-        float sliderStart = bbPad * 7 + bbSize * 6 + 64f;
-        float sliderEnd = VoezEditor.windowRes.x - 250f;
+        float sliderStart = bbPad * 7 + bbSize * 6 + 44f;
+        float sliderEnd = VoezEditor.windowRes.x - 230f;
         playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, bbPad + bbSize * 0.5f), sliderEnd - sliderStart);
         VoezEditor.Editor.AddObject(playbackSlider);
         grid = new SnapGrid();

@@ -181,6 +181,19 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">add.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>10,10,19,19</rect>
+                <key>scale9Paddings</key>
+                <rect>10,10,19,19</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">bottomGradient.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -204,6 +217,47 @@
                 <rect>15,15,30,30</rect>
                 <key>scale9Paddings</key>
                 <rect>15,15,30,30</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">color.png</key>
+            <key type="filename">notes.png</key>
+            <key type="filename">scale.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>16,16,33,33</rect>
+                <key>scale9Paddings</key>
+                <rect>16,16,33,33</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">copy.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">delete.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,10,16,19</rect>
+                <key>scale9Paddings</key>
+                <rect>8,10,16,19</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -247,29 +301,31 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">notes.png</key>
+            <key type="filename">mirror.png</key>
+            <key type="filename">move.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>16,16,33,33</rect>
+                <rect>10,6,19,12</rect>
                 <key>scale9Paddings</key>
-                <rect>16,16,33,33</rect>
+                <rect>10,6,19,12</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">outlineBoxLarge.png</key>
+            <key type="filename">next.png</key>
+            <key type="filename">prev.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>89,89,178,178</rect>
+                <rect>9,8,18,17</rect>
                 <key>scale9Paddings</key>
-                <rect>89,89,178,178</rect>
+                <rect>9,8,18,17</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -283,6 +339,19 @@
                 <rect>45,45,89,89</rect>
                 <key>scale9Paddings</key>
                 <rect>45,45,89,89</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">paste.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,9,15,18</rect>
+                <key>scale9Paddings</key>
+                <rect>8,9,15,18</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -401,7 +470,6 @@
             <filename>evenGradient.png</filename>
             <filename>bottomGradient.png</filename>
             <filename>holdTick.png</filename>
-            <filename>outlineBoxLarge.png</filename>
             <filename>outlineBoxMed.png</filename>
             <filename>pause.png</filename>
             <filename>play.png</filename>
@@ -410,6 +478,16 @@
             <filename>notes.png</filename>
             <filename>grid.png</filename>
             <filename>track.png</filename>
+            <filename>delete.png</filename>
+            <filename>copy.png</filename>
+            <filename>paste.png</filename>
+            <filename>mirror.png</filename>
+            <filename>next.png</filename>
+            <filename>prev.png</filename>
+            <filename>add.png</filename>
+            <filename>move.png</filename>
+            <filename>scale.png</filename>
+            <filename>color.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

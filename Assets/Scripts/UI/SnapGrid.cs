@@ -87,7 +87,7 @@ public class SnapGrid : UIElement {
     {
         foreach (FSprite fsprite in sGroup.sprites) {
             fsprite.RemoveFromContainer();
-            VoezEditor.Editor.gridContainer.AddChild(sGroup.sprites[0]);
+            VoezEditor.Editor.gridContainer.AddChild(fsprite);
         }
     }
 }

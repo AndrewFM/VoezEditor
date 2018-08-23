@@ -76,10 +76,7 @@ public class Button : UIElement {
             sGroup.sprites[0].scale = size / newEffectiveWidth;
         } else
             sGroup.sprites[0].scale = size / sGroup.sprites[0].width;
-        if (size > 350f)
-            sGroup.sprites[1] = new FSprite("outlineBoxLarge");
-        else
-            sGroup.sprites[1] = new FSprite("outlineBoxMed");
+        sGroup.sprites[1] = new FSprite("outlineBoxMed");
         if (diamond) {
             sGroup.sprites[1].rotation = 45f;
             float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[1].width, 2));

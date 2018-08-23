@@ -1,8 +1,16 @@
 {"frames": {
 
-"Raleway24.png":
+"Raleway16.png":
 {
 	"frame": {"x":2,"y":2,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+},
+"Raleway24.png":
+{
+	"frame": {"x":260,"y":2,"w":256,"h":256},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
@@ -13,8 +21,8 @@
 	"version": "1.0",
 	"image": "fontAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":260,"h":260},
+	"size": {"w":518,"h":260},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:599291295f3a5be6311a047920008508:cedd14c843e49c0750faad12e04a6b25:7bce6697796edaa9e8fd7f80550e98be$"
+	"smartupdate": "$TexturePacker:SmartUpdate:637beef24241b1a52bf0ced20727ac03:1da344283f0a1b56ee351bb90f3b9235:7bce6697796edaa9e8fd7f80550e98be$"
 }
 }

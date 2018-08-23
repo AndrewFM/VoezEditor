@@ -23,10 +23,8 @@ public class NoteEditor : UIElement {
     public bool init;
 
     public int Spr_Back { get { return 0; } }
-    public int Spr_BackBorder { get { return 1; } }
-    public int Spr_Hover { get { return 2; } }
-    public int Spr_Selector { get { return 3; } }
-    public int Spr_SelectorBorder { get { return 4; } }
+    public int Spr_Hover { get { return 1; } }
+    public int Spr_Selector { get { return 2; } }
 
     public NoteEditor(Vector2 pos, ProjectData.NoteData data)
     {
@@ -92,27 +90,20 @@ public class NoteEditor : UIElement {
 
     public override void InitiateSprites(SpriteGroup sGroup)
     {
-        sGroup.sprites = new FSprite[5];
+        sGroup.sprites = new FSprite[3];
 
         sGroup.sprites[Spr_Back] = new FSprite("Futile_White");
         sGroup.sprites[Spr_Back].color = Color.black;
         sGroup.sprites[Spr_Back].scaleX = (WIDTH+5) / sGroup.sprites[Spr_Back].width;
         sGroup.sprites[Spr_Back].scaleY = (HEIGHT+5) / sGroup.sprites[Spr_Back].height;
         sGroup.sprites[Spr_Back].alpha = 0.8f;
-        sGroup.sprites[Spr_BackBorder] = new FSprite("outlineBoxLarge");
-        sGroup.sprites[Spr_BackBorder].scaleX = WIDTH / sGroup.sprites[Spr_BackBorder].width;
-        sGroup.sprites[Spr_BackBorder].scaleY = HEIGHT / sGroup.sprites[Spr_BackBorder].height;
 
         sGroup.sprites[Spr_Selector] = new FSprite("Futile_White");
         sGroup.sprites[Spr_Selector].scaleX = WIDTH / sGroup.sprites[Spr_Selector].width;
-        sGroup.sprites[Spr_Selector].scaleY = (LINE_HEIGHT+4) / sGroup.sprites[Spr_Selector].height;
+        sGroup.sprites[Spr_Selector].scaleY = LINE_HEIGHT / sGroup.sprites[Spr_Selector].height;
         sGroup.sprites[Spr_Selector].alpha = 0.5f;
         sGroup.sprites[Spr_Selector].color = Color.red;
         sGroup.sprites[Spr_Selector].anchorY = 1f;
-        sGroup.sprites[Spr_SelectorBorder] = new FSprite("outlineBoxLarge");
-        sGroup.sprites[Spr_SelectorBorder].scaleX = WIDTH / sGroup.sprites[Spr_SelectorBorder].width;
-        sGroup.sprites[Spr_SelectorBorder].scaleY = LINE_HEIGHT / sGroup.sprites[Spr_SelectorBorder].height;
-        sGroup.sprites[Spr_SelectorBorder].anchorY = 1f;
 
         sGroup.sprites[Spr_Hover] = new FSprite("Futile_White");
         sGroup.sprites[Spr_Hover].scaleX = WIDTH / sGroup.sprites[Spr_Hover].width;
@@ -246,9 +237,6 @@ public class NoteEditor : UIElement {
         Vector2 drawPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, frameProgress), Mathf.Lerp(lastPos.y, pos.y, frameProgress));
         sGroup.sprites[Spr_Back].x = drawPos.x;
         sGroup.sprites[Spr_Back].y = drawPos.y;
-        sGroup.sprites[Spr_BackBorder].x = drawPos.x;
-        sGroup.sprites[Spr_BackBorder].y = drawPos.y;
-        sGroup.sprites[Spr_BackBorder].isVisible = false;
 
         Vector3 mouse = Input.mousePosition;
         sGroup.sprites[Spr_Hover].isVisible = false;
@@ -256,7 +244,7 @@ public class NoteEditor : UIElement {
             if (mouse.x >= pos.x - WIDTH * 0.5f && mouse.x <= pos.x + WIDTH * 0.5f && mouse.y < pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i && mouse.y >= pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * (i+1)) {
                 sGroup.sprites[Spr_Hover].isVisible = true;
                 sGroup.sprites[Spr_Hover].x = drawPos.x;
-                sGroup.sprites[Spr_Hover].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i;
+                sGroup.sprites[Spr_Hover].y = drawPos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i;
 
                 if (Input.GetMouseButtonDown(0))
                     selectedLine = i;
@@ -264,10 +252,7 @@ public class NoteEditor : UIElement {
         }
 
         sGroup.sprites[Spr_Selector].x = drawPos.x;
-        sGroup.sprites[Spr_Selector].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine;
-        sGroup.sprites[Spr_SelectorBorder].x = drawPos.x;
-        sGroup.sprites[Spr_SelectorBorder].y = pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine + 2f;
-        sGroup.sprites[Spr_SelectorBorder].isVisible = false;
+        sGroup.sprites[Spr_Selector].y = drawPos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * selectedLine;
 
         timeLabel.x = pos.x - WIDTH * 0.5f + 10f + timeLabel.textRect.width * 0.5f;
         dirLabel.x = pos.x - WIDTH * 0.5f + 10f + dirLabel.textRect.width * 0.5f;

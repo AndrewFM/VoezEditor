@@ -10,6 +10,7 @@ public class DrawableObject : UpdatableObject, IDrawable {
 
     public virtual void InitiateSprites(SpriteGroup sGroup)
     {
+        sGroup.sprites = new FSprite[0];
     }
 
     public virtual void DrawSprites(SpriteGroup sGroup, float frameProgress)

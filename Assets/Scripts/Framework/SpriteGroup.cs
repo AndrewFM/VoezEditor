@@ -4,8 +4,8 @@ using System.Collections;
 public class SpriteGroup {
     public SpriteGroup(IDrawable obj)
     {
-        this.drawableObject = obj;
-        this.drawableObject.InitiateSprites(this);
+        drawableObject = obj;
+        drawableObject.InitiateSprites(this);
     }
 
     public void Update(float frameProgress)

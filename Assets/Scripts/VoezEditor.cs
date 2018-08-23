@@ -21,6 +21,7 @@ public class VoezEditor : MonoBehaviour {
         Futile.atlasManager.LoadAtlas("Atlases/mainAtlas");
         Futile.atlasManager.LoadAtlas("Atlases/fontAtlas");
         Futile.atlasManager.LoadFont("Raleway24", "Raleway24", "Atlases/Raleway24", 0f, 0f);
+        Futile.atlasManager.LoadFont("Raleway16", "Raleway16", "Atlases/Raleway16", 0f, 0f);
 
         activeProcess = new EditorProcess();
     }

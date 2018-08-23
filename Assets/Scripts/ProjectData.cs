@@ -15,6 +15,9 @@ public class ProjectData {
     public string infoString;
     public int songBPM = 120;
 
+    public List<TrackTransformation> transformClipboard;
+    public TrackTransformation.TransformType clipboardContentsType;
+
     public ProjectData()
     {
         projectFolder = Application.dataPath + "/../ActiveProject";
@@ -341,6 +344,27 @@ public class ProjectData {
         return retStr;
     }
 
+    // Creates a deep copy of a list of track transformations (ie: not a reference to the original)
+    public static List<TrackTransformation> DeepCopyTransformationList(List<TrackTransformation> list)
+    {
+        List<TrackTransformation> newList = new List<TrackTransformation>();
+        for(int i=0; i<list.Count; i+=1) {
+            newList.Add(list[i].Copy());
+        }
+        return newList;
+    }
+
+    // Replaces the contents of the dest transformation list with the source transformation list, without breaking its original reference
+    public static void ReplaceTransformationList(List<TrackTransformation> source, List<TrackTransformation> dest)
+    {
+        dest.Clear();
+        for(int i=0; i<source.Count; i+=1) {
+            TrackTransformation newTrans = new TrackTransformation();
+            newTrans.Paste(source[i]);
+            dest.Add(newTrans);
+        }
+    }
+
     public enum Easing {
         LINEAR,
         EXP_IN,
@@ -366,6 +390,11 @@ public class ProjectData {
         Util.Color255(139, 174, 226), // 7 - Blue
         Util.Color255(118, 202, 195), // 8 - Cyan
         Util.Color255(208, 176, 252), // 9 - Purple
+    };
+
+    public static string[] colorNames = new string[]
+    {
+        "Red", "Yellow", "Gray", "Light Blue", "Green", "Orange", "Violet", "Blue", "Cyan", "Purple"
     };
 
     public class NoteData {
@@ -409,6 +438,30 @@ public class ProjectData {
         public float start;
         public float end;
         public Easing ease;
+
+        public enum TransformType {
+            MOVE,
+            SCALE,
+            COLOR
+        };
+
+        public TrackTransformation Copy()
+        {
+            TrackTransformation copiedTrans = new TrackTransformation();
+            copiedTrans.to = to;
+            copiedTrans.start = start;
+            copiedTrans.end = end;
+            copiedTrans.ease = ease;
+            return copiedTrans;
+        }
+
+        public void Paste(TrackTransformation newData)
+        {
+            to = newData.to;
+            start = newData.start;
+            end = newData.end;
+            ease = newData.ease;
+        }
 
         public System.Func<float, float, float, float> GetEaseFunction()
         {

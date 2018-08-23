@@ -42,7 +42,7 @@ public class TrackEditor : UIElement {
 
     public void SetPage(ProjectData.TrackTransformation.TransformType pageID)
     {
-        selectedLine = 0;
+        selectedLine = 2;
         page = pageID;
         RefreshValueLabel();
         if (keyframeEditor != null)
@@ -68,7 +68,7 @@ public class TrackEditor : UIElement {
         } else
             valueLabel.color = Color.white;
         if (page == ProjectData.TrackTransformation.TransformType.MOVE)
-            valueLabel.text = "Position: " + (data.x * 100f).ToString("0.0") + "%";
+            valueLabel.text = "Position: " + Mathf.FloorToInt(data.x * 100f).ToString() + "%";
         if (page == ProjectData.TrackTransformation.TransformType.SCALE)
             valueLabel.text = "Scale: " + data.size.ToString("0.00") + "x";
     }
@@ -145,13 +145,13 @@ public class TrackEditor : UIElement {
         float baseDelta = VoezEditor.Editor.GetBPMTimeIncrement();
         if (!VoezEditor.Editor.ui.bpmButton.toggled) {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-                delta = baseDelta;
+                delta = 1f;
             if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-                delta = -baseDelta;
+                delta = -1f;
             if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
-                delta = 4f * baseDelta;
+                delta = 4f;
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
-                delta = -4f * baseDelta;
+                delta = -4f;
         }
 
         if (keyframeEditor.transSelected >= 0)
@@ -160,9 +160,9 @@ public class TrackEditor : UIElement {
         if (delta != 0) {
             if (selectedLine == 0) {
                 if (data.move.Count == 0 && data.colorChange.Count == 0 && data.scale.Count == 0)
-                    data.start = Mathf.Clamp(data.start + delta, 0f, data.end);
+                    data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0f, data.end);
                 else {
-                    data.start = Mathf.Clamp(data.start + delta, 0f,
+                    data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0f,
                                              Mathf.Min(data.move.Count == 0 ? int.MaxValue : data.move[0].start, 
                                                        data.scale.Count == 0 ? int.MaxValue : data.scale[0].start,
                                                        data.colorChange.Count == 0 ? int.MaxValue : data.colorChange[0].start));
@@ -171,9 +171,9 @@ public class TrackEditor : UIElement {
             }
             if (selectedLine == 1) {
                 if (data.move.Count == 0 && data.colorChange.Count == 0 && data.scale.Count == 0)
-                    data.end = Mathf.Clamp(data.end + delta, data.start, VoezEditor.Editor.musicPlayer.source.clip.length);
+                    data.end = Mathf.Clamp(data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement(), data.start, VoezEditor.Editor.musicPlayer.source.clip.length);
                 else {
-                    data.end = Mathf.Clamp(data.end + delta,
+                    data.end = Mathf.Clamp(data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement(),
                                            Mathf.Max(data.move.Count == 0 ? 0 : data.move[data.move.Count-1].end,
                                                      data.scale.Count == 0 ? 0 : data.scale[data.scale.Count-1].end,
                                                      data.colorChange.Count == 0 ? 0 : data.colorChange[data.colorChange.Count-1].end),
@@ -195,6 +195,38 @@ public class TrackEditor : UIElement {
                 RefreshValueLabel();
             }
             VoezEditor.Editor.RefreshTrack(data.id);
+        }
+
+        // Mouse Slide Value Editing
+        if (Input.GetMouseButton(1)) {
+            if (selectedLine == 2 && page == ProjectData.TrackTransformation.TransformType.MOVE) {
+                VoezEditor.Editor.ui.trackAdder.previewScale = 1f; 
+                VoezEditor.Editor.ui.trackAdder.previewX = -1f; // will default to following the mouse
+                data.x = Util.InvScreenPosX(VoezEditor.Editor.ui.trackAdder.pos.x);
+                RefreshValueLabel();
+            }
+            if (selectedLine == 2 && page == ProjectData.TrackTransformation.TransformType.SCALE) {
+                Track myTrack = null;
+                for(int i=0; i<VoezEditor.Editor.activeTracks.Count; i+=1) {
+                    if (VoezEditor.Editor.activeTracks[i].ID == data.id) {
+                        myTrack = VoezEditor.Editor.activeTracks[i];
+                        break;
+                    }
+                }
+                if (myTrack == null)
+                    VoezEditor.Editor.ui.trackAdder.previewX = data.x;
+                else
+                    VoezEditor.Editor.ui.trackAdder.previewX = Util.InvScreenPosX(myTrack.pos.x);
+                VoezEditor.Editor.ui.trackAdder.previewScale = Mathf.Abs(Input.mousePosition.x - Util.ScreenPosX(VoezEditor.Editor.ui.trackAdder.previewX))/(VoezEditor.windowRes.x*Track.TRACK_SCREEN_WIDTH);
+                VoezEditor.Editor.ui.trackAdder.previewScale = Mathf.Clamp(VoezEditor.Editor.ui.trackAdder.previewScale*2f, 0f, 10f);
+                data.size = VoezEditor.Editor.ui.trackAdder.previewScale;
+                RefreshValueLabel();
+            }
+        }
+        else if (Input.GetMouseButtonUp(1)) {
+            VoezEditor.Editor.RefreshTrack(data.id);
+            VoezEditor.Editor.ui.trackAdder.previewScale = -1f;
+            VoezEditor.Editor.ui.trackAdder.previewX = -1f;
         }
 
         base.Update();
@@ -262,5 +294,7 @@ public class TrackEditor : UIElement {
         endLabel.RemoveFromContainer();
         valueLabel.RemoveFromContainer();
         VoezEditor.Editor.trackEditor = null;
+        VoezEditor.Editor.ui.trackAdder.previewScale = -1f;
+        VoezEditor.Editor.ui.trackAdder.previewX = -1f;
     }
 }

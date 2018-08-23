@@ -23,7 +23,7 @@ public class Track : DrawableObject {
     {
         get {
             Vector3 mouse = Input.mousePosition;
-            return mouse.x >= pos.x - currentWidth * 0.5f && mouse.x <= pos.x + currentWidth * 0.5f && mouse.y > VoezEditor.windowRes.y * (1f - TRACK_SCREEN_HEIGHT);
+            return mouse.x >= pos.x - Mathf.Abs(currentWidth) * 0.5f && mouse.x <= pos.x + Mathf.Abs(currentWidth) * 0.5f && mouse.y > VoezEditor.windowRes.y * (1f - TRACK_SCREEN_HEIGHT);
         }
     }
 

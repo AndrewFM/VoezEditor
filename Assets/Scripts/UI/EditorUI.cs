@@ -26,7 +26,8 @@ public class EditorUI {
 
         playButton = new Button("play", new Vector2(bbOrigin, bbOrigin), bbSize, false);
         playbackTimeButton = new Button("time", new Vector2(bbOrigin + bbSize + bbPad, bbOrigin), bbSize, false);
-        notesButton = new Button("notes", new Vector2(bbOrigin + bbSize * 2 + bbPad * 2, bbOrigin), bbSize, false);
+        notesButton = new Button("click", new Vector2(bbOrigin + bbSize * 2 + bbPad * 2, bbOrigin), bbSize, false);
+        notesButton.mySymbol.rotation = 45f;
         gridButton = new Button("grid", new Vector2(bbOrigin + bbSize * 3 + bbPad * 3, bbOrigin), bbSize, false);
         bpmButton = new Button("Raleway24", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + bbSize * 4 + bbPad * 4, bbOrigin), bbSize, false);
         saveButton = new Button("save", new Vector2(bbOrigin + bbSize * 5 + bbPad * 5, bbOrigin), bbSize, false);
@@ -244,7 +245,15 @@ public class EditorUI {
         }
 
         // Set Playback Speed
-        for(int i=0; i<playbackTimes.Length; i+=1) {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && !Util.ShiftDown())
+            playbackTimes[0].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha2) && !Util.ShiftDown())
+            playbackTimes[1].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha3) && !Util.ShiftDown())
+            playbackTimes[2].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha4) && !Util.ShiftDown())
+            playbackTimes[3].clicked = true;
+        for (int i=0; i<playbackTimes.Length; i+=1) {
             if (playbackTimes[i].clicked) {
                 for (int j = 0; j < playbackTimes.Length; j += 1)
                     playbackTimes[j].toggled = false;
@@ -262,32 +271,62 @@ public class EditorUI {
         }
 
         // Set Selected Note Type
+        if (Input.GetKeyDown(KeyCode.Z))
+            noteTypes[0].clicked = true;
+        if (Input.GetKeyDown(KeyCode.X))
+            noteTypes[1].clicked = true;
+        if (Input.GetKeyDown(KeyCode.C))
+            noteTypes[2].clicked = true;
+        if (Input.GetKeyDown(KeyCode.V))
+            noteTypes[3].clicked = true;
         for (int i = 0; i < noteTypes.Length; i += 1) {
             if (noteTypes[i].clicked) {
                 for (int j = 0; j < noteTypes.Length; j += 1)
                     noteTypes[j].toggled = false;
                 noteTypes[i].toggled = true;
                 noteTypes[i].clicked = false;
-                if (i == 0)
+                if (i == 0) {
                     VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
-                else if (i == 1)
+                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
+                } else if (i == 1) {
                     VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
-                else if (i == 2)
+                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
+                } else if (i == 2) {
                     VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
+                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
+                }
 
-                if (i == 3)
+                if (i == 3) {
                     VoezEditor.Editor.trackEditMode = true;
-                else
+                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
+                    notesButton.mySymbol.rotation = 0f;
+                } else {
                     VoezEditor.Editor.trackEditMode = false;
+                    notesButton.mySymbol.rotation = 45f;
+                }
 
                 // Automatically close the note type selector after a choice has been made.
-                for (int j = 0; j < noteTypes.Length; j += 1)
-                    noteTypes[j].visible = !noteTypes[j].visible;
-                notesButton.toggled = noteTypes[0].visible;
+                if (notesButton.toggled) {
+                    for (int j = 0; j < noteTypes.Length; j += 1)
+                        noteTypes[j].visible = false;
+                    notesButton.toggled = false;
+                }
             }
         }
 
         // Set Grid Snapping
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Util.ShiftDown())
+            snapTimes[0].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha2) && Util.ShiftDown())
+            snapTimes[1].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha3) && Util.ShiftDown())
+            snapTimes[2].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha4) && Util.ShiftDown())
+            snapTimes[3].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha5) && Util.ShiftDown())
+            snapTimes[4].clicked = true;
+        if (Input.GetKeyDown(KeyCode.Alpha6) && Util.ShiftDown())
+            snapTimes[5].clicked = true;
         for (int i = 0; i < snapTimes.Length; i += 1) {
             if (snapTimes[i].clicked) {
                 for (int j = 0; j < snapTimes.Length; j += 1)

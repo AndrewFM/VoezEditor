@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TrackAddPreview : UIElement {
+    public float previewX = -1f;
+    public float previewScale = -1f;
+    public float baseWidth;
 
     public TrackAddPreview()
     {
@@ -12,6 +15,8 @@ public class TrackAddPreview : UIElement {
     {
         base.Update();
         float posPerc = Util.InvScreenPosX(Input.mousePosition.x);
+        if (previewX >= 0)
+            posPerc = previewX;
         pos.x = Util.ScreenPosX(posPerc);
         pos.y = VoezEditor.windowRes.y * (1.0f - Track.TRACK_SCREEN_HEIGHT);
 
@@ -34,6 +39,7 @@ public class TrackAddPreview : UIElement {
     {
         sGroup.sprites = new FSprite[1];
         sGroup.sprites[0] = new FSprite("trackGradient");
+        baseWidth = sGroup.sprites[0].width;
         sGroup.sprites[0].scaleX = (VoezEditor.windowRes.x / sGroup.sprites[0].width) * Track.TRACK_SCREEN_WIDTH;
         sGroup.sprites[0].scaleY = (VoezEditor.windowRes.y / sGroup.sprites[0].height) * Track.TRACK_SCREEN_HEIGHT;
         sGroup.sprites[0].color = ProjectData.colors[0];
@@ -48,10 +54,16 @@ public class TrackAddPreview : UIElement {
         sGroup.sprites[0].x = drawPos.x;
         sGroup.sprites[0].y = drawPos.y;
 
-        if (Util.ShiftDown() && Input.GetMouseButton(0) && VoezEditor.Editor.trackEditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.EditMode)
+        if ((Util.ShiftDown() && Input.GetMouseButton(0) && VoezEditor.Editor.trackEditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.EditMode)
+            || previewX >= 0 || previewScale >= 0)
             sGroup.sprites[0].isVisible = true;
         else
             sGroup.sprites[0].isVisible = false;
+
+        if (previewScale >= 0)
+            sGroup.sprites[0].scaleX = (VoezEditor.windowRes.x / baseWidth) * Track.TRACK_SCREEN_WIDTH * previewScale;
+        else
+            sGroup.sprites[0].scaleX = (VoezEditor.windowRes.x / baseWidth) * Track.TRACK_SCREEN_WIDTH;
 
         base.DrawSprites(sGroup, frameProgress);
     }

@@ -97,6 +97,37 @@ public class TransformationList : UIElement {
                 transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, -5);
         }
 
+        // Mouse Slide Value Editing
+        if (Input.GetMouseButton(1)) {
+            if (transSelected >= 0 && itemSelected == 0 && type == ProjectData.TrackTransformation.TransformType.MOVE) {
+                VoezEditor.Editor.ui.trackAdder.previewScale = 1f;
+                VoezEditor.Editor.ui.trackAdder.previewX = -1f; // will default to following the mouse
+                transUIElems[transSelected % transUIElems.Length].data.to = Util.InvScreenPosX(VoezEditor.Editor.ui.trackAdder.pos.x);
+                transUIElems[transSelected % transUIElems.Length].RefreshLabelValues();
+            }
+            if (transSelected >= 0 && itemSelected == 0 && type == ProjectData.TrackTransformation.TransformType.SCALE) {
+                Track myTrack = null;
+                for (int i = 0; i < VoezEditor.Editor.activeTracks.Count; i += 1) {
+                    if (VoezEditor.Editor.activeTracks[i].ID == parent.data.id) {
+                        myTrack = VoezEditor.Editor.activeTracks[i];
+                        break;
+                    }
+                }
+                if (myTrack == null)
+                    VoezEditor.Editor.ui.trackAdder.previewX = parent.data.x;
+                else
+                    VoezEditor.Editor.ui.trackAdder.previewX = Util.InvScreenPosX(myTrack.pos.x);
+                VoezEditor.Editor.ui.trackAdder.previewScale = Mathf.Abs(Input.mousePosition.x - Util.ScreenPosX(VoezEditor.Editor.ui.trackAdder.previewX)) / (VoezEditor.windowRes.x * Track.TRACK_SCREEN_WIDTH);
+                VoezEditor.Editor.ui.trackAdder.previewScale = Mathf.Clamp(VoezEditor.Editor.ui.trackAdder.previewScale * 2f, 0f, 10f);
+                transUIElems[transSelected % transUIElems.Length].data.to = VoezEditor.Editor.ui.trackAdder.previewScale;
+                transUIElems[transSelected % transUIElems.Length].RefreshLabelValues();
+            }
+        } else if (Input.GetMouseButtonUp(1)) {
+            VoezEditor.Editor.RefreshTrack(parent.data.id);
+            VoezEditor.Editor.ui.trackAdder.previewScale = -1f;
+            VoezEditor.Editor.ui.trackAdder.previewX = -1f;
+        }
+
         // Page Navigation
         if (prevPageButton.clicked) {
             if (page > 0) {
@@ -418,7 +449,7 @@ public class TransformationList : UIElement {
                 labels[0].text = "Color: " + ProjectData.colorNames[(int)data.to];
                 labels[0].color = ProjectData.colors[(int)data.to];
             } else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                labels[0].text = "Position: " + (data.to * 100f).ToString("0.0") + "%";
+                labels[0].text = "Position: " + Mathf.FloorToInt(data.to * 100f).ToString() + "%";
             else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                 labels[0].text = "Scale: " + data.to.ToString("0.00") + "x";
 

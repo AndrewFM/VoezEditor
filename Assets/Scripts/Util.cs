@@ -52,12 +52,12 @@ public class Util {
 
     public static float LerpQuadEaseIn(float start, float end, float perc)
     {
-        return (end - start) * perc * perc + start;
+        return (end - start) * (perc * perc) + start;
     }
 
     public static float LerpQuadEaseOut(float start, float end, float perc)
     {
-        return -(end - start) * perc * (perc - 2f) + start;
+        return -(end - start) * (perc * (perc - 2f)) + start;
     }
 
     public static float LerpQuadEaseInOut(float start, float end, float perc)
@@ -68,11 +68,6 @@ public class Util {
             return (end - start) * (-1 + (4-2*perc) * perc) + start;
     }
 
-    public static float LerpSinEaseInOut(float start, float end, float perc)
-    {
-        return -(end - start) / 2f * (Mathf.Cos(perc * Mathf.PI) - 1f) + start;
-    }
-
     public static float LerpCircEaseIn(float start, float end, float perc)
     {
         return (end - start) * (1 - Mathf.Sqrt(1 - perc*perc)) + start;
@@ -80,21 +75,26 @@ public class Util {
 
     public static float LerpCircEaseOut(float start, float end, float perc)
     {
-        // TODO: Broken formula
-        return (end - start) * ((perc - 1) * Mathf.Sqrt(1 - perc*perc))  + start;
+        return -(end - start) * -Mathf.Sqrt(1 - (perc-1)*(perc-1))  + start;
     }
 
     public static float LerpExpEaseIn(float start, float end, float perc)
     {
-        // TODO: Update Quint to actual EXP
-        //return (end - start) * Mathf.Pow(2, 10f * (perc - 1)) + start;
-        return (end - start) * Mathf.Pow(perc, 5) + start;
+        return (end - start) * Mathf.Pow(2, 10f * (perc - 1)) + start;
     }
 
     public static float LerpExpEaseOut(float start, float end, float perc)
     {
-        // TODO: Broken formula
-        return (1 + (1-perc)*Mathf.Pow(perc, 4)) * (end-start) + start;
-        //return (end - start) * (-Mathf.Pow(2, -10f * (perc - 1)) + 1f) + start;
+        return -(end - start) * (-1 - (-Mathf.Pow(2, -10f * perc))) + start;
+    }
+
+    public static float LerpBackEaseIn(float start, float end, float perc)
+    {
+        return (end - start) * (perc * perc * (2.70158f * perc - 1.70158f)) + start;
+    }
+
+    public static float LerpBackEaseOut(float start, float end, float perc)
+    {
+        return -(end - start) * ((1 - perc) * (1 - perc) * (2.70158f * (1 - perc) - 1.70158f) - 1f) + start;
     }
 }

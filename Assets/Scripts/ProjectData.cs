@@ -465,7 +465,6 @@ public class ProjectData {
 
         public System.Func<float, float, float, float> GetEaseFunction()
         {
-            // TODO: Easing styles: Easing.BACK_IN, Easing.BACK_OUT
             if (ease == Easing.LINEAR)
                 return Util.LerpLinearEase;
             if (ease == Easing.EXP_IN)
@@ -482,6 +481,10 @@ public class ProjectData {
                 return Util.LerpCircEaseIn;
             if (ease == Easing.CIRC_OUT)
                 return Util.LerpCircEaseOut;
+            if (ease == Easing.BACK_IN)
+                return Util.LerpBackEaseIn;
+            if (ease == Easing.BACK_OUT)
+                return Util.LerpBackEaseOut;
             return Util.LerpQuadEaseOut;
         }
     }

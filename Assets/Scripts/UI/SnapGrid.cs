@@ -26,6 +26,42 @@ public class SnapGrid : UIElement {
         }
     }
 
+    public float GetSongTimeAtGridY(float y)
+    {
+        float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
+        float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
+        float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / Note.NOTE_DURATION;
+        int numVisible = Mathf.CeilToInt(Note.NOTE_DURATION / timeIncrement);
+        float closest = int.MaxValue;
+        float songTimeAtClosest = 0;
+        for (int i = 0; i < numVisible; i += 1) {
+            float gridY = (VoezEditor.windowRes.y * (1f - Track.TRACK_SCREEN_HEIGHT)) - (offset * pixelsPerSecond) + (i * timeIncrement * pixelsPerSecond);
+            if (Mathf.Abs(gridY - y) < closest) {
+                closest = Mathf.Abs(gridY - y);
+                songTimeAtClosest = VoezEditor.Editor.songTime + timeIncrement*i;
+            }
+        }
+        return songTimeAtClosest;
+    }
+
+    public float SnapToGridY(float y)
+    {
+        float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
+        float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
+        float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / Note.NOTE_DURATION;
+        int numVisible = Mathf.CeilToInt(Note.NOTE_DURATION / timeIncrement);
+        float closest = int.MaxValue;
+        float closestValue = 0;
+        for (int i=0; i<numVisible; i+=1) {
+            float gridY = (VoezEditor.windowRes.y * (1f - Track.TRACK_SCREEN_HEIGHT)) - (offset * pixelsPerSecond) + (i * timeIncrement * pixelsPerSecond);
+            if (Mathf.Abs(gridY - y) < closest) {
+                closest = Mathf.Abs(gridY - y);
+                closestValue = gridY;
+            }
+        }
+        return closestValue;
+    }
+
     public override void InitiateSprites(SpriteGroup sGroup) {
         int numVisible = 0;
         if (VoezEditor.Editor.selectedTimeSnap > 0) {

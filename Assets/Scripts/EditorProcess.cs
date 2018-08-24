@@ -67,8 +67,7 @@ public class EditorProcess : MainLoopProcess {
     {
         if (project.songClip != null)
             musicPlayer.PlayAudioClip(project.songClip);
-        if (project.background != null)
-            AddObject(new BackgroundImage(project.background));
+        AddObject(new BackgroundImage(project.background));
     }
 
     public override void Update()
@@ -152,19 +151,30 @@ public class EditorProcess : MainLoopProcess {
             }
             if (nearestTrack != null) {
                 nearestTrack.activeHover = true;
+                if (!trackEditMode) {
+                    ui.trackAdder.notePreviewVisible = true;
+                    ui.trackAdder.pos.x = nearestTrack.pos.x;
+                    ui.trackAdder.pos.y = ui.grid.SnapToGridY(Input.mousePosition.y);
+                }
 
                 // Add New Note to Hovered Track
-                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !TrackOccupiedAtTime(nearestTrack.ID, songTime) && !trackEditMode) {
-                    ProjectData.NoteData newNote = new ProjectData.NoteData();
-                    newNote.id = GetUniqueTempNoteID();
-                    newNote.time = songTime;
-                    newNote.track = nearestTrack.ID;
-                    newNote.type = selectedNoteType;
-                    project.AddNote(newNote);
-                    RefreshAllNotes();
+                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !trackEditMode) {
+                    float desiredSongTime = ui.grid.GetSongTimeAtGridY(Input.mousePosition.y);
+                    desiredSongTime = Mathf.Clamp(desiredSongTime, 0f, musicPlayer.source.clip.length);
+                    if (!TrackOccupiedAtTime(nearestTrack.ID, desiredSongTime)) {
+                        ProjectData.NoteData newNote = new ProjectData.NoteData();
+                        newNote.id = GetUniqueTempNoteID();
+                        newNote.time = desiredSongTime;
+                        newNote.track = nearestTrack.ID;
+                        newNote.type = selectedNoteType;
+                        project.AddNote(newNote);
+                        RefreshAllNotes();
+                    }
                 }
-            }
-        }
+            } else
+                ui.trackAdder.notePreviewVisible = false;
+        } else
+            ui.trackAdder.notePreviewVisible = false;
     }
 
     public void RefreshAllTracks()

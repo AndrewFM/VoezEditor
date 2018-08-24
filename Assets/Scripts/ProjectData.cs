@@ -21,8 +21,8 @@ public class ProjectData {
     public ProjectData()
     {
         projectFolder = Application.dataPath + "/../ActiveProject";
-        notesFileName = projectFolder + "/note_default.txt";
-        tracksFileName = projectFolder + "/track_default.txt";
+        notesFileName = projectFolder + "/note_song.txt";
+        tracksFileName = projectFolder + "/track_song.txt";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
@@ -99,28 +99,30 @@ public class ProjectData {
             if (projectFiles[i].Contains("note_")) {
                 notesFileName = projectFiles[i];
                 string notesString = File.ReadAllText(projectFiles[i]);
-                notesString = notesString.Substring(1, notesString.Length - 2);
-                notesString = Regex.Replace(notesString, @"\t|\n|\r", "");
-                string[] indNotes = Regex.Split(notesString, @"\},");
-                for (int j = 0; j < indNotes.Length; j += 1) {
-                    string ind = indNotes[j] + (indNotes[j].EndsWith("}") ? "" : "}");
-                    Dictionary<string, object> noteProperties = (Dictionary<string, object>)Json.Deserialize(ind);
-                    NoteData newNote = new NoteData();
-                    newNote.id = (int)((long)noteProperties["Id"]);
-                    newNote.track = (int)((long)noteProperties["Track"]);
-                    newNote.time = Util.ParseJSONFloat(noteProperties["Time"]);
-                    newNote.dir = (int)((long)noteProperties["Dir"]);
-                    newNote.hold = Util.ParseJSONFloat(noteProperties["Hold"]);
-                    string type = (string)noteProperties["Type"];
-                    if (type == "click")
-                        newNote.type = NoteData.NoteType.CLICK;
-                    else if (type == "hold")
-                        newNote.type = NoteData.NoteType.HOLD;
-                    else if (type == "swipe")
-                        newNote.type = NoteData.NoteType.SWIPE;
-                    else if (type == "slide")
-                        newNote.type = NoteData.NoteType.SLIDE;
-                    notes.Add(newNote);
+                if (notesString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no notes
+                    notesString = notesString.Substring(1, notesString.Length - 2);
+                    notesString = Regex.Replace(notesString, @"\t|\n|\r", "");
+                    string[] indNotes = Regex.Split(notesString, @"\},");
+                    for (int j = 0; j < indNotes.Length; j += 1) {
+                        string ind = indNotes[j] + (indNotes[j].EndsWith("}") ? "" : "}");
+                        Dictionary<string, object> noteProperties = (Dictionary<string, object>)Json.Deserialize(ind);
+                        NoteData newNote = new NoteData();
+                        newNote.id = (int)((long)noteProperties["Id"]);
+                        newNote.track = (int)((long)noteProperties["Track"]);
+                        newNote.time = Util.ParseJSONFloat(noteProperties["Time"]);
+                        newNote.dir = (int)((long)noteProperties["Dir"]);
+                        newNote.hold = Util.ParseJSONFloat(noteProperties["Hold"]);
+                        string type = (string)noteProperties["Type"];
+                        if (type == "click")
+                            newNote.type = NoteData.NoteType.CLICK;
+                        else if (type == "hold")
+                            newNote.type = NoteData.NoteType.HOLD;
+                        else if (type == "swipe")
+                            newNote.type = NoteData.NoteType.SWIPE;
+                        else if (type == "slide")
+                            newNote.type = NoteData.NoteType.SLIDE;
+                        notes.Add(newNote);
+                    }
                 }
             }
 
@@ -128,52 +130,54 @@ public class ProjectData {
             if (projectFiles[i].Contains("track_")) {
                 tracksFileName = projectFiles[i];
                 string tracksString = File.ReadAllText(projectFiles[i]);
-                tracksString = tracksString.Substring(1, tracksString.Length - 2);
-                tracksString = Regex.Replace(tracksString, @"\t|\n|\r", "");
-                string[] indTracks = Regex.Split(tracksString, @"\]\},");
-                for (int j = 0; j < indTracks.Length; j += 1) {
-                    string ind = indTracks[j];
-                    ind = ind.Substring(0, ind.IndexOf(",\"Move\""));
-                    ind += (ind.EndsWith("}") ? "" : "}");
-                    Dictionary<string, object> basicTrackProperties = (Dictionary<string, object>)Json.Deserialize(ind);
+                if (tracksString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no notes
+                    tracksString = tracksString.Substring(1, tracksString.Length - 2);
+                    tracksString = Regex.Replace(tracksString, @"\t|\n|\r", "");
+                    string[] indTracks = Regex.Split(tracksString, @"\]\},");
+                    for (int j = 0; j < indTracks.Length; j += 1) {
+                        string ind = indTracks[j];
+                        ind = ind.Substring(0, ind.IndexOf(",\"Move\""));
+                        ind += (ind.EndsWith("}") ? "" : "}");
+                        Dictionary<string, object> basicTrackProperties = (Dictionary<string, object>)Json.Deserialize(ind);
 
-                    TrackData newTrack = new TrackData();
-                    newTrack.id = (int)((long)basicTrackProperties["Id"]);
-                    newTrack.x = Util.ParseJSONFloat(basicTrackProperties["X"]);
-                    newTrack.size = Util.ParseJSONFloat(basicTrackProperties["Size"]);
-                    newTrack.start = Util.ParseJSONFloat(basicTrackProperties["Start"]);
-                    newTrack.end = Util.ParseJSONFloat(basicTrackProperties["End"]);
-                    newTrack.color = (int)((long)basicTrackProperties["Color"]);
-                    if (basicTrackProperties.ContainsKey("PositionLock"))
-                        newTrack.positionLock = (bool)basicTrackProperties["PositionLock"];
-                    if (basicTrackProperties.ContainsKey("EntranceOn"))
-                        newTrack.entranceOn = (bool)basicTrackProperties["EntranceOn"];
+                        TrackData newTrack = new TrackData();
+                        newTrack.id = (int)((long)basicTrackProperties["Id"]);
+                        newTrack.x = Util.ParseJSONFloat(basicTrackProperties["X"]);
+                        newTrack.size = Util.ParseJSONFloat(basicTrackProperties["Size"]);
+                        newTrack.start = Util.ParseJSONFloat(basicTrackProperties["Start"]);
+                        newTrack.end = Util.ParseJSONFloat(basicTrackProperties["End"]);
+                        newTrack.color = (int)((long)basicTrackProperties["Color"]);
+                        if (basicTrackProperties.ContainsKey("PositionLock"))
+                            newTrack.positionLock = (bool)basicTrackProperties["PositionLock"];
+                        if (basicTrackProperties.ContainsKey("EntranceOn"))
+                            newTrack.entranceOn = (bool)basicTrackProperties["EntranceOn"];
 
-                    ind = indTracks[j];
-                    int moveStart = ind.IndexOf("[");
-                    int moveEnd = ind.IndexOf("]");
-                    if (moveEnd - moveStart > 1) {
-                        string moveString = ind.Substring(moveStart + 1, moveEnd - moveStart - 1);
-                        newTrack.move = parseTransformationList(moveString);
+                        ind = indTracks[j];
+                        int moveStart = ind.IndexOf("[");
+                        int moveEnd = ind.IndexOf("]");
+                        if (moveEnd - moveStart > 1) {
+                            string moveString = ind.Substring(moveStart + 1, moveEnd - moveStart - 1);
+                            newTrack.move = parseTransformationList(moveString);
+                        }
+
+                        ind = ind.Substring(moveEnd + 1);
+                        int scaleStart = ind.IndexOf("[");
+                        int scaleEnd = ind.IndexOf("]");
+                        if (scaleEnd - scaleStart > 1) {
+                            string scaleString = ind.Substring(scaleStart + 1, scaleEnd - scaleStart - 1);
+                            newTrack.scale = parseTransformationList(scaleString);
+                        }
+
+                        ind = ind.Substring(scaleEnd + 1);
+                        ind += (ind.EndsWith("]") ? "" : "]");
+                        int colorStart = ind.IndexOf("[");
+                        int colorEnd = ind.IndexOf("]");
+                        if (colorEnd - colorStart > 1) {
+                            string colorString = ind.Substring(colorStart + 1, colorEnd - colorStart - 1);
+                            newTrack.colorChange = parseTransformationList(colorString);
+                        }
+                        tracks.Add(newTrack);
                     }
-
-                    ind = ind.Substring(moveEnd+1);
-                    int scaleStart = ind.IndexOf("[");
-                    int scaleEnd = ind.IndexOf("]");
-                    if (scaleEnd - scaleStart > 1) {
-                        string scaleString = ind.Substring(scaleStart + 1, scaleEnd - scaleStart - 1);
-                        newTrack.scale = parseTransformationList(scaleString);
-                    }
-
-                    ind = ind.Substring(scaleEnd + 1);
-                    ind += (ind.EndsWith("]") ? "" : "]");
-                    int colorStart = ind.IndexOf("[");
-                    int colorEnd = ind.IndexOf("]");
-                    if (colorEnd - colorStart > 1) {
-                        string colorString = ind.Substring(colorStart + 1, colorEnd - colorStart - 1);
-                        newTrack.colorChange = parseTransformationList(colorString);
-                    }
-                    tracks.Add(newTrack);
                 }
             }
         }

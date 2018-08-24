@@ -77,7 +77,7 @@ public class Note : DrawableObject {
 
         if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && !VoezEditor.Editor.trackEditMode) {
             // Delete Note
-            if (hovered && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
+            if (hovered && (Input.GetKeyDown(KeyCode.Delete) || Input.GetMouseButtonDown(1) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
                 VoezEditor.Editor.project.DeleteNote(data.id);
                 VoezEditor.Editor.RefreshAllNotes();
             }

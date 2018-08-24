@@ -31,6 +31,14 @@ public class RectangleBorder : UIElement {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
+        if (lastPos == Vector2.zero || pos == Vector2.zero) {
+            for (int i = 0; i < sGroup.sprites.Length; i += 1)
+                sGroup.sprites[i].isVisible = false;
+        } else {
+            for (int i = 0; i < sGroup.sprites.Length; i += 1)
+                sGroup.sprites[i].isVisible = true;
+        }
+
         Vector2 drawPos = new Vector2(Mathf.Lerp(lastPos.x, pos.x, frameProgress), Mathf.Lerp(lastPos.y, pos.y, frameProgress));
         sGroup.sprites[0].x = drawPos.x - bounds.width * 0.5f;
         sGroup.sprites[1].x = drawPos.x + bounds.width * 0.5f;

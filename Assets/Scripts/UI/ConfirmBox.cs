@@ -15,7 +15,7 @@ public class ConfirmBox : UIElement {
         this.bounds = bounds;
         pos = bounds.center;
         VoezEditor.Editor.confirmBoxOpen = true;
-        text = new FLabel("Raleway24", caption);
+        text = new FLabel("Raleway32", caption);
     }
 
     public override void Update()
@@ -23,8 +23,8 @@ public class ConfirmBox : UIElement {
         float buttonSize = 128f;
         if (!init) {
             init = true;
-            yesButton = new Button("Raleway24", "Yes", Vector2.zero, buttonSize, true);
-            noButton = new Button("Raleway24", "No", Vector2.zero, buttonSize, true);
+            yesButton = new Button("Raleway32", "Yes", Vector2.zero, buttonSize, true);
+            noButton = new Button("Raleway32", "No", Vector2.zero, buttonSize, true);
             border = new RectangleBorder(new Rect(new Vector2(bounds.x + 5, bounds.y + 5), new Vector2(bounds.width - 10, bounds.height - 10)), 3f);
             VoezEditor.Editor.AddObject(yesButton);
             VoezEditor.Editor.AddObject(noButton);

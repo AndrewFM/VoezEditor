@@ -98,7 +98,7 @@ public class TransformationList : UIElement {
         }
 
         // Mouse Slide Value Editing
-        if (Input.GetMouseButton(1)) {
+        if (Input.GetMouseButton(1) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
             if (transSelected >= 0 && itemSelected == 0 && type == ProjectData.TrackTransformation.TransformType.MOVE) {
                 VoezEditor.Editor.ui.trackAdder.previewScale = 1f;
                 VoezEditor.Editor.ui.trackAdder.previewX = -1f; // will default to following the mouse
@@ -123,7 +123,6 @@ public class TransformationList : UIElement {
                 transUIElems[transSelected % transUIElems.Length].RefreshLabelValues();
             }
         } else if (Input.GetMouseButtonUp(1)) {
-            VoezEditor.Editor.RefreshTrack(parent.data.id);
             VoezEditor.Editor.ui.trackAdder.previewScale = -1f;
             VoezEditor.Editor.ui.trackAdder.previewX = -1f;
         }
@@ -161,26 +160,25 @@ public class TransformationList : UIElement {
             }
             else if (Util.ShiftDown()) {
                 // Add Before selection
-                if (transSelected == 0)
-                    transformation.start = parent.data.start;
-                else
-                    transformation.start = transList[transSelected - 1].end;
                 transformation.end = transList[transSelected].start;
+                if (transSelected == 0)
+                    transformation.start = Mathf.Max(transformation.end - VoezEditor.Editor.GetBPMTimeIncrement() * 5, parent.data.start);
+                else
+                    transformation.start = Mathf.Max(transformation.end - VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[transSelected - 1].end);
             }
             else {
                 // Add After Selection
-                if (transSelected == transList.Count - 1)
-                    transformation.end = parent.data.end;
-                else
-                    transformation.end = transList[transSelected + 1].start;
                 transformation.start = transList[transSelected].end;
+                if (transSelected == transList.Count - 1)
+                    transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, parent.data.end);
+                else
+                    transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[transSelected + 1].start);
             }
             if (transformation.end - transformation.start != 0) {
                 transList.Add(transformation);
                 transSelected = Mathf.Clamp(transSelected + 1, 0, transList.Count - 1);
                 ResortDataList();
                 RefreshPages();
-                VoezEditor.Editor.RefreshTrack(parent.data.id);
             }
             addButton.clicked = false;
         }
@@ -189,7 +187,6 @@ public class TransformationList : UIElement {
                 transList.RemoveAt(transSelected);
                 transSelected -= 1;
                 RefreshPages();
-                VoezEditor.Editor.RefreshTrack(parent.data.id);
             }
             deleteButton.clicked = false;
         }
@@ -206,7 +203,6 @@ public class TransformationList : UIElement {
                 page = 0;
                 transSelected = -1;
                 RefreshPages();
-                VoezEditor.Editor.RefreshTrack(parent.data.id);
             }
             pasteButton.clicked = false;
         }
@@ -216,7 +212,6 @@ public class TransformationList : UIElement {
             parent.data.x = 1f - parent.data.x;
             for (int i = 0; i < transList.Count; i += 1)
                 transList[i].to = 1f - transList[i].to;
-            VoezEditor.Editor.RefreshTrack(parent.data.id);
             RefreshPages();
             parent.RefreshValueLabel();
             mirrorButton.clicked = false;
@@ -330,6 +325,11 @@ public class TransformationList : UIElement {
                 if (Input.GetMouseButtonDown(0)) {
                     itemSelected = item;
                     transSelected = trans;
+
+                    if (itemSelected == 1)
+                        VoezEditor.Editor.JumpToTime(transUIElems[transSelected % transUIElems.Length].data.start);
+                    if (itemSelected == 0 || itemSelected == 2)
+                        VoezEditor.Editor.JumpToTime(transUIElems[transSelected % transUIElems.Length].data.end);
                 }
             }
             if (i >= 4) {
@@ -471,19 +471,18 @@ public class TransformationList : UIElement {
                         data.to = ProjectData.colors.Length - 1;
                     if (data.to > ProjectData.colors.Length - 1)
                         data.to = 0;
-                }
-                else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
+                } else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.to = Mathf.Clamp(data.to + 0.1f * delta, 0f, 10f);
                 else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
                     data.to = Mathf.Clamp(data.to + 0.01f * delta, 0f, 1f);
-            }
-            else if (valueID == 1)
+            } else if (valueID == 1) {
                 data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), parent.StartTimeBound(data), data.end);
-            else if (valueID == 2)
+                VoezEditor.Editor.JumpToTime(data.start);
+            } else if (valueID == 2) {
                 data.end = Mathf.Clamp(data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement(), data.start, parent.EndTimeBound(data));
-            else if (valueID == 3) 
+                VoezEditor.Editor.JumpToTime(data.end);
+            } else if (valueID == 3)
                 data.ease = CycleEasing(delta > 0);
-            VoezEditor.Editor.RefreshTrack(parent.parent.data.id);
             RefreshLabelValues();
         }
 

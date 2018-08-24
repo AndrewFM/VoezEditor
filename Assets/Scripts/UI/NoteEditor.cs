@@ -31,10 +31,10 @@ public class NoteEditor : UIElement {
         this.data = data;
         this.pos = pos;
 
-        typeLabel = new FLabel("Raleway24", "Type:");
-        timeLabel = new FLabel("Raleway24", "Spawn Time: "+data.time.ToString("0.000"));
-        holdLabel = new FLabel("Raleway24", "Hold Duration: "+data.hold.ToString("0.000"));
-        dirLabel = new FLabel("Raleway24", "Direction:");
+        typeLabel = new FLabel("Raleway32", "Type:");
+        timeLabel = new FLabel("Raleway32", "Spawn Time: "+data.time.ToString("0.000"));
+        holdLabel = new FLabel("Raleway32", "Hold Duration: "+data.hold.ToString("0.000"));
+        dirLabel = new FLabel("Raleway32", "Direction:");
     }
 
     public void SetPage(int pageID)

@@ -125,8 +125,8 @@ public class TrackEditor : UIElement {
 
         if (Input.GetMouseButtonDown(0) && !MouseOver)
             Destroy();
-        if (!VoezEditor.Editor.musicPlayer.paused)
-            Destroy();
+        //if (!VoezEditor.Editor.musicPlayer.paused)
+        //    Destroy();
 
         if (moveButton.clicked) {
             SetPage(ProjectData.TrackTransformation.TransformType.MOVE);
@@ -168,6 +168,7 @@ public class TrackEditor : UIElement {
                                                        data.colorChange.Count == 0 ? int.MaxValue : data.colorChange[0].start));
                 }
                 startLabel.text = "Spawn Time: " + data.start.ToString("0.000");
+                VoezEditor.Editor.JumpToTime(data.start);
             }
             if (selectedLine == 1) {
                 if (data.move.Count == 0 && data.colorChange.Count == 0 && data.scale.Count == 0)
@@ -180,6 +181,7 @@ public class TrackEditor : UIElement {
                                            VoezEditor.Editor.musicPlayer.source.clip.length);
                 }
                 endLabel.text = "Despawn Time: " + data.end.ToString("0.000");
+                VoezEditor.Editor.JumpToTime(data.end);
             }
             if (selectedLine == 2) {
                 if (page == ProjectData.TrackTransformation.TransformType.COLOR) {
@@ -194,11 +196,12 @@ public class TrackEditor : UIElement {
                     data.x = Mathf.Clamp(data.x + 0.01f * delta, 0f, 1f);
                 RefreshValueLabel();
             }
-            VoezEditor.Editor.RefreshTrack(data.id);
+            if (selectedLine <= 1)
+                VoezEditor.Editor.RefreshTrack(data.id);
         }
 
         // Mouse Slide Value Editing
-        if (Input.GetMouseButton(1)) {
+        if (Input.GetMouseButton(1) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
             if (selectedLine == 2 && page == ProjectData.TrackTransformation.TransformType.MOVE) {
                 VoezEditor.Editor.ui.trackAdder.previewScale = 1f; 
                 VoezEditor.Editor.ui.trackAdder.previewX = -1f; // will default to following the mouse
@@ -224,7 +227,6 @@ public class TrackEditor : UIElement {
             }
         }
         else if (Input.GetMouseButtonUp(1)) {
-            VoezEditor.Editor.RefreshTrack(data.id);
             VoezEditor.Editor.ui.trackAdder.previewScale = -1f;
             VoezEditor.Editor.ui.trackAdder.previewX = -1f;
         }
@@ -260,6 +262,12 @@ public class TrackEditor : UIElement {
                 if (Input.GetMouseButtonDown(0)) {
                     selectedLine = i;
                     keyframeEditor.transSelected = -1;
+                    
+                    // Jump playback time to the time being referenced/edited
+                    if (selectedLine == 0 || selectedLine == 2)
+                        VoezEditor.Editor.JumpToTime(data.start);
+                    if (selectedLine == 1)
+                        VoezEditor.Editor.JumpToTime(data.end);
                 }
             }
         }

@@ -199,7 +199,7 @@ public class Track : DrawableObject {
                 sGroup.sprites[Spr_BackGradient].color = Color.Lerp(ProjectData.colors[lastSubColor], ProjectData.colors[(int)data.colorChange[i].to], data.colorChange[i].GetEaseFunction()(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
                 appliedColor = true;
             } else if ((i < data.colorChange.Count - 1 && VoezEditor.Editor.songTime >= data.colorChange[i].end && VoezEditor.Editor.songTime < data.colorChange[i + 1].start)
-                   || ((i == data.colorChange.Count - 1 && VoezEditor.Editor.songTime >= data.colorChange[i].end && VoezEditor.Editor.songTime < data.end))) {
+                   || ((i == data.colorChange.Count - 1 && VoezEditor.Editor.songTime >= data.colorChange[i].end && VoezEditor.Editor.songTime <= data.end))) {
                 sGroup.sprites[Spr_BackGradient].color = ProjectData.colors[(int)data.colorChange[i].to];
                 appliedColor = true;
             }
@@ -215,12 +215,12 @@ public class Track : DrawableObject {
                 if (i == 0)
                     lastSubScale = data.size;
                 else
-                    lastSubScale = (int)data.scale[i - 1].to;
+                    lastSubScale = data.scale[i - 1].to;
                 float subScaleProgress = (VoezEditor.Editor.songTime - data.scale[i].start) / (data.scale[i].end - data.scale[i].start);
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH;
                 currentWidth *= data.scale[i].GetEaseFunction()(lastSubScale, data.scale[i].to, Mathf.Clamp(subScaleProgress, 0, 1));
             } else if ((i < data.scale.Count - 1 && VoezEditor.Editor.songTime >= data.scale[i].end && VoezEditor.Editor.songTime < data.scale[i + 1].start)
-                   || ((i == data.scale.Count - 1 && VoezEditor.Editor.songTime >= data.scale[i].end && VoezEditor.Editor.songTime < data.end)))
+                   || ((i == data.scale.Count - 1 && VoezEditor.Editor.songTime >= data.scale[i].end && VoezEditor.Editor.songTime <= data.end)))
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH * data.scale[i].to;
         }
         sGroup.sprites[Spr_BackGradient].scaleX = currentWidth / sGroup.sprites[Spr_BackGradient].element.sourceRect.width;
@@ -247,11 +247,20 @@ public class Track : DrawableObject {
         if (activeHover || (VoezEditor.Editor.trackEditor != null && VoezEditor.Editor.trackEditor.data.id == ID)) {
             sGroup.sprites[Spr_MiddleGradLine].color = Color.red;
             sGroup.sprites[Spr_BottomDiamond].color = Color.red;
+            if (VoezEditor.Editor.trackEditMode) {
+                sGroup.sprites[Spr_LeftGradLine].color = Color.red;
+                sGroup.sprites[Spr_RightGradLine].color = Color.red;
+            }
             sGroup.sprites[Spr_BackGradient].alpha = 1f;
         } else {
             sGroup.sprites[Spr_MiddleGradLine].color = Color.black;
             sGroup.sprites[Spr_BottomDiamond].color = Color.black;
-            sGroup.sprites[Spr_BackGradient].alpha = 0.9f;
+            sGroup.sprites[Spr_LeftGradLine].color = Color.white;
+            sGroup.sprites[Spr_RightGradLine].color = Color.white;
+            if (VoezEditor.Editor.trackEditor != null)
+                sGroup.sprites[Spr_BackGradient].alpha = 0.25f;
+            else
+                sGroup.sprites[Spr_BackGradient].alpha = 0.9f;
         }
 
         if (pulseFlashEffectTime > 0)

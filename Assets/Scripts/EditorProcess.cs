@@ -243,6 +243,12 @@ public class EditorProcess : MainLoopProcess {
         return false;
     }
 
+    public void JumpToTime(float seconds)
+    {
+        musicPlayer.source.time = seconds;
+        currentFrame = Mathf.CeilToInt(VoezEditor.Editor.musicPlayer.source.time * VoezEditor.Editor.framesPerSecond);
+    }
+
     public float GetBPMTimeIncrement()
     {
         if (selectedTimeSnap == 0)

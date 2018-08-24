@@ -29,7 +29,7 @@ public class EditorUI {
         notesButton = new Button("click", new Vector2(bbOrigin + bbSize * 2 + bbPad * 2, bbOrigin), bbSize, false);
         notesButton.mySymbol.rotation = 45f;
         gridButton = new Button("grid", new Vector2(bbOrigin + bbSize * 3 + bbPad * 3, bbOrigin), bbSize, false);
-        bpmButton = new Button("Raleway24", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + bbSize * 4 + bbPad * 4, bbOrigin), bbSize, false);
+        bpmButton = new Button("Raleway32", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + bbSize * 4 + bbPad * 4, bbOrigin), bbSize, false);
         saveButton = new Button("save", new Vector2(bbOrigin + bbSize * 5 + bbPad * 5, bbOrigin), bbSize, false);
         VoezEditor.Editor.AddObject(playButton);
         VoezEditor.Editor.AddObject(playbackTimeButton);
@@ -47,7 +47,7 @@ public class EditorUI {
                 buttonText = "1.0x";
             if (i == 3)
                 buttonText = "2.0x";
-            playbackTimes[i] = new Button("Raleway24", buttonText
+            playbackTimes[i] = new Button("Raleway32", buttonText
                 , new Vector2(playButton.pos.x + i*69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
             playbackTimes[i].visible = false;
@@ -91,7 +91,7 @@ public class EditorUI {
                 buttonText = "1/2";
             if (i == 5)
                 buttonText = "1";
-            snapTimes[i] = new Button("Raleway24", buttonText
+            snapTimes[i] = new Button("Raleway32", buttonText
                 , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
             snapTimes[i].visible = false;
@@ -108,7 +108,7 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(grid);
         trackAdder = new TrackAddPreview();
         VoezEditor.Editor.AddObject(trackAdder);
-        playbackTimeLabel = new DropshadowLabel("Raleway24", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, bbPad + bbSize * 0.5f), new Vector2(2f, -2f));
+        playbackTimeLabel = new DropshadowLabel("Raleway32", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, bbPad + bbSize * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
     }
 

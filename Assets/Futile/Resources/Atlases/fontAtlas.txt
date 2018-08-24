@@ -15,14 +15,22 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
 	"sourceSize": {"w":256,"h":256}
+},
+"Raleway32.png":
+{
+	"frame": {"x":518,"y":2,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
 }},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "fontAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":518,"h":260},
+	"size": {"w":776,"h":260},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:637beef24241b1a52bf0ced20727ac03:1da344283f0a1b56ee351bb90f3b9235:7bce6697796edaa9e8fd7f80550e98be$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f7682e90b6e43a4e0e367e3d0f61767d:e6babe0333c4d04b55f8237c8e26c1d5:7bce6697796edaa9e8fd7f80550e98be$"
 }
 }

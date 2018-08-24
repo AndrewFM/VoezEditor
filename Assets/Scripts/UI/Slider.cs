@@ -11,13 +11,14 @@ public class Slider : UIElement {
     public static float SCRUBBER_SIZE = 64f;
     public bool clicked;
     public bool rightClicked;
+    public float pulseFlashEffectTime;
     public float loopPoint = -1;
 
     public Slider(Vector2 pos, float width)
     {
         this.pos = pos;
         this.width = width;
-        this.allowScrubbing = true;
+        allowScrubbing = true;
     }
 
     public int Spr_SliderBack { get { return 0; } }
@@ -58,6 +59,8 @@ public class Slider : UIElement {
             progress = pendingProgress;
             progressUpdate = true;
         }
+        if (pulseFlashEffectTime > 0)
+            pulseFlashEffectTime -= 1;
         base.Update();
     }
 
@@ -113,8 +116,13 @@ public class Slider : UIElement {
             sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.red, 0.15f);
             sGroup.sprites[Spr_SliderScrubberBack].alpha = 1f;
         } else {
-            sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.black, 0.15f);
-            sGroup.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
+            if (pulseFlashEffectTime > 0) {
+                sGroup.sprites[Spr_SliderScrubberBack].color = Color.white;
+                sGroup.sprites[Spr_SliderScrubberBack].alpha = 1f;
+            } else {
+                sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.black, 0.15f);
+                sGroup.sprites[Spr_SliderScrubberBack].alpha = 0.8f;
+            }
         }
 
         if (loopPoint >= 0f) {

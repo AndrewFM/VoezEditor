@@ -19,6 +19,7 @@ public class EditorProcess : MainLoopProcess {
     public TrackEditor trackEditor;
     public MusicPlayer musicPlayer;
     public EditorUI ui;
+    public BackgroundImage bg;
     public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
     public float selectedTimeSnap = 4;
     public float currentFrame;
@@ -67,7 +68,8 @@ public class EditorProcess : MainLoopProcess {
     {
         if (project.songClip != null)
             musicPlayer.PlayAudioClip(project.songClip);
-        AddObject(new BackgroundImage(project.background));
+        bg = new BackgroundImage(project.background);
+        AddObject(bg);
     }
 
     public override void Update()

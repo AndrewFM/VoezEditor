@@ -72,7 +72,6 @@ public class SnapGrid : UIElement {
             }
         }
         sGroup.sprites = new FSprite[numVisible];
-
         for (int i = 0; i < sGroup.sprites.Length; i += 1) {
             sGroup.sprites[i] = new FSprite("Futile_White");
             sGroup.sprites[i].scaleX = VoezEditor.windowRes.x / sGroup.sprites[i].width;

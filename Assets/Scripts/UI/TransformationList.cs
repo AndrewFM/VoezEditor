@@ -152,6 +152,11 @@ public class TransformationList : UIElement {
         // Add and Delete Transformations
         if (addButton.clicked) {
             ProjectData.TrackTransformation transformation = new ProjectData.TrackTransformation();
+            // Default Values
+            if (type == ProjectData.TrackTransformation.TransformType.SCALE)
+                transformation.to = 1.0f;
+            if (type == ProjectData.TrackTransformation.TransformType.MOVE)
+                transformation.to = 0.5f;
             if (transSelected < 0)
                 transSelected = transList.Count - 1; // If no item selected, default to adding at end of trans list.
             if (transList.Count == 0) {
@@ -174,7 +179,7 @@ public class TransformationList : UIElement {
                 else
                     transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[transSelected + 1].start);
             }
-            if (transformation.end - transformation.start != 0) {
+            if (transformation.end >= transformation.start) {
                 transList.Add(transformation);
                 transSelected = Mathf.Clamp(transSelected + 1, 0, transList.Count - 1);
                 ResortDataList();
@@ -379,7 +384,16 @@ public class TransformationList : UIElement {
 
     public void ResortDataList()
     {
-        transList.Sort((a, b) => (a.start.CompareTo(b.start)));
+        transList.Sort((a, b) => (TransListSortMethod(a,b)));
+    }
+
+    private int TransListSortMethod(ProjectData.TrackTransformation a, ProjectData.TrackTransformation b)
+    {
+        int firstComp = a.end.CompareTo(b.end);
+        if (firstComp == 0)
+            return a.start.CompareTo(b.start);
+        else
+            return firstComp;
     }
 
     public void RefreshPages()

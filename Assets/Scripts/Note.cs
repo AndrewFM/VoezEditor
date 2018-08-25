@@ -90,6 +90,7 @@ public class Note : DrawableObject {
                     noteEditWindowX = pos.x + NoteEditor.WIDTH * 0.5f + 64f;
                 VoezEditor.Editor.noteEditor = new NoteEditor(new Vector2(noteEditWindowX, VoezEditor.windowRes.y * 0.5f), data);
                 VoezEditor.Editor.AddObject(VoezEditor.Editor.noteEditor);
+                VoezEditor.Editor.ui.bpmButton.toggled = false;
             }
         }
 

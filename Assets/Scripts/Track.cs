@@ -85,6 +85,7 @@ public class Track : DrawableObject {
                     trackEditWindowX = pos.x + TrackEditor.WIDTH * 0.5f + 64f;
                 VoezEditor.Editor.trackEditor = new TrackEditor(new Vector2(trackEditWindowX, VoezEditor.windowRes.y * 0.55f), data);
                 VoezEditor.Editor.AddObject(VoezEditor.Editor.trackEditor);
+                VoezEditor.Editor.ui.bpmButton.toggled = false;
             }
         }
 
@@ -96,7 +97,7 @@ public class Track : DrawableObject {
                 VoezEditor.Editor.RefreshAllNotes();
                 VoezEditor.Editor.RefreshAllTracks();
             }
-            if (deletionConfirm.noButton != null && deletionConfirm.noButton.clicked) {
+            else if (deletionConfirm.noButton != null && deletionConfirm.noButton.clicked) {
                 deletionConfirm.Destroy();
                 deletionConfirm = null;
             }

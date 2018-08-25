@@ -196,6 +196,7 @@ public class EditorUI {
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 VoezEditor.Editor.project.songBPM -= 5;
             VoezEditor.Editor.project.songBPM = Mathf.Clamp(VoezEditor.Editor.project.songBPM, 10, 250);
+            grid.SnapPlaytimeToGrid();
             bpmButton.myText.text = "BPM" + Environment.NewLine + VoezEditor.Editor.project.songBPM.ToString();
         }
 
@@ -283,6 +284,13 @@ public class EditorUI {
                 else if (i == 3)
                     VoezEditor.Editor.musicPlayer.playbackSpeed = 2.0f;
                 playbackTimes[i].clicked = false;
+
+                // Automatically close the playback time selector after a choice has been made.
+                if (playbackTimeButton.toggled) {
+                    for (int j = 0; j < playbackTimes.Length; j += 1)
+                        playbackTimes[j].visible = false;
+                    playbackTimeButton.toggled = false;
+                }
             }
         }
 
@@ -362,6 +370,13 @@ public class EditorUI {
                     VoezEditor.Editor.selectedTimeSnap = 1;
                 snapTimes[i].clicked = false;
                 grid.SnapPlaytimeToGrid();
+
+                // Automatically close the grid snap selector after a choice has been made.
+                if (gridButton.toggled) {
+                    for (int j = 0; j < snapTimes.Length; j += 1)
+                        snapTimes[j].visible = false;
+                    gridButton.toggled = false;
+                }
             }
         }
     }

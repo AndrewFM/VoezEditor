@@ -187,6 +187,7 @@ public class EditorUI {
             bpmButton.clicked = false;
         }
         if (bpmButton.toggled) {
+            float lastBPM = VoezEditor.Editor.project.songBPM;
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
                 VoezEditor.Editor.project.songBPM += 1;
             if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
@@ -196,7 +197,8 @@ public class EditorUI {
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 VoezEditor.Editor.project.songBPM -= 5;
             VoezEditor.Editor.project.songBPM = Mathf.Clamp(VoezEditor.Editor.project.songBPM, 10, 250);
-            grid.SnapPlaytimeToGrid();
+            if (VoezEditor.Editor.project.songBPM != lastBPM)
+                grid.SnapPlaytimeToGrid();
             bpmButton.myText.text = "BPM" + Environment.NewLine + VoezEditor.Editor.project.songBPM.ToString();
         }
 

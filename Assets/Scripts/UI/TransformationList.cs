@@ -195,11 +195,19 @@ public class TransformationList : UIElement {
         if (copyButton.clicked) {
             VoezEditor.Editor.project.transformClipboard = ProjectData.DeepCopyTransformationList(transList);
             VoezEditor.Editor.project.clipboardContentsType = type;
+            VoezEditor.Editor.project.transformClipboardStartTime = parent.data.start;
             copyButton.clicked = false;
         }
         if (pasteButton.clicked) {
             if (VoezEditor.Editor.project.transformClipboard != null && VoezEditor.Editor.project.clipboardContentsType == type) {
-                ProjectData.ReplaceTransformationList(VoezEditor.Editor.project.transformClipboard, transList);
+                ProjectData.ReplaceTransformationList(VoezEditor.Editor.project.transformClipboard, transList, VoezEditor.Editor.project.transformClipboardStartTime, parent.data.start);
+                for(int i=0; i<transList.Count; i+=1) {
+                    if (transList[i].end > parent.data.end) {
+                        // Pasting can change the total duration of the track if the new keyframes span beyond that duration.
+                        parent.data.end = transList[i].end;
+                        parent.endLabel.text = "Despawn Time: " + parent.data.end.ToString("0.000");
+                    }
+                }
                 page = 0;
                 transSelected = -1;
                 RefreshPages();

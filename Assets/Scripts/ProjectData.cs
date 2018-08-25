@@ -17,6 +17,7 @@ public class ProjectData {
 
     public List<TrackTransformation> transformClipboard;
     public TrackTransformation.TransformType clipboardContentsType;
+    public float transformClipboardStartTime;
 
     public ProjectData()
     {
@@ -403,13 +404,15 @@ public class ProjectData {
     }
 
     // Replaces the contents of the dest transformation list with the source transformation list, without breaking its original reference
-    public static void ReplaceTransformationList(List<TrackTransformation> source, List<TrackTransformation> dest)
+    public static void ReplaceTransformationList(List<TrackTransformation> source, List<TrackTransformation> dest, float initialStartTime, float newStartTime)
     {
         dest.Clear();
         for(int i=0; i<source.Count; i+=1) {
             TrackTransformation newTrans = new TrackTransformation();
-            newTrans.Paste(source[i]);
-            dest.Add(newTrans);
+            newTrans.Paste(source[i], initialStartTime, newStartTime);
+            float timeLimit = VoezEditor.Editor.musicPlayer.source.clip.length;
+            if (newTrans.start <= timeLimit && newTrans.end <= timeLimit)
+                dest.Add(newTrans);
         }
     }
 
@@ -514,11 +517,11 @@ public class ProjectData {
             return copiedTrans;
         }
 
-        public void Paste(TrackTransformation newData)
+        public void Paste(TrackTransformation newData, float oldStartTime, float newStartTime)
         {
             to = newData.to;
-            start = newData.start;
-            end = newData.end;
+            start = newStartTime+(newData.start-oldStartTime);
+            end = newStartTime+(newData.end-oldStartTime);
             ease = newData.ease;
         }
 

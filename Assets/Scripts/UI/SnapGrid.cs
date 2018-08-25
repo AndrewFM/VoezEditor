@@ -29,7 +29,7 @@ public class SnapGrid : UIElement {
     public float GetSongTimeAtGridY(float y)
     {
         float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
-        float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
+        float offset = VoezEditor.Editor.songTime - (Mathf.Round(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
         float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / Note.NOTE_DURATION;
         int numVisible = Mathf.CeilToInt(Note.NOTE_DURATION / timeIncrement);
         float closest = int.MaxValue;
@@ -47,7 +47,7 @@ public class SnapGrid : UIElement {
     public float SnapToGridY(float y)
     {
         float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
-        float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
+        float offset = VoezEditor.Editor.songTime - (Mathf.Round(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
         float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / Note.NOTE_DURATION;
         int numVisible = Mathf.CeilToInt(Note.NOTE_DURATION / timeIncrement);
         float closest = int.MaxValue;

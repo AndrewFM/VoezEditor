@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System;
 
@@ -7,6 +7,7 @@ public class VoezEditor : MonoBehaviour {
 
     public static MainLoopProcess activeProcess;
     public static Vector2 windowRes = new Vector2(1280f, 720f);
+    public static int musicSyncThreshold = 4;
 
     // Use this for initialization
     void Start()
@@ -24,6 +25,7 @@ public class VoezEditor : MonoBehaviour {
         Futile.atlasManager.LoadFont("Raleway24", "Raleway24", "Atlases/Raleway24", 0f, 0f);
         Futile.atlasManager.LoadFont("Raleway16", "Raleway16", "Atlases/Raleway16", 0f, 0f);
 
+        LoadConfigFile();
         activeProcess = new EditorProcess();
     }
 
@@ -50,6 +52,18 @@ public class VoezEditor : MonoBehaviour {
             File.AppendAllText("exceptionLog.txt", logString + Environment.NewLine);
             File.AppendAllText("exceptionLog.txt", stackTrace + Environment.NewLine);
             return;
+        }
+    }
+
+    public void LoadConfigFile()
+    {
+        if (File.Exists(Application.dataPath+ "/../config.txt")) {
+            Dictionary<string, object> dictionary = File.ReadAllText(Application.dataPath + "/../config.txt").dictionaryFromJson();
+            if (dictionary != null) {
+                if (dictionary.ContainsKey("syncTime")) {
+                    musicSyncThreshold = (int)((long)dictionary["syncTime"]);
+                }
+            }
         }
     }
 }

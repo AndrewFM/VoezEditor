@@ -12,6 +12,7 @@ public class MusicPlayer {
 
 	public MusicPlayer() {
         gameObj = new GameObject("Music Player");
+        gameObj.AddComponent<AudioListener>();
         source = gameObj.AddComponent<AudioSource>();
         playbackSpeed = 1.0f;
     }
@@ -41,7 +42,7 @@ public class MusicPlayer {
     // Tell the music player what time in the song it's supposed to be at, and if there's a mismatch, resync the audio
     public void SyncTracker(float seconds)
     {
-        if (source.isPlaying && Mathf.Abs(source.time-seconds) > 1f/15f)
+        if (source.isPlaying && Mathf.Abs(source.time-seconds) > ((1f/VoezEditor.Editor.framesPerSecond)*VoezEditor.musicSyncThreshold))
             source.time = seconds;
     }
 

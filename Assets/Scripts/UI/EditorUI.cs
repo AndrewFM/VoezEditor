@@ -17,20 +17,20 @@ public class EditorUI {
     public SnapGrid grid;
     public TrackAddPreview trackAdder;
     public DropshadowLabel playbackTimeLabel;
+    public static float BUTTON_SIZE = 80f;
+    public static float BUTTON_PADDING = 10f;
 
 	public EditorUI()
     {
-        float bbSize = 80f;
-        float bbPad = 10f;
-        float bbOrigin = bbPad + bbSize * 0.5f;
+        float bbOrigin = BUTTON_PADDING + BUTTON_SIZE * 0.5f;
 
-        playButton = new Button("play", new Vector2(bbOrigin, bbOrigin), bbSize, false);
-        playbackTimeButton = new Button("time", new Vector2(bbOrigin + bbSize + bbPad, bbOrigin), bbSize, false);
-        notesButton = new Button("click", new Vector2(bbOrigin + bbSize * 2 + bbPad * 2, bbOrigin), bbSize, false);
+        playButton = new Button("play", new Vector2(bbOrigin, bbOrigin), BUTTON_SIZE, false);
+        playbackTimeButton = new Button("time", new Vector2(bbOrigin + BUTTON_SIZE + BUTTON_PADDING, bbOrigin), BUTTON_SIZE, false);
+        notesButton = new Button("click", new Vector2(bbOrigin + BUTTON_SIZE * 2 + BUTTON_PADDING * 2, bbOrigin), BUTTON_SIZE, false);
         notesButton.mySymbol.rotation = 45f;
-        gridButton = new Button("grid", new Vector2(bbOrigin + bbSize * 3 + bbPad * 3, bbOrigin), bbSize, false);
-        bpmButton = new Button("Raleway32", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + bbSize * 4 + bbPad * 4, bbOrigin), bbSize, false);
-        saveButton = new Button("save", new Vector2(bbOrigin + bbSize * 5 + bbPad * 5, bbOrigin), bbSize, false);
+        gridButton = new Button("grid", new Vector2(bbOrigin + BUTTON_SIZE * 3 + BUTTON_PADDING * 3, bbOrigin), BUTTON_SIZE, false);
+        bpmButton = new Button("Raleway32", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + BUTTON_SIZE * 4 + BUTTON_PADDING * 4, bbOrigin), BUTTON_SIZE, false);
+        saveButton = new Button("save", new Vector2(bbOrigin + BUTTON_SIZE * 5 + BUTTON_PADDING * 5, bbOrigin), BUTTON_SIZE, false);
         VoezEditor.Editor.AddObject(playButton);
         VoezEditor.Editor.AddObject(playbackTimeButton);
         VoezEditor.Editor.AddObject(notesButton);
@@ -38,8 +38,44 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(bpmButton);
         VoezEditor.Editor.AddObject(saveButton);
 
+        float sliderStart = BUTTON_PADDING * 7 + BUTTON_SIZE * 6 + 44f;
+        float sliderEnd = VoezEditor.windowRes.x - 230f;
+        playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), sliderEnd - sliderStart);
+        VoezEditor.Editor.AddObject(playbackSlider);
+        grid = new SnapGrid();
+        VoezEditor.Editor.AddObject(grid);
+        trackAdder = new TrackAddPreview();
+        VoezEditor.Editor.AddObject(trackAdder);
+        playbackTimeLabel = new DropshadowLabel("Raleway32", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
+        VoezEditor.Editor.AddObject(playbackTimeLabel);
+    }
+
+    public bool HoveringOverSubmenuItem()
+    {
+        if (noteTypes != null) {
+            for (int i = 0; i < noteTypes.Length; i += 1)
+                if (noteTypes[i].visible && noteTypes[i].MouseOver)
+                    return true;
+        }
+        if (playbackTimes != null) {
+            for (int i = 0; i < playbackTimes.Length; i += 1)
+                if (playbackTimes[i].visible && playbackTimes[i].MouseOver)
+                    return true;
+        }
+        if (snapTimes != null) {
+            for (int i = 0; i < snapTimes.Length; i += 1)
+                if (snapTimes[i].visible && snapTimes[i].MouseOver)
+                    return true;
+        }
+        if (playbackSlider.MouseOver || playButton.MouseOver || playbackTimeButton.MouseOver || notesButton.MouseOver || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver)
+            return true;
+        return false;
+    }
+
+    public void SpawnPlaybackTimeButtons()
+    {
         playbackTimes = new Button[4];
-        for(int i=0; i<playbackTimes.Length; i+=1) {
+        for (int i = 0; i < playbackTimes.Length; i += 1) {
             string buttonText = "0.25x";
             if (i == 1)
                 buttonText = "0.5x";
@@ -48,16 +84,32 @@ public class EditorUI {
             if (i == 3)
                 buttonText = "2.0x";
             playbackTimes[i] = new Button("Raleway32", buttonText
-                , new Vector2(playButton.pos.x + i*69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
-            playbackTimes[i].visible = false;
-            if (i == 2)
+            playbackTimes[i].visible = true;
+            if (i == 0 && VoezEditor.Editor.musicPlayer.playbackSpeed == 0.25f)
+                playbackTimes[i].toggled = true;
+            if (i == 1 && VoezEditor.Editor.musicPlayer.playbackSpeed == 0.5f)
+                playbackTimes[i].toggled = true;
+            if (i == 2 && VoezEditor.Editor.musicPlayer.playbackSpeed == 1.0f)
+                playbackTimes[i].toggled = true;
+            if (i == 3 && VoezEditor.Editor.musicPlayer.playbackSpeed == 2.0f)
                 playbackTimes[i].toggled = true;
             VoezEditor.Editor.AddObject(playbackTimes[i]);
         }
+    }
 
+    public void DespawnPlaybackTimeButtons()
+    {
+        for(int i=0; i<playbackTimes.Length; i+=1)
+            playbackTimes[i].Destroy();
+        playbackTimes = null;
+    }
+
+    public void SpawnNoteButtons()
+    {
         noteTypes = new Button[4];
-        for(int i=0; i< noteTypes.Length; i+=1) {
+        for (int i = 0; i < noteTypes.Length; i += 1) {
             string noteSymbol = "click";
             if (i == 1)
                 noteSymbol = "slide";
@@ -66,18 +118,34 @@ public class EditorUI {
             if (i == 3)
                 noteSymbol = "track";
             noteTypes[i] = new Button(noteSymbol
-                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
-            noteTypes[i].visible = false;
+            noteTypes[i].visible = true;
             if (i != 3)
                 noteTypes[i].mySymbol.rotation = 45f;
             else
                 noteTypes[i].mySymbol.scale = 1.5f;
-            if (i == 0)
+            if (i == 0 && VoezEditor.Editor.selectedNoteType == ProjectData.NoteData.NoteType.CLICK && !VoezEditor.Editor.trackEditMode)
+                noteTypes[i].toggled = true;
+            if (i == 1 && VoezEditor.Editor.selectedNoteType == ProjectData.NoteData.NoteType.SLIDE && !VoezEditor.Editor.trackEditMode)
+                noteTypes[i].toggled = true;
+            if (i == 2 && VoezEditor.Editor.selectedNoteType == ProjectData.NoteData.NoteType.SWIPE && !VoezEditor.Editor.trackEditMode)
+                noteTypes[i].toggled = true;
+            if (i == 3 && VoezEditor.Editor.trackEditMode)
                 noteTypes[i].toggled = true;
             VoezEditor.Editor.AddObject(noteTypes[i]);
         }
+    }
 
+    public void DespawnNoteButtons()
+    {
+        for (int i = 0; i < noteTypes.Length; i += 1)
+            noteTypes[i].Destroy();
+        noteTypes = null;
+    }
+
+    public void SpawnGridButtons()
+    {
         snapTimes = new Button[6];
         for (int i = 0; i < snapTimes.Length; i += 1) {
             string buttonText = "Off";
@@ -92,40 +160,30 @@ public class EditorUI {
             if (i == 5)
                 buttonText = "1";
             snapTimes[i] = new Button("Raleway32", buttonText
-                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + bbSize * 0.5f + 74f + (i % 2) * 69f)
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
-            snapTimes[i].visible = false;
-            if (i == 3)
+            snapTimes[i].visible = true;
+            if (i == 0 && VoezEditor.Editor.selectedTimeSnap == 0)
+                snapTimes[i].toggled = true;
+            if (i == 1 && VoezEditor.Editor.selectedTimeSnap == 16)
+                snapTimes[i].toggled = true;
+            if (i == 2 && VoezEditor.Editor.selectedTimeSnap == 8)
+                snapTimes[i].toggled = true;
+            if (i == 3 && VoezEditor.Editor.selectedTimeSnap == 4)
+                snapTimes[i].toggled = true;
+            if (i == 4 && VoezEditor.Editor.selectedTimeSnap == 2)
+                snapTimes[i].toggled = true;
+            if (i == 5 && VoezEditor.Editor.selectedTimeSnap == 1)
                 snapTimes[i].toggled = true;
             VoezEditor.Editor.AddObject(snapTimes[i]);
         }
-
-        float sliderStart = bbPad * 7 + bbSize * 6 + 44f;
-        float sliderEnd = VoezEditor.windowRes.x - 230f;
-        playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, bbPad + bbSize * 0.5f), sliderEnd - sliderStart);
-        VoezEditor.Editor.AddObject(playbackSlider);
-        grid = new SnapGrid();
-        VoezEditor.Editor.AddObject(grid);
-        trackAdder = new TrackAddPreview();
-        VoezEditor.Editor.AddObject(trackAdder);
-        playbackTimeLabel = new DropshadowLabel("Raleway32", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, bbPad + bbSize * 0.5f), new Vector2(2f, -2f));
-        VoezEditor.Editor.AddObject(playbackTimeLabel);
     }
 
-    public bool HoveringOverSubmenuItem()
+    public void DespawnGridButtons()
     {
-        for (int i = 0; i < noteTypes.Length; i += 1)
-            if (noteTypes[i].visible && noteTypes[i].MouseOver)
-                return true;
-        for (int i = 0; i < playbackTimes.Length; i += 1)
-            if (playbackTimes[i].visible && playbackTimes[i].MouseOver)
-                return true;
         for (int i = 0; i < snapTimes.Length; i += 1)
-            if (snapTimes[i].visible && snapTimes[i].MouseOver)
-                return true;
-        if (playbackSlider.MouseOver || playButton.MouseOver || playbackTimeButton.MouseOver || notesButton.MouseOver || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver)
-            return true;
-        return false;
+            snapTimes[i].Destroy();
+        snapTimes = null;
     }
 
     public void Update()
@@ -225,9 +283,11 @@ public class EditorUI {
             if (gridButton.toggled && !playbackTimeButton.toggled)
                 gridButton.clicked = true; // Grid Snap Menu is already open, close it.
 
-            for (int i = 0; i < playbackTimes.Length; i += 1)
-                playbackTimes[i].visible = !playbackTimes[i].visible;
-            playbackTimeButton.toggled = playbackTimes[0].visible;
+            if (playbackTimes == null)
+                SpawnPlaybackTimeButtons();
+            else
+                DespawnPlaybackTimeButtons();
+            playbackTimeButton.toggled = playbackTimes != null;
             playbackTimeButton.clicked = false;
         }
 
@@ -238,9 +298,11 @@ public class EditorUI {
             if (gridButton.toggled && !notesButton.toggled)
                 gridButton.clicked = true; // Grid Snap Menu is already open, close it.
 
-            for (int i = 0; i < noteTypes.Length; i += 1)
-                noteTypes[i].visible = !noteTypes[i].visible;
-            notesButton.toggled = noteTypes[0].visible;
+            if (noteTypes == null)
+                SpawnNoteButtons();
+            else
+                DespawnNoteButtons();
+            notesButton.toggled = noteTypes != null;
             notesButton.clicked = false;
         }
 
@@ -251,9 +313,11 @@ public class EditorUI {
             if (playbackTimeButton.toggled && !gridButton.toggled)
                 playbackTimeButton.clicked = true; // Playback Speed Menu is already open, close it.
 
-            for (int i = 0; i < snapTimes.Length; i += 1)
-                snapTimes[i].visible = !snapTimes[i].visible;
-            gridButton.toggled = snapTimes[0].visible;
+            if (snapTimes == null)
+                SpawnGridButtons();
+            else
+                DespawnGridButtons();
+            gridButton.toggled = snapTimes != null;
             gridButton.clicked = false;
         }
 
@@ -264,120 +328,197 @@ public class EditorUI {
         }
 
         // Set Playback Speed
-        if (Input.GetKeyDown(KeyCode.Alpha1) && !Util.ShiftDown())
-            playbackTimes[0].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha2) && !Util.ShiftDown())
-            playbackTimes[1].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha3) && !Util.ShiftDown())
-            playbackTimes[2].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha4) && !Util.ShiftDown())
-            playbackTimes[3].clicked = true;
-        for (int i=0; i<playbackTimes.Length; i+=1) {
-            if (playbackTimes[i].clicked) {
-                for (int j = 0; j < playbackTimes.Length; j += 1)
-                    playbackTimes[j].toggled = false;
-                playbackTimes[i].toggled = true;
-                if (i == 0)
-                    VoezEditor.Editor.musicPlayer.playbackSpeed = 0.25f;
-                else if (i == 1)
-                    VoezEditor.Editor.musicPlayer.playbackSpeed = 0.5f;
-                else if (i == 2)
-                    VoezEditor.Editor.musicPlayer.playbackSpeed = 1.0f;
-                else if (i == 3)
-                    VoezEditor.Editor.musicPlayer.playbackSpeed = 2.0f;
-                playbackTimes[i].clicked = false;
-
-                // Automatically close the playback time selector after a choice has been made.
-                if (playbackTimeButton.toggled) {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && !Util.ShiftDown()) {
+            if (playbackTimes != null)
+                playbackTimes[0].clicked = true;
+            else
+                VoezEditor.Editor.musicPlayer.playbackSpeed = 0.25f;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2) && !Util.ShiftDown()) {
+            if (playbackTimes != null)
+                playbackTimes[1].clicked = true;
+            else
+                VoezEditor.Editor.musicPlayer.playbackSpeed = 0.5f;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3) && !Util.ShiftDown()) {
+            if (playbackTimes != null)
+                playbackTimes[2].clicked = true;
+            else
+                VoezEditor.Editor.musicPlayer.playbackSpeed = 1.0f;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4) && !Util.ShiftDown()) {
+            if (playbackTimes != null)
+                playbackTimes[3].clicked = true;
+            else
+                VoezEditor.Editor.musicPlayer.playbackSpeed = 2.0f;
+        }
+        if (playbackTimes != null) {
+            for (int i = 0; i < playbackTimes.Length; i += 1) {
+                if (playbackTimes[i].clicked) {
                     for (int j = 0; j < playbackTimes.Length; j += 1)
-                        playbackTimes[j].visible = false;
-                    playbackTimeButton.toggled = false;
+                        playbackTimes[j].toggled = false;
+                    playbackTimes[i].toggled = true;
+                    if (i == 0)
+                        VoezEditor.Editor.musicPlayer.playbackSpeed = 0.25f;
+                    else if (i == 1)
+                        VoezEditor.Editor.musicPlayer.playbackSpeed = 0.5f;
+                    else if (i == 2)
+                        VoezEditor.Editor.musicPlayer.playbackSpeed = 1.0f;
+                    else if (i == 3)
+                        VoezEditor.Editor.musicPlayer.playbackSpeed = 2.0f;
+                    playbackTimes[i].clicked = false;
+
+                    // Automatically close the playback time selector after a choice has been made.
+                    if (playbackTimeButton.toggled) {
+                        for (int j = 0; j < playbackTimes.Length; j += 1)
+                            playbackTimes[j].visible = false;
+                        playbackTimeButton.toggled = false;
+                    }
                 }
             }
         }
 
         // Set Selected Note Type
-        if (Input.GetKeyDown(KeyCode.Z))
-            noteTypes[0].clicked = true;
-        if (Input.GetKeyDown(KeyCode.X))
-            noteTypes[1].clicked = true;
-        if (Input.GetKeyDown(KeyCode.C))
-            noteTypes[2].clicked = true;
-        if (Input.GetKeyDown(KeyCode.V))
-            noteTypes[3].clicked = true;
-        for (int i = 0; i < noteTypes.Length; i += 1) {
-            if (noteTypes[i].clicked) {
-                for (int j = 0; j < noteTypes.Length; j += 1)
-                    noteTypes[j].toggled = false;
-                noteTypes[i].toggled = true;
-                noteTypes[i].clicked = false;
-                if (i == 0) {
-                    VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
-                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
-                } else if (i == 1) {
-                    VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
-                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
-                } else if (i == 2) {
-                    VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
-                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
-                }
-
-                if (i == 3) {
-                    VoezEditor.Editor.trackEditMode = true;
-                    notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
-                    notesButton.mySymbol.rotation = 0f;
-                } else {
-                    VoezEditor.Editor.trackEditMode = false;
-                    notesButton.mySymbol.rotation = 45f;
-                }
-
-                // Automatically close the note type selector after a choice has been made.
-                if (notesButton.toggled) {
+        if (Input.GetKeyDown(KeyCode.Z)) {
+            if (noteTypes != null)
+                noteTypes[0].clicked = true;
+            else {
+                VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
+                notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
+                VoezEditor.Editor.trackEditMode = false;
+                notesButton.mySymbol.rotation = 45f + 180f;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.X)) {
+            if (noteTypes != null)
+                noteTypes[1].clicked = true;
+            else {
+                VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
+                notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
+                VoezEditor.Editor.trackEditMode = false;
+                notesButton.mySymbol.rotation = 45f + 180f;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            if (noteTypes != null)
+                noteTypes[2].clicked = true;
+            else {
+                VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
+                notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
+                VoezEditor.Editor.trackEditMode = false;
+                notesButton.mySymbol.rotation = 45f + 180f;
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.V)) {
+            if (noteTypes != null)
+                noteTypes[3].clicked = true;
+            else {
+                VoezEditor.Editor.trackEditMode = true;
+                notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
+                notesButton.mySymbol.rotation = 0f;
+            }
+        }
+        if (noteTypes != null) {
+            for (int i = 0; i < noteTypes.Length; i += 1) {
+                if (noteTypes[i].clicked) {
                     for (int j = 0; j < noteTypes.Length; j += 1)
-                        noteTypes[j].visible = false;
-                    notesButton.toggled = false;
+                        noteTypes[j].toggled = false;
+                    noteTypes[i].toggled = true;
+                    noteTypes[i].clicked = false;
+                    if (i == 0) {
+                        VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
+                        notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
+                    } else if (i == 1) {
+                        VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
+                        notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
+                    } else if (i == 2) {
+                        VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
+                        notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
+                    }
+
+                    if (i == 3) {
+                        VoezEditor.Editor.trackEditMode = true;
+                        notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
+                        notesButton.mySymbol.rotation = 0f;
+                    } else {
+                        VoezEditor.Editor.trackEditMode = false;
+                        notesButton.mySymbol.rotation = 45f;
+                    }
+
+                    // Automatically close the note type selector after a choice has been made.
+                    if (notesButton.toggled) {
+                        for (int j = 0; j < noteTypes.Length; j += 1)
+                            noteTypes[j].visible = false;
+                        notesButton.toggled = false;
+                    }
                 }
             }
         }
 
         // Set Grid Snapping
-        if (Input.GetKeyDown(KeyCode.Alpha1) && Util.ShiftDown())
-            snapTimes[0].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha2) && Util.ShiftDown())
-            snapTimes[1].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha3) && Util.ShiftDown())
-            snapTimes[2].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha4) && Util.ShiftDown())
-            snapTimes[3].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha5) && Util.ShiftDown())
-            snapTimes[4].clicked = true;
-        if (Input.GetKeyDown(KeyCode.Alpha6) && Util.ShiftDown())
-            snapTimes[5].clicked = true;
-        for (int i = 0; i < snapTimes.Length; i += 1) {
-            if (snapTimes[i].clicked) {
-                for (int j = 0; j < snapTimes.Length; j += 1)
-                    snapTimes[j].toggled = false;
-                snapTimes[i].toggled = true;
-                if (i == 0)
-                    VoezEditor.Editor.selectedTimeSnap = 0;
-                else if (i == 1)
-                    VoezEditor.Editor.selectedTimeSnap = 16;
-                else if (i == 2)
-                    VoezEditor.Editor.selectedTimeSnap = 8;
-                else if (i == 3)
-                    VoezEditor.Editor.selectedTimeSnap = 4;
-                else if (i == 4)
-                    VoezEditor.Editor.selectedTimeSnap = 2;
-                else if (i == 5)
-                    VoezEditor.Editor.selectedTimeSnap = 1;
-                snapTimes[i].clicked = false;
-                grid.SnapPlaytimeToGrid();
-
-                // Automatically close the grid snap selector after a choice has been made.
-                if (gridButton.toggled) {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[0].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 0;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[1].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 16;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[2].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 8;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[3].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 4;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[4].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 2;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6) && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[5].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 1;
+        }
+        if (snapTimes != null) {
+            for (int i = 0; i < snapTimes.Length; i += 1) {
+                if (snapTimes[i].clicked) {
                     for (int j = 0; j < snapTimes.Length; j += 1)
-                        snapTimes[j].visible = false;
-                    gridButton.toggled = false;
+                        snapTimes[j].toggled = false;
+                    snapTimes[i].toggled = true;
+                    if (i == 0)
+                        VoezEditor.Editor.selectedTimeSnap = 0;
+                    else if (i == 1)
+                        VoezEditor.Editor.selectedTimeSnap = 16;
+                    else if (i == 2)
+                        VoezEditor.Editor.selectedTimeSnap = 8;
+                    else if (i == 3)
+                        VoezEditor.Editor.selectedTimeSnap = 4;
+                    else if (i == 4)
+                        VoezEditor.Editor.selectedTimeSnap = 2;
+                    else if (i == 5)
+                        VoezEditor.Editor.selectedTimeSnap = 1;
+                    snapTimes[i].clicked = false;
+                    grid.SnapPlaytimeToGrid();
+
+                    // Automatically close the grid snap selector after a choice has been made.
+                    if (gridButton.toggled) {
+                        for (int j = 0; j < snapTimes.Length; j += 1)
+                            snapTimes[j].visible = false;
+                        gridButton.toggled = false;
+                    }
                 }
             }
         }

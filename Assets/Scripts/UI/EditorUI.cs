@@ -255,7 +255,7 @@ public class EditorUI {
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
                 VoezEditor.Editor.project.songBPM -= 5;
             VoezEditor.Editor.project.songBPM = Mathf.Clamp(VoezEditor.Editor.project.songBPM, 10, 250);
-            if (VoezEditor.Editor.project.songBPM != lastBPM)
+            if (VoezEditor.Editor.project.songBPM != lastBPM && VoezEditor.Editor.EditMode)
                 grid.SnapPlaytimeToGrid();
             bpmButton.myText.text = "BPM" + Environment.NewLine + VoezEditor.Editor.project.songBPM.ToString();
         }

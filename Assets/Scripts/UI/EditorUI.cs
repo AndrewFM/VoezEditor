@@ -370,9 +370,9 @@ public class EditorUI {
 
                     // Automatically close the playback time selector after a choice has been made.
                     if (playbackTimeButton.toggled) {
-                        for (int j = 0; j < playbackTimes.Length; j += 1)
-                            playbackTimes[j].visible = false;
+                        DespawnPlaybackTimeButtons();
                         playbackTimeButton.toggled = false;
+                        break;
                     }
                 }
             }
@@ -447,9 +447,9 @@ public class EditorUI {
 
                     // Automatically close the note type selector after a choice has been made.
                     if (notesButton.toggled) {
-                        for (int j = 0; j < noteTypes.Length; j += 1)
-                            noteTypes[j].visible = false;
+                        DespawnNoteButtons();
                         notesButton.toggled = false;
+                        break;
                     }
                 }
             }
@@ -515,9 +515,9 @@ public class EditorUI {
 
                     // Automatically close the grid snap selector after a choice has been made.
                     if (gridButton.toggled) {
-                        for (int j = 0; j < snapTimes.Length; j += 1)
-                            snapTimes[j].visible = false;
+                        DespawnGridButtons();
                         gridButton.toggled = false;
+                        break;
                     }
                 }
             }

@@ -39,14 +39,14 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(saveButton);
 
         float sliderStart = BUTTON_PADDING * 7 + BUTTON_SIZE * 6 + 44f;
-        float sliderEnd = VoezEditor.windowRes.x - 230f;
+        float sliderEnd = VoezEditor.windowRes.x - 160f;
         playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), sliderEnd - sliderStart);
         VoezEditor.Editor.AddObject(playbackSlider);
         grid = new SnapGrid();
         VoezEditor.Editor.AddObject(grid);
         trackAdder = new TrackAddPreview();
         VoezEditor.Editor.AddObject(trackAdder);
-        playbackTimeLabel = new DropshadowLabel("Raleway32", "00:00/00:00", new Vector2(VoezEditor.windowRes.x - 110f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
+        playbackTimeLabel = new DropshadowLabel("Raleway32", "0.000", new Vector2(VoezEditor.windowRes.x - 75f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
     }
 
@@ -202,10 +202,10 @@ public class EditorUI {
             playbackSlider.progress = VoezEditor.Editor.songTime / VoezEditor.Editor.musicPlayer.source.clip.length;
             if (!playbackSlider.clicked)
                 // If playback slider is not being dragged, show current song time.
-                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)VoezEditor.Editor.songTime).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)VoezEditor.Editor.musicPlayer.source.clip.length).ToString());
+                playbackTimeLabel.SetText(VoezEditor.Editor.songTime.ToString("0.000"));
             else
                 // If playback slider is being dragged, show song time at slider's current position
-                playbackTimeLabel.SetText(Util.MinuteTimeStampFromSeconds((int)(VoezEditor.Editor.musicPlayer.source.clip.length * playbackSlider.pendingProgress)).ToString() + "/" + Util.MinuteTimeStampFromSeconds((int)VoezEditor.Editor.musicPlayer.source.clip.length).ToString());
+                playbackTimeLabel.SetText((VoezEditor.Editor.musicPlayer.source.clip.length * playbackSlider.pendingProgress).ToString("0.000"));
         } else
             playbackSlider.allowScrubbing = false;
 

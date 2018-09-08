@@ -123,7 +123,7 @@ public class TrackEditor : UIElement {
         }
         border.pos = pos;
 
-        if (Input.GetMouseButtonDown(0) && !MouseOver)
+        if (InputManager.leftMousePushed && !MouseOver)
             Destroy();
         //if (!VoezEditor.Editor.musicPlayer.paused)
         //    Destroy();
@@ -144,13 +144,13 @@ public class TrackEditor : UIElement {
         float delta = 0;
         float baseDelta = VoezEditor.Editor.GetBPMTimeIncrement();
         if (!VoezEditor.Editor.ui.bpmButton.toggled) {
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.UpTick())
                 delta = 1f;
-            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.DownTick())
                 delta = -1f;
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.RightTick())
                 delta = 4f;
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.LeftTick())
                 delta = -4f;
         }
 
@@ -259,7 +259,7 @@ public class TrackEditor : UIElement {
                 sGroup.sprites[Spr_Hover].x = drawPos.x;
                 sGroup.sprites[Spr_Hover].y = drawPos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * i;
 
-                if (Input.GetMouseButtonDown(0)) {
+                if (InputManager.leftMousePushed) {
                     selectedLine = i;
                     keyframeEditor.transSelected = -1;
                     

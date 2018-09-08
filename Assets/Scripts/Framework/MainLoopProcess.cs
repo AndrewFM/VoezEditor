@@ -1,15 +1,22 @@
 ﻿using System;
 
 public abstract class MainLoopProcess {
+    public int framesPerSecond;
+    private float cumulativeDelta;
+    public int framesSinceStart;
+    public InputManager inputManager;
+
     public MainLoopProcess()
     {
         framesPerSecond = 60;
+        inputManager = new InputManager();
     }
 
     public virtual void RawUpdate(float dt)
     {
         cumulativeDelta += dt * framesPerSecond;
         if (cumulativeDelta > 1f) {
+            inputManager.Update();
             Update();
             cumulativeDelta -= 1f;
             if (cumulativeDelta >= 1f)
@@ -34,8 +41,4 @@ public abstract class MainLoopProcess {
     public virtual void CommunicateWithUpcomingProcess(MainLoopProcess nextProcess)
     {
     }
-
-    public int framesPerSecond;
-    private float cumulativeDelta;
-    public int framesSinceStart;
 }

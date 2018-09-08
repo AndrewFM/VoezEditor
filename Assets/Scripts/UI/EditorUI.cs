@@ -210,7 +210,7 @@ public class EditorUI {
             playbackSlider.allowScrubbing = false;
 
         // Play/Pause
-        if (playButton.clicked || Input.GetKeyDown(KeyCode.Space)) {
+        if (playButton.clicked || InputManager.spacePushed) {
             if (VoezEditor.Editor.musicPlayer.paused) {
                 VoezEditor.Editor.musicPlayer.ResumeSong();
                 playButton.mySymbol.element = Futile.atlasManager.GetElementWithName("pause");
@@ -232,7 +232,7 @@ public class EditorUI {
         }
 
         // Jump Playback To Loop Point
-        if (playbackSlider.loopPoint >= 0f && (playButton.rightClicked || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(2))) {
+        if (playbackSlider.loopPoint >= 0f && (playButton.rightClicked || InputManager.returnPushed || InputManager.middleMousePushed)) {
             VoezEditor.Editor.musicPlayer.source.time = VoezEditor.Editor.musicPlayer.source.clip.length * Mathf.Clamp(playbackSlider.loopPoint, 0f, 0.99f);
             VoezEditor.Editor.currentFrame = (int)(VoezEditor.Editor.musicPlayer.source.time * VoezEditor.Editor.framesPerSecond);
             grid.SnapPlaytimeToGrid();
@@ -246,13 +246,13 @@ public class EditorUI {
         }
         if (bpmButton.toggled) {
             float lastBPM = VoezEditor.Editor.project.songBPM;
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.UpTick())
                 VoezEditor.Editor.project.songBPM += 1;
-            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.DownTick())
                 VoezEditor.Editor.project.songBPM -= 1;
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.RightTick())
                 VoezEditor.Editor.project.songBPM += 5;
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.LeftTick())
                 VoezEditor.Editor.project.songBPM -= 5;
             VoezEditor.Editor.project.songBPM = Mathf.Clamp(VoezEditor.Editor.project.songBPM, 10, 250);
             if (VoezEditor.Editor.project.songBPM != lastBPM && VoezEditor.Editor.EditMode)
@@ -328,25 +328,25 @@ public class EditorUI {
         }
 
         // Set Playback Speed
-        if (Input.GetKeyDown(KeyCode.Alpha1) && !Util.ShiftDown()) {
+        if (InputManager.onePushed && !Util.ShiftDown()) {
             if (playbackTimes != null)
                 playbackTimes[0].clicked = true;
             else
                 VoezEditor.Editor.musicPlayer.playbackSpeed = 0.25f;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && !Util.ShiftDown()) {
+        if (InputManager.twoPushed && !Util.ShiftDown()) {
             if (playbackTimes != null)
                 playbackTimes[1].clicked = true;
             else
                 VoezEditor.Editor.musicPlayer.playbackSpeed = 0.5f;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && !Util.ShiftDown()) {
+        if (InputManager.threePushed && !Util.ShiftDown()) {
             if (playbackTimes != null)
                 playbackTimes[2].clicked = true;
             else
                 VoezEditor.Editor.musicPlayer.playbackSpeed = 1.0f;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && !Util.ShiftDown()) {
+        if (InputManager.fourPushed && !Util.ShiftDown()) {
             if (playbackTimes != null)
                 playbackTimes[3].clicked = true;
             else
@@ -379,7 +379,7 @@ public class EditorUI {
         }
 
         // Set Selected Note Type
-        if (Input.GetKeyDown(KeyCode.Z)) {
+        if (InputManager.zPushed) {
             if (noteTypes != null)
                 noteTypes[0].clicked = true;
             else {
@@ -389,7 +389,7 @@ public class EditorUI {
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
         }
-        if (Input.GetKeyDown(KeyCode.X)) {
+        if (InputManager.xPushed) {
             if (noteTypes != null)
                 noteTypes[1].clicked = true;
             else {
@@ -399,7 +399,7 @@ public class EditorUI {
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
         }
-        if (Input.GetKeyDown(KeyCode.C)) {
+        if (InputManager.cPushed) {
             if (noteTypes != null)
                 noteTypes[2].clicked = true;
             else {
@@ -409,7 +409,7 @@ public class EditorUI {
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
         }
-        if (Input.GetKeyDown(KeyCode.V)) {
+        if (InputManager.vPushed) {
             if (noteTypes != null)
                 noteTypes[3].clicked = true;
             else {
@@ -456,37 +456,37 @@ public class EditorUI {
         }
 
         // Set Grid Snapping
-        if (Input.GetKeyDown(KeyCode.Alpha1) && Util.ShiftDown()) {
+        if (InputManager.onePushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[0].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 0;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) && Util.ShiftDown()) {
+        if (InputManager.twoPushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[1].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 16;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha3) && Util.ShiftDown()) {
+        if (InputManager.threePushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[2].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 8;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha4) && Util.ShiftDown()) {
+        if (InputManager.fourPushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[3].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 4;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha5) && Util.ShiftDown()) {
+        if (InputManager.fivePushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[4].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 2;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha6) && Util.ShiftDown()) {
+        if (InputManager.sixPushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[5].clicked = true;
             else

@@ -48,9 +48,9 @@ public class Slider : UIElement {
 
     public override void Update()
     {
-        if (Input.GetMouseButtonDown(0) && allowScrubbing && MouseOver)
+        if (InputManager.leftMousePushed && allowScrubbing && MouseOver)
             clicked = true;
-        if (Input.GetMouseButtonDown(1) && allowScrubbing && MouseOver)
+        if (InputManager.rightMousePushed && allowScrubbing && MouseOver)
             rightClicked = true;
         if (clicked)
             pendingProgress = Mathf.Clamp((Input.mousePosition.x - (pos.x - width * 0.5f)) / width, 0f, 1f);

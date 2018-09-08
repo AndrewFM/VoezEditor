@@ -53,9 +53,9 @@ public class Button : UIElement {
 
     public override void Update()
     {
-        if (Input.GetMouseButtonDown(0) && visible && MouseOver)
+        if (InputManager.leftMousePushed && visible && MouseOver)
             clicked = true;
-        if (Input.GetMouseButtonDown(1) && visible && MouseOver)
+        if (InputManager.rightMousePushed && visible && MouseOver)
             rightClicked = true;
         base.Update();
     }

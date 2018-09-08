@@ -58,7 +58,7 @@ public class Track : DrawableObject {
 
         if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.trackEditMode) {
             // Delete Track
-            if (activeHover && (Input.GetKeyDown(KeyCode.Delete) || (Util.ShiftDown() && Input.GetMouseButtonDown(1)))) {
+            if (activeHover && (InputManager.delPushed || (Util.ShiftDown() && InputManager.rightMousePushed))) {
                 Vector2 windowCenter = new Vector2(VoezEditor.windowRes.x * 0.5f, VoezEditor.windowRes.y * 0.5f);
                 int damageCount = 0;
                 for(int i=0; i<VoezEditor.Editor.project.notes.Count; i+=1) {
@@ -77,7 +77,7 @@ public class Track : DrawableObject {
                 }
             }
             // Edit Track
-            if (activeHover && Input.GetMouseButtonDown(0) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
+            if (activeHover && InputManager.leftMousePushed && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
                 float trackEditWindowX = 0f;
                 if (pos.x > VoezEditor.windowRes.x * 0.5f)
                     trackEditWindowX = pos.x - TrackEditor.WIDTH * 0.5f - 64f;

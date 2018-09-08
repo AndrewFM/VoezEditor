@@ -112,13 +112,13 @@ public class EditorProcess : MainLoopProcess {
         // Frame Advancing while Paused
         if (EditMode && !MenuOpen && !ui.bpmButton.toggled) {
             float delta = GetBPMTimeIncrement() * framesPerSecond;
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.UpTick())
                 currentFrame = Mathf.Min(currentFrame + delta, musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.DownTick())
                 currentFrame = Mathf.Max(currentFrame - delta, 0);
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.RightTick())
                 currentFrame = Mathf.Min(currentFrame + (delta * 4f), musicPlayer.source.clip.length * framesPerSecond);
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.LeftTick())
                 currentFrame = Mathf.Max(currentFrame - (delta * 4f), 0);
         }
 
@@ -160,7 +160,7 @@ public class EditorProcess : MainLoopProcess {
                 }
 
                 // Add New Note to Hovered Track
-                if (Input.GetMouseButtonDown(0) && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !trackEditMode) {
+                if (InputManager.leftMousePushed && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !trackEditMode) {
                     float desiredSongTime = ui.grid.GetSongTimeAtGridY(Input.mousePosition.y);
                     desiredSongTime = Mathf.Clamp(desiredSongTime, 0f, musicPlayer.source.clip.length);
                     if (!TrackOccupiedAtTime(nearestTrack.ID, desiredSongTime)) {

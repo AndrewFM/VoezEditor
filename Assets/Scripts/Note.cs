@@ -77,12 +77,12 @@ public class Note : DrawableObject {
 
         if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && !VoezEditor.Editor.trackEditMode) {
             // Delete Note
-            if (hovered && (Input.GetKeyDown(KeyCode.Delete) || Input.GetMouseButtonDown(1) || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
+            if (hovered && (InputManager.delPushed || InputManager.rightMousePushed || (Util.ShiftDown() && Input.GetMouseButton(1)))) {
                 VoezEditor.Editor.project.DeleteNote(data.id);
                 VoezEditor.Editor.RefreshAllNotes();
             }
             // Edit Note
-            if (MouseOver && Input.GetMouseButtonDown(0) && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
+            if (MouseOver && InputManager.leftMousePushed && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
                 float noteEditWindowX = 0f;
                 if (pos.x > VoezEditor.windowRes.x * 0.5f)
                     noteEditWindowX = pos.x - NoteEditor.WIDTH * 0.5f - 64f;

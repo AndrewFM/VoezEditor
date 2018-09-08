@@ -87,13 +87,13 @@ public class TransformationList : UIElement {
 
         // Edit Values
         if (transSelected >= 0 && transUIElems[transSelected % transUIElems.Length] != null) {
-            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.UpTick())
                 transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, 1);
-            if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S) || (!Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.DownTick())
                 transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, -1);
-            if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0))
+            if (InputManager.RightTick())
                 transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, 5);
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A) || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") < 0))
+            if (InputManager.LeftTick())
                 transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, -5);
         }
 
@@ -335,7 +335,7 @@ public class TransformationList : UIElement {
                 sGroup.sprites[Spr_BigHover].x = drawPos.x;
                 sGroup.sprites[Spr_BigHover].y = drawPos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * ((Mathf.FloorToInt(i / 4) * 4));
 
-                if (Input.GetMouseButtonDown(0)) {
+                if (InputManager.leftMousePushed) {
                     itemSelected = item;
                     transSelected = trans;
 

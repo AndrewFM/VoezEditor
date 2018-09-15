@@ -365,6 +365,7 @@ public class EditorUI {
                 SpawnPlaybackTimeButtons();
             else
                 DespawnPlaybackTimeButtons();
+            InputManager.ClearMouseInputs();
             playbackTimeButton.toggled = playbackTimes != null;
             playbackTimeButton.clicked = false;
         }
@@ -376,6 +377,7 @@ public class EditorUI {
                 SpawnNoteButtons();
             else
                 DespawnNoteButtons();
+            InputManager.ClearMouseInputs();
             notesButton.toggled = noteTypes != null;
             notesButton.clicked = false;
         }
@@ -387,6 +389,7 @@ public class EditorUI {
                 SpawnGridButtons();
             else
                 DespawnGridButtons();
+            InputManager.ClearMouseInputs();
             gridButton.toggled = snapTimes != null;
             gridButton.clicked = false;
         }
@@ -398,6 +401,7 @@ public class EditorUI {
                 SpawnScrollButtons();
             else
                 DespawnScrollButtons();
+            InputManager.ClearMouseInputs();
             scrollButton.toggled = scrollRates != null;
             scrollButton.clicked = false;
         }
@@ -409,6 +413,7 @@ public class EditorUI {
                 SpawnSoundAssistButtons();
             else
                 DespawnSoundAssistButtons();
+            InputManager.ClearMouseInputs();
             soundAssistButton.toggled = metronomeToggle != null;
             soundAssistButton.clicked = false;
         }
@@ -463,6 +468,7 @@ public class EditorUI {
                     // Automatically close the playback time selector after a choice has been made.
                     if (playbackTimeButton.toggled) {
                         DespawnPlaybackTimeButtons();
+                        InputManager.ClearMouseInputs();
                         playbackTimeButton.toggled = false;
                         break;
                     }
@@ -540,6 +546,7 @@ public class EditorUI {
                     // Automatically close the note type selector after a choice has been made.
                     if (notesButton.toggled) {
                         DespawnNoteButtons();
+                        InputManager.ClearMouseInputs();
                         notesButton.toggled = false;
                         break;
                     }
@@ -608,6 +615,7 @@ public class EditorUI {
                     // Automatically close the grid snap selector after a choice has been made.
                     if (gridButton.toggled) {
                         DespawnGridButtons();
+                        InputManager.ClearMouseInputs();
                         gridButton.toggled = false;
                         break;
                     }
@@ -629,6 +637,7 @@ public class EditorUI {
                     // Automatically close the scroll rate selector after a choice has been made.
                     if (scrollButton.toggled) {
                         DespawnScrollButtons();
+                        InputManager.ClearMouseInputs();
                         scrollButton.toggled = false;
                         break;
                     }

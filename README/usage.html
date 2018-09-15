@@ -66,6 +66,7 @@ div.title {
 <table style="width:1280px;">
 <tr><td style="text-align:center;">
 <img src="manual_imgs/title.png" /><br><br>
+<b>Program Download and Source: <a href="https://github.com/AndrewFM/VoezEditor/releases" target="_blank">Github</a></b><br>
 <b>By <a href="http://eggzero.tumblr.com/" target="_blank" >AndrewFM</a></b>
 </td></tr>
 <tr><td>
@@ -108,18 +109,24 @@ From left to right, the tools are:
 		<li>Shift + 5 Key: 2 Beats Per Measure</li>
 		<li>Shift + 6 Key: 1 Beat Per Measure</li></ul>
 	</li>
+	<li><b>Scroll Speed</b>: Change the speed at which the notes scroll down along the tracks. This is a visual change only, it does not affect the timings of the song at all.</li>
+	<li><b>Audio Assistance</b>: Provides a couple audio guide tools:
+		<ul><li><b>Metronome</b>: When this is enabled, a click will be heard every time one beat elapses.</li>
+			<li><b>Hit Sounds</b>: When this is enabled, a sound will play whenever a note on a track intersects with the play line.</li></ul>
+	</li> 
 	<li><b>Beats Per Minute</b>: Adjusts the BPM value for the song. If this value is not correct, then the time signature grid (and thus, the notes you place) will be out of sync with the beats in the song. Calibrating this value is the very first thing you should do before starting creating a beat map for your song. Performing this calibration is explained in the next section.</li>
 	<li><b>Save</b>: Saves all of your edits to disk. Note that this will overwrite your previous save files every time. If you want to keep periodic backups, you'll need to manually backup the ActiveProjects folder from time to time.</li>
 	<li><b>Scrubber</b>: This bar shows the current playback progress through the song, and allows you to navigate to any time in the song by clicking and dragging the scrubber.<ul>
 		<li><b>Loop Point</b>: You can right-click the scrubber to set a loop point at its current location. Once the loop point is placed, the scrubber can be jumped back to that position at any point by pressing the <b>Enter</b> key, or by pressing the <b>Middle Mouse Button</b>, or by right-clicking the Play button.</li>
 		<li>While the song is paused, you can use the Arrow Keys/WASD keys, or the Scroll Wheel on the mouse to frame advance/rewind the scrubber. Hold down the Shift key to advance the time at a faster rate.</li>
 	</ul></li>
+	<li><b>Timer</b>: The current song time. The number on top is the time in seconds, the number on bottom in parentheses is the cumulative beat count.</li>
 </ol>
 
 <h2>Setting the BPM</h2>
 Click on the BPM button to enable BPM editing mode. While active you can use the Scroll Wheel on the mouse, or the Arrow Keys/WASD Keys to edit the value of the BPM. Hold down the Shift key to scroll the value at a faster pace. (This is the standard control scheme for editing any numeric values in the editor)
 <br><br>
-While BPM editing mode is enabled, if you start playing the song, the screen will pulse at the current BPM rate that you have set. Adjust the BPM value until the pulsing rate is perfectly in sync with the music. Try playing with the playback speed options to also help with this calibration.
+While BPM editing mode is enabled, if you start playing the song, the screen will pulse at the current BPM rate that you have set. Adjust the BPM value until the pulsing rate is perfectly in sync with the music. The playback speed options and the metronome can be helpful with this calibration.
 <br><br>
 When done, click the BPM button again to exit BPM editing mode.
 
@@ -138,8 +145,8 @@ Once you have tracks placed down, they need to be configured to adjust their dur
 Use the left mouse button on the different fields in the window to select them from editing. Each tab has three main values:
 <table><tr><td>
 <ul>
-	<li><b>Spawn Time:</b> The time (in seconds) at which the track will first spawn.</li>
-	<li><b>Despawn Time:</b> The time (in seconds) at which the track will disappear.</li>
+	<li><b>Spawn Time:</b> The time at which the track will first spawn.</li>
+	<li><b>Despawn Time:</b> The time at which the track will disappear.</li>
 	<li><b>Value:</b> The base value the track will have when it is <i>first spawned</i>, for the current tab:
 		<ul>
 			<li><b>Position:</b> A value between 0% and 100%, where 0% is the far left side of the screen, and 100% is the far right side of the screen. Note that when editing postion values, you can hold the <b>Right Mouse Button</b> to snap the track to the mouse cursor and drag and drop it to the desired position, instead of trying to set the numerical value manually.</li>
@@ -174,7 +181,7 @@ To edit the attributes of a placed note, hover over it with the mouse, and left 
 <img src="manual_imgs/noteEditWindow.PNG"/><br><br>
 The three buttons on the top will change which type of note this is. The value fields below will change attributes about the note:
 <ul>
-	<li><b>Spawn Time:</b> The time (in seconds) in the song when this note needs to be tapped/swiped by the player.</li>
+	<li><b>Spawn Time:</b> The time in the song when this note needs to be tapped/swiped by the player.</li>
 	<li><b>Hold Duration:</b> Only available for click notes. If this is set to a value other than 0, then the click note becomes a hold note. If you want to make a hold note that moves around, you need to keyframe the track's position. See the previous section on track editing above.</li>
 	<li><b>Direction:</b> Only available for swipe notes. Lets you select whether it should be swiped to the left, or swiped to the right.
 </ul>

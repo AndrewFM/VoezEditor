@@ -113,6 +113,13 @@ public class InputManager {
         return rightPushed || dPushed || (Util.ShiftDown() && Input.GetAxis("Mouse ScrollWheel") > 0);
     }
 
+    public static void ClearMouseInputs()
+    {
+        leftMousePushed = false;
+        rightMousePushed = false;
+        middleMousePushed = false;
+    }
+
     private bool oneNowDown;
     private bool oneLastDown;
     private bool twoNowDown;

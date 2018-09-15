@@ -66,4 +66,9 @@ public class VoezEditor : MonoBehaviour {
             }
         }
     }
+
+    public static AudioClip LoadSoundEffect(string name)
+    {
+        return Resources.Load<AudioClip>("SoundEffects/" + name);
+    }
 }

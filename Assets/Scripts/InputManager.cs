@@ -27,6 +27,7 @@ public class InputManager {
     public static bool leftMousePushed;
     public static bool rightMousePushed;
     public static bool middleMousePushed;
+    public static bool anyPushed;
 
     public void Update()
     {
@@ -54,6 +55,16 @@ public class InputManager {
         UpdateMousePushTracker(0, ref mouseLeftLastDown, ref mouseLeftNowDown, ref leftMousePushed);
         UpdateMousePushTracker(1, ref mouseRightLastDown, ref mouseRightNowDown, ref rightMousePushed);
         UpdateMousePushTracker(2, ref mouseMiddleLastDown, ref mouseMiddleNowDown, ref middleMousePushed);
+
+        anyLastDown = anyNowDown;
+        if (Input.anyKeyDown && !Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1) && !Input.GetMouseButtonDown(2))
+            anyNowDown = true;
+        else
+            anyNowDown = false;
+        if (anyNowDown && !anyLastDown)
+            anyPushed = true;
+        else
+            anyPushed = false;
     }
 
     public static void UpdateKeyPushTracker(KeyCode key, ref bool lastDown, ref bool nowDown, ref bool pushStatus)
@@ -155,4 +166,7 @@ public class InputManager {
     private bool mouseRightLastDown;
     private bool mouseMiddleNowDown;
     private bool mouseMiddleLastDown;
+
+    private bool anyNowDown;
+    private bool anyLastDown;
 }

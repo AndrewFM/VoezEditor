@@ -36,8 +36,8 @@ public class TrackEditor : UIElement {
         numLines = 3;
 
         valueLabel = new FLabel("Raleway16", "Value: ");
-        startLabel = new FLabel("Raleway16", "Spawn Time: "+data.start.ToString("0.000"));
-        endLabel = new FLabel("Raleway16", "Despawn Time: "+data.end.ToString("0.000"));
+        startLabel = new FLabel("Raleway16", "Spawn Time: "+VoezEditor.Editor.BeatTimeStamp(data.start));
+        endLabel = new FLabel("Raleway16", "Despawn Time: "+ VoezEditor.Editor.BeatTimeStamp(data.end));
     }
 
     public void SetPage(ProjectData.TrackTransformation.TransformType pageID)
@@ -167,7 +167,7 @@ public class TrackEditor : UIElement {
                                                        data.scale.Count == 0 ? int.MaxValue : data.scale[0].start,
                                                        data.colorChange.Count == 0 ? int.MaxValue : data.colorChange[0].start));
                 }
-                startLabel.text = "Spawn Time: " + data.start.ToString("0.000");
+                startLabel.text = "Spawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.start);
                 VoezEditor.Editor.JumpToTime(data.start);
             }
             if (selectedLine == 1) {
@@ -180,7 +180,7 @@ public class TrackEditor : UIElement {
                                                      data.colorChange.Count == 0 ? 0 : data.colorChange[data.colorChange.Count-1].end),
                                            VoezEditor.Editor.musicPlayer.source.clip.length);
                 }
-                endLabel.text = "Despawn Time: " + data.end.ToString("0.000");
+                endLabel.text = "Despawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.end);
                 VoezEditor.Editor.JumpToTime(data.end);
             }
             if (selectedLine == 2) {
@@ -193,7 +193,7 @@ public class TrackEditor : UIElement {
                 } else if (page == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.size = Mathf.Clamp(data.size + 0.1f * delta, 0f, 10f);
                 else if (page == ProjectData.TrackTransformation.TransformType.MOVE)
-                    data.x = Mathf.Clamp(data.x + 0.01f * delta, 0f, 1f);
+                    data.x = Mathf.RoundToInt(Mathf.Clamp(data.x + 0.01f * delta, 0f, 1f)*100f)/100f;
                 RefreshValueLabel();
             }
             if (selectedLine <= 1)

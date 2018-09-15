@@ -42,19 +42,8 @@ public class Track : DrawableObject {
         if (pulseFlashEffectTime > 0)
             pulseFlashEffectTime -= 1;
 
-        // BPM Pulsing in BPM Edit Mode
-        if (VoezEditor.Editor.ui.bpmButton.toggled && VoezEditor.Editor.musicPlayer.source.isPlaying) {
-            float timeIncrement = 0;
-            if (VoezEditor.Editor.project.songBPM > 0) {
-                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
-                timeIncrement = secondsPerBeat; // BPM data available; set time snap to match BPM
-            } else
-                timeIncrement = 1f; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-            float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
-
-            if (offset <= 1f / VoezEditor.Editor.framesPerSecond)
+        if (VoezEditor.Editor.ui.bpmButton.toggled && VoezEditor.Editor.bpmPulse)
                 pulseFlashEffectTime = 5;
-        }
 
         if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.trackEditMode) {
             // Delete Track

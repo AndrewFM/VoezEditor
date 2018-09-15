@@ -8,10 +8,23 @@ public class Note : DrawableObject {
     public float holdProgress;
     public bool hovered;
     public int ID;
-    public static float NOTE_DURATION = 1.5f; // number of seconds to transition from top of track to bottom of track
-    public static float SELECTION_RADIUS = 85f;
     public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
     public List<HoldTick> holdTicks;
+    private bool playedHoldHitSound;
+    public static float SELECTION_RADIUS = 85f;
+    public static float NOTE_DURATION = 1.1f; // number of seconds to transition from top of track to bottom of track
+    public static float[] SCROLL_DURATIONS = {
+        1.5f,   // 1x
+        1.3f,   // 2x
+        1.1f,   // 3x
+        0.9f,   // 4x
+        0.8f,   // 5x
+        0.7f,   // 6x
+        0.55f,  // 7x
+        0.425f, // 8x
+        0.3f,   // 9x
+        0.2f,   // 10x
+    };
 
     public Note(ProjectData.NoteData data)
     {
@@ -64,14 +77,14 @@ public class Note : DrawableObject {
                     break;
                 }
             }
-            if (linkedTrack == null && tempNoteX < 0) {
+            /*if (linkedTrack == null && tempNoteX < 0) {
                 for(int i=0; i< VoezEditor.Editor.project.tracks.Count; i+=1) {
                     if (VoezEditor.Editor.project.tracks[i].id == data.track) {
                         tempNoteX = Util.ScreenPosX(VoezEditor.Editor.project.tracks[i].x);
                         break;
                     }
                 }
-            }
+            }*/
             pos.x = tempNoteX;
         }
 
@@ -95,6 +108,7 @@ public class Note : DrawableObject {
         }
 
         if (linkedTrack != null) {
+            tempNoteX = -1000;
             pos.x = linkedTrack.pos.x;
             pos.y = VoezEditor.windowRes.y - (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT * noteProgress);
             if (noteProgress < 0f)
@@ -102,7 +116,22 @@ public class Note : DrawableObject {
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
                 Destroy();
                 linkedTrack.flashEffectTime = 5;
+                if (VoezEditor.Editor.hitSoundsEnabled) {
+                    if (data.type == ProjectData.NoteData.NoteType.HOLD)
+                        VoezEditor.Editor.sfxPlayer.ReleaseHitSound();
+                    else if (data.type == ProjectData.NoteData.NoteType.SLIDE)
+                        VoezEditor.Editor.sfxPlayer.SlideHitSound();
+                    else
+                        VoezEditor.Editor.sfxPlayer.ClickHitSound();
+                }
             }
+            if (noteProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD && !playedHoldHitSound) {
+                if (VoezEditor.Editor.hitSoundsEnabled)
+                    VoezEditor.Editor.sfxPlayer.ClickHitSound();
+                playedHoldHitSound = true;
+            }
+            if (noteProgress < 1)
+                playedHoldHitSound = false;
             if (linkedTrack.readyForDeletion)
                 linkedTrack = null;
 
@@ -178,13 +207,14 @@ public class Note : DrawableObject {
                 sGroup.sprites[i].isVisible = true;
         }
 
-        bool highlightCondition = (MouseOver && !VoezEditor.Editor.MenuOpen) || (VoezEditor.Editor.noteEditor != null && VoezEditor.Editor.noteEditor.data.id == ID);
-        if (VoezEditor.Editor.EditMode && !hovered && highlightCondition && !VoezEditor.Editor.trackEditMode) {
+        bool strictHighlightCondition = (VoezEditor.Editor.noteEditor != null && VoezEditor.Editor.noteEditor.data.id == ID);
+        bool highlightCondition = (MouseOver && !VoezEditor.Editor.MenuOpen) || strictHighlightCondition;
+        if (VoezEditor.Editor.EditMode && highlightCondition && !VoezEditor.Editor.trackEditMode && !VoezEditor.Editor.ui.HoveringOverSubmenuItem()) {
             for (int i = 0; i < sGroup.sprites.Length; i += 1)
                 sGroup.sprites[i].color = Color.red;
             hovered = true;
         }
-        else if (hovered && !highlightCondition) {
+        else if (hovered && !strictHighlightCondition) {
             for (int i = 0; i < sGroup.sprites.Length; i += 1) {
                 if (i == 1)
                     sGroup.sprites[i].color = Color.black;

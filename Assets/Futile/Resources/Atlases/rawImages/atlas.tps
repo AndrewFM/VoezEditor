@@ -221,6 +221,7 @@
                 <false/>
             </struct>
             <key type="filename">color.png</key>
+            <key type="filename">hitsound.png</key>
             <key type="filename">notes.png</key>
             <key type="filename">scale.png</key>
             <struct type="IndividualSpriteSettings">
@@ -298,6 +299,19 @@
                 <rect>31,12,61,25</rect>
                 <key>scale9Paddings</key>
                 <rect>31,12,61,25</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">metronome.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>16,15,33,31</rect>
+                <key>scale9Paddings</key>
+                <rect>16,15,33,31</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -407,6 +421,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">scroll.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,16,16,33</rect>
+                <key>scale9Paddings</key>
+                <rect>8,16,16,33</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">slide.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -488,6 +515,9 @@
             <filename>move.png</filename>
             <filename>scale.png</filename>
             <filename>color.png</filename>
+            <filename>hitsound.png</filename>
+            <filename>metronome.png</filename>
+            <filename>scroll.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

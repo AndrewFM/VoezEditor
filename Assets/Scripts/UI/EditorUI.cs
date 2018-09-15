@@ -10,15 +10,20 @@ public class EditorUI {
     public Button gridButton;
     public Button saveButton;
     public Button bpmButton;
+    public Button scrollButton;
+    public Button soundAssistButton;
     public Button[] snapTimes;
     public Button[] playbackTimes;
     public Button[] noteTypes;
+    public Button[] scrollRates;
+    public Button metronomeToggle;
+    public Button hitSoundToggle;
     public Slider playbackSlider;
     public SnapGrid grid;
     public TrackAddPreview trackAdder;
     public DropshadowLabel playbackTimeLabel;
-    public static float BUTTON_SIZE = 80f;
-    public static float BUTTON_PADDING = 10f;
+    public static float BUTTON_SIZE = 75f;
+    public static float BUTTON_PADDING = 5f;
 
 	public EditorUI()
     {
@@ -29,16 +34,20 @@ public class EditorUI {
         notesButton = new Button("click", new Vector2(bbOrigin + BUTTON_SIZE * 2 + BUTTON_PADDING * 2, bbOrigin), BUTTON_SIZE, false);
         notesButton.mySymbol.rotation = 45f;
         gridButton = new Button("grid", new Vector2(bbOrigin + BUTTON_SIZE * 3 + BUTTON_PADDING * 3, bbOrigin), BUTTON_SIZE, false);
-        bpmButton = new Button("Raleway32", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + BUTTON_SIZE * 4 + BUTTON_PADDING * 4, bbOrigin), BUTTON_SIZE, false);
-        saveButton = new Button("save", new Vector2(bbOrigin + BUTTON_SIZE * 5 + BUTTON_PADDING * 5, bbOrigin), BUTTON_SIZE, false);
+        scrollButton = new Button("scroll", new Vector2(bbOrigin + BUTTON_SIZE * 4 + BUTTON_PADDING * 4, bbOrigin), BUTTON_SIZE, false);
+        soundAssistButton = new Button("metronome", new Vector2(bbOrigin + BUTTON_SIZE * 5 + BUTTON_PADDING * 5, bbOrigin), BUTTON_SIZE, false);
+        bpmButton = new Button("Raleway32", "BPM"+Environment.NewLine+VoezEditor.Editor.project.songBPM.ToString(), new Vector2(bbOrigin + BUTTON_SIZE * 6 + BUTTON_PADDING * 6, bbOrigin), BUTTON_SIZE, false);
+        saveButton = new Button("save", new Vector2(bbOrigin + BUTTON_SIZE * 7 + BUTTON_PADDING * 7, bbOrigin), BUTTON_SIZE, false);
         VoezEditor.Editor.AddObject(playButton);
         VoezEditor.Editor.AddObject(playbackTimeButton);
         VoezEditor.Editor.AddObject(notesButton);
         VoezEditor.Editor.AddObject(gridButton);
+        VoezEditor.Editor.AddObject(scrollButton);
+        VoezEditor.Editor.AddObject(soundAssistButton);
         VoezEditor.Editor.AddObject(bpmButton);
         VoezEditor.Editor.AddObject(saveButton);
 
-        float sliderStart = BUTTON_PADDING * 7 + BUTTON_SIZE * 6 + 44f;
+        float sliderStart = BUTTON_PADDING * 9 + BUTTON_SIZE * 8 + 44f;
         float sliderEnd = VoezEditor.windowRes.x - 160f;
         playbackSlider = new Slider(new Vector2((sliderStart + sliderEnd) * 0.5f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), sliderEnd - sliderStart);
         VoezEditor.Editor.AddObject(playbackSlider);
@@ -46,7 +55,7 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(grid);
         trackAdder = new TrackAddPreview();
         VoezEditor.Editor.AddObject(trackAdder);
-        playbackTimeLabel = new DropshadowLabel("Raleway32", "0.000", new Vector2(VoezEditor.windowRes.x - 75f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
+        playbackTimeLabel = new DropshadowLabel("Raleway32", BeatTimeStamp(0), new Vector2(VoezEditor.windowRes.x - 75f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
     }
 
@@ -67,7 +76,17 @@ public class EditorUI {
                 if (snapTimes[i].visible && snapTimes[i].MouseOver)
                     return true;
         }
-        if (playbackSlider.MouseOver || playButton.MouseOver || playbackTimeButton.MouseOver || notesButton.MouseOver || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver)
+        if (scrollRates != null) {
+            for (int i = 0; i < scrollRates.Length; i += 1)
+                if (scrollRates[i].visible && scrollRates[i].MouseOver)
+                    return true;
+        }
+        if (metronomeToggle != null && (metronomeToggle.visible && metronomeToggle.MouseOver))
+            return true;
+        if (hitSoundToggle != null && (hitSoundToggle.visible && hitSoundToggle.MouseOver))
+            return true;
+        if (playbackSlider.MouseOver || playButton.MouseOver || playbackTimeButton.MouseOver || notesButton.MouseOver 
+            || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver || scrollButton.MouseOver || soundAssistButton.MouseOver)
             return true;
         return false;
     }
@@ -125,6 +144,8 @@ public class EditorUI {
                 noteTypes[i].mySymbol.rotation = 45f;
             else
                 noteTypes[i].mySymbol.scale = 1.5f;
+            if (i == 1)
+                noteTypes[i].mySymbol.scale = 2.0f;
             if (i == 0 && VoezEditor.Editor.selectedNoteType == ProjectData.NoteData.NoteType.CLICK && !VoezEditor.Editor.trackEditMode)
                 noteTypes[i].toggled = true;
             if (i == 1 && VoezEditor.Editor.selectedNoteType == ProjectData.NoteData.NoteType.SLIDE && !VoezEditor.Editor.trackEditMode)
@@ -186,8 +207,81 @@ public class EditorUI {
         snapTimes = null;
     }
 
+    public void SpawnScrollButtons()
+    {
+        scrollRates = new Button[10];
+        for (int i = 0; i < scrollRates.Length; i += 1) {
+            string buttonText = (i+1).ToString()+"x";
+            scrollRates[i] = new Button("Raleway32", buttonText
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
+                , 128f, true);
+            scrollRates[i].visible = true;
+            if (VoezEditor.Editor.selectedScrollRate == i+1)
+                scrollRates[i].toggled = true;
+            VoezEditor.Editor.AddObject(scrollRates[i]);
+        }
+    }
+
+    public void DespawnScrollButtons()
+    {
+        for (int i = 0; i < scrollRates.Length; i += 1)
+            scrollRates[i].Destroy();
+        scrollRates = null;
+    }
+
+    public void SpawnSoundAssistButtons()
+    {
+        int i = 5;
+        metronomeToggle = new Button("metronome"
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
+                , 128f, true);
+        metronomeToggle.toggled = VoezEditor.Editor.metronomeEnabled;
+        metronomeToggle.mySymbol.scale = 1.5f;
+        VoezEditor.Editor.AddObject(metronomeToggle);
+        i = 6;
+        hitSoundToggle = new Button("hitsound"
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
+                , 128f, true);
+        hitSoundToggle.toggled = VoezEditor.Editor.hitSoundsEnabled;
+        VoezEditor.Editor.AddObject(hitSoundToggle);
+    }
+
+    public void DespawnSoundAssistButtons()
+    {
+        metronomeToggle.Destroy();
+        hitSoundToggle.Destroy();
+        metronomeToggle = null;
+        hitSoundToggle = null;
+    }
+
+    public void UntoggleAllSubmenus()
+    {
+        if (notesButton.toggled)
+            notesButton.clicked = true;
+        if (playbackTimeButton.toggled)
+            playbackTimeButton.clicked = true;
+        if (gridButton.toggled)
+            gridButton.clicked = true;
+        if (scrollButton.toggled)
+            scrollButton.clicked = true;
+        if (soundAssistButton.toggled)
+            soundAssistButton.clicked = true;
+    }
+
+    public string BeatTimeStamp(float seconds)
+    {
+        if (VoezEditor.Editor.EditMode)
+            return String.Format("{0:0.###}", seconds) + Environment.NewLine + "(" + String.Format("{0:0.###}", VoezEditor.Editor.SecondsToBeats(seconds)) + ")";
+        else
+            return String.Format("{0:0.###}", seconds) + Environment.NewLine + "(" + Mathf.FloorToInt(VoezEditor.Editor.SecondsToBeats(seconds)).ToString() + ")";
+    }
+
     public void Update()
     {
+        if ((InputManager.leftMousePushed && !HoveringOverSubmenuItem()) || InputManager.anyPushed) {
+            UntoggleAllSubmenus();
+        }
+
         // Handle Playback Slider Dragged
         if (playbackSlider.progressUpdate) {
             VoezEditor.Editor.musicPlayer.source.time = VoezEditor.Editor.musicPlayer.source.clip.length * Mathf.Clamp(playbackSlider.progress, 0f, 0.99f);
@@ -202,10 +296,10 @@ public class EditorUI {
             playbackSlider.progress = VoezEditor.Editor.songTime / VoezEditor.Editor.musicPlayer.source.clip.length;
             if (!playbackSlider.clicked)
                 // If playback slider is not being dragged, show current song time.
-                playbackTimeLabel.SetText(VoezEditor.Editor.songTime.ToString("0.000"));
+                playbackTimeLabel.SetText(BeatTimeStamp(VoezEditor.Editor.songTime));
             else
                 // If playback slider is being dragged, show song time at slider's current position
-                playbackTimeLabel.SetText((VoezEditor.Editor.musicPlayer.source.clip.length * playbackSlider.pendingProgress).ToString("0.000"));
+                playbackTimeLabel.SetText(BeatTimeStamp(VoezEditor.Editor.musicPlayer.source.clip.length * playbackSlider.pendingProgress));
         } else
             playbackSlider.allowScrubbing = false;
 
@@ -259,30 +353,14 @@ public class EditorUI {
                 grid.SnapPlaytimeToGrid();
             bpmButton.myText.text = "BPM" + Environment.NewLine + VoezEditor.Editor.project.songBPM.ToString();
         }
-
-        // BPM Pulsing in BPM Edit Mode
-        if (bpmButton.toggled && VoezEditor.Editor.musicPlayer.source.isPlaying) {
-            float timeIncrement = 0;
-            if (VoezEditor.Editor.project.songBPM > 0) {
-                float secondsPerBeat = 60f / VoezEditor.Editor.project.songBPM;
-                timeIncrement = secondsPerBeat; // BPM data available; set time snap to match BPM
-            } else
-                timeIncrement = 1f; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-            float offset = VoezEditor.Editor.songTime - (Mathf.Floor(VoezEditor.Editor.songTime / timeIncrement) * timeIncrement);
-
-            if (offset <= 1f / VoezEditor.Editor.framesPerSecond) {
+        if (bpmButton.toggled && VoezEditor.Editor.bpmPulse) { 
                 playbackSlider.pulseFlashEffectTime = 3;
                 VoezEditor.Editor.bg.pulseFlashEffectTime = 3;
-            }
         }
 
         // Open Playback Speed Menu
         if (playbackTimeButton.clicked) {
-            if (notesButton.toggled && !playbackTimeButton.toggled)
-                notesButton.clicked = true; // Notes Selection Menu is already open, close it.
-            if (gridButton.toggled && !playbackTimeButton.toggled)
-                gridButton.clicked = true; // Grid Snap Menu is already open, close it.
-
+            UntoggleAllSubmenus();
             if (playbackTimes == null)
                 SpawnPlaybackTimeButtons();
             else
@@ -293,11 +371,7 @@ public class EditorUI {
 
         // Open Notes Selection Menu
         if (notesButton.clicked) {
-            if (playbackTimeButton.toggled && !notesButton.toggled)
-                playbackTimeButton.clicked = true; // Playback Speed Menu is already open, close it.
-            if (gridButton.toggled && !notesButton.toggled)
-                gridButton.clicked = true; // Grid Snap Menu is already open, close it.
-
+            UntoggleAllSubmenus();
             if (noteTypes == null)
                 SpawnNoteButtons();
             else
@@ -308,17 +382,35 @@ public class EditorUI {
 
         // Open Grid Snap Menu
         if (gridButton.clicked) {
-            if (notesButton.toggled && !gridButton.toggled)
-                notesButton.clicked = true; // Notes Selection Menu is already open, close it.
-            if (playbackTimeButton.toggled && !gridButton.toggled)
-                playbackTimeButton.clicked = true; // Playback Speed Menu is already open, close it.
-
+            UntoggleAllSubmenus();
             if (snapTimes == null)
                 SpawnGridButtons();
             else
                 DespawnGridButtons();
             gridButton.toggled = snapTimes != null;
             gridButton.clicked = false;
+        }
+
+        // Open Scroll Rate Menu
+        if (scrollButton.clicked) {
+            UntoggleAllSubmenus();
+            if (scrollRates == null)
+                SpawnScrollButtons();
+            else
+                DespawnScrollButtons();
+            scrollButton.toggled = scrollRates != null;
+            scrollButton.clicked = false;
+        }
+
+        // Open Sound Assist Options Menu
+        if (soundAssistButton.clicked) {
+            UntoggleAllSubmenus();
+            if (metronomeToggle == null)
+                SpawnSoundAssistButtons();
+            else
+                DespawnSoundAssistButtons();
+            soundAssistButton.toggled = metronomeToggle != null;
+            soundAssistButton.clicked = false;
         }
 
         // Save Project
@@ -522,5 +614,39 @@ public class EditorUI {
                 }
             }
         }
+
+        // Set Scroll Rate
+        if (scrollRates != null) {
+            for (int i = 0; i < scrollRates.Length; i += 1) {
+                if (scrollRates[i].clicked) {
+                    for (int j = 0; j < scrollRates.Length; j += 1)
+                        scrollRates[j].toggled = false;
+                    scrollRates[i].toggled = true;
+                    VoezEditor.Editor.selectedScrollRate = i + 1;
+                    Note.NOTE_DURATION = Note.SCROLL_DURATIONS[i];
+                    VoezEditor.Editor.RefreshAllNotes();
+
+                    // Automatically close the scroll rate selector after a choice has been made.
+                    if (scrollButton.toggled) {
+                        DespawnScrollButtons();
+                        scrollButton.toggled = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Set Sound Assist Options
+        if (metronomeToggle != null && metronomeToggle.clicked) {
+            metronomeToggle.toggled = !metronomeToggle.toggled;
+            VoezEditor.Editor.metronomeEnabled = metronomeToggle.toggled;
+            metronomeToggle.clicked = false;
+        }
+        if (hitSoundToggle != null && hitSoundToggle.clicked) {
+            hitSoundToggle.toggled = !hitSoundToggle.toggled;
+            VoezEditor.Editor.hitSoundsEnabled = hitSoundToggle.toggled;
+            hitSoundToggle.clicked = false;
+        }
+
     }
 }

@@ -210,7 +210,7 @@ public class TransformationList : UIElement {
                     if (transList[i].end > parent.data.end) {
                         // Pasting can change the total duration of the track if the new keyframes span beyond that duration.
                         parent.data.end = transList[i].end;
-                        parent.endLabel.text = "Despawn Time: " + parent.data.end.ToString("0.000");
+                        parent.endLabel.text = "Despawn Time: " + VoezEditor.Editor.BeatTimeStamp(parent.data.end);
                     }
                 }
                 page = 0;
@@ -475,8 +475,8 @@ public class TransformationList : UIElement {
             else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                 labels[0].text = "Scale: " + data.to.ToString("0.00") + "x";
 
-            labels[1].text = "Start: " + data.start.ToString("0.000");
-            labels[2].text = "End: " + data.end.ToString("0.000");
+            labels[1].text = "Start: " + VoezEditor.Editor.BeatTimeStamp(data.start);
+            labels[2].text = "End: " + VoezEditor.Editor.BeatTimeStamp(data.end);
             labels[3].text = "Ease: " + Enum.GetName(typeof(ProjectData.Easing), data.ease);
             for (int i = 0; i < labels.Length; i += 1) {
                 labels[i].x = pos.x - WIDTH * 0.5f + 10f + labels[i].textRect.width * 0.5f;
@@ -496,7 +496,7 @@ public class TransformationList : UIElement {
                 } else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.to = Mathf.Clamp(data.to + 0.1f * delta, 0f, 10f);
                 else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                    data.to = Mathf.Clamp(data.to + 0.01f * delta, 0f, 1f);
+                    data.to = Mathf.RoundToInt(Mathf.Clamp(data.to + 0.01f * delta, 0f, 1f)*100f)/100f;
             } else if (valueID == 1) {
                 data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), parent.StartTimeBound(data), data.end);
                 VoezEditor.Editor.JumpToTime(data.start);

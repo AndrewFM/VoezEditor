@@ -85,7 +85,7 @@ public class Button : UIElement {
             sGroup.sprites[1].scale = (size - 7f) / sGroup.sprites[1].width;
         if (mySymbol != null) { 
             sGroup.sprites[2] = mySymbol;
-            sGroup.sprites[2].scale = (size * 0.5f) / sGroup.sprites[2].width;
+            sGroup.sprites[2].scale = (size * 0.6f) / Mathf.Max(sGroup.sprites[2].width, sGroup.sprites[2].height);
         }
     }
 
@@ -93,10 +93,13 @@ public class Button : UIElement {
     {
         foreach (FSprite fsprite in sGroup.sprites) {
             fsprite.RemoveFromContainer();
-            newContainer.AddChild(fsprite);
         }
+        newContainer.AddChild(sGroup.sprites[0]);
+        if (sGroup.sprites.Length > 2)
+            newContainer.AddChild(sGroup.sprites[2]);
         if (myText != null)
             newContainer.AddChild(myText);
+        newContainer.AddChild(sGroup.sprites[1]);
     }
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)

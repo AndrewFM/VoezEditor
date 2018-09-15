@@ -32,7 +32,7 @@ public class TrackAddPreview : UIElement {
                 float timeIncrement = VoezEditor.Editor.GetBPMTimeIncrement();
                 newTrack.end = Mathf.Clamp(VoezEditor.Editor.songTime + timeIncrement * 10f, 0f, VoezEditor.Editor.musicPlayer.source.clip.length);
                 newTrack.size = 1f;
-                newTrack.x = posPerc;
+                newTrack.x = Mathf.RoundToInt(posPerc*100f)/100f;
                 VoezEditor.Editor.project.AddTrack(newTrack);
                 VoezEditor.Editor.RefreshAllTracks();
             }

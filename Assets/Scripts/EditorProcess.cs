@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class EditorProcess : MainLoopProcess {
 
@@ -18,16 +19,22 @@ public class EditorProcess : MainLoopProcess {
     public NoteEditor noteEditor;
     public TrackEditor trackEditor;
     public MusicPlayer musicPlayer;
+    public SFXPlayer sfxPlayer;
     public EditorUI ui;
     public BackgroundImage bg;
+    
     public ProjectData.NoteData.NoteType selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
     public float selectedTimeSnap = 4;
+    public float selectedScrollRate = 3;
     public float currentFrame;
     public float currentTime;
     public float songTime;
     public int tempNoteID = -1;
+    public bool metronomeEnabled;
+    public bool hitSoundsEnabled;
     public bool trackEditMode;
     public bool confirmBoxOpen;
+    public bool bpmPulse;
     public bool init;
 
     public EditorProcess()
@@ -36,6 +43,7 @@ public class EditorProcess : MainLoopProcess {
         spriteGroups = new List<SpriteGroup>();
         activeNotes = new List<Note>();
         activeTracks = new List<Track>();
+        sfxPlayer = new SFXPlayer();
 
         // Setup drawing layers (order matters here)
         backgroundContainer = new FContainer();
@@ -87,27 +95,22 @@ public class EditorProcess : MainLoopProcess {
             musicPlayer.PauseSong(); // wait for user to manually start the song with the play button
         }
 
-        // Update all active objects
+        // Music Player updating
+        sfxPlayer.Update();
         musicPlayer.Update();
-        ui.Update();
-        int updateIndex = updateList.Count - 1;
-        while (updateIndex >= 0) {
-            UpdatableObject obj = updateList[updateIndex];
-            if (obj.readyForDeletion)
-                PurgeObject(obj);
-            else
-                obj.Update();
-            updateIndex--;
-        }
-
         if (!musicPlayer.source.isPlaying && musicPlayer.hasStarted && !musicPlayer.paused) {
             currentFrame = 0f;
             if (project.songClip != null)
                 musicPlayer.PlayAudioClip(project.songClip);
         }
-
         if (musicPlayer.source.isPlaying)
             currentFrame += 1 * musicPlayer.playbackSpeed;
+        if (musicPlayer.source != null) {
+            if (metronomeEnabled || hitSoundsEnabled)
+                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 0.2f, 0.03f);
+            else
+                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 1f, 0.01f);
+        }
 
         // Frame Advancing while Paused
         if (EditMode && !MenuOpen && !ui.bpmButton.toggled) {
@@ -125,6 +128,41 @@ public class EditorProcess : MainLoopProcess {
         currentTime = currentFrame / framesPerSecond;
         songTime = currentTime;
         musicPlayer.SyncTracker(songTime);
+
+        // BPM Pulse Tracking
+        if (musicPlayer.source.isPlaying) {
+            float timeIncrement = 0;
+            if (project.songBPM > 0) {
+                float secondsPerBeat = 60f / project.songBPM;
+                timeIncrement = secondsPerBeat; // BPM data available; set time snap to match BPM
+            } else
+                timeIncrement = 1f; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
+            float offset = songTime - (Mathf.Floor(songTime / timeIncrement) * timeIncrement);
+
+            if (offset <= 1f / framesPerSecond) {
+                bpmPulse = true;
+                if (metronomeEnabled) {
+                    if (Mathf.FloorToInt(SecondsToBeats(songTime)) % 2 == 0)
+                        sfxPlayer.metroSource.PlayOneShot(sfxPlayer.metroTick1);
+                    else
+                        sfxPlayer.metroSource.PlayOneShot(sfxPlayer.metroTick2);
+                }
+            } else
+                bpmPulse = false;
+        } else
+            bpmPulse = false;
+
+        // Update all active objects
+        int updateIndex = updateList.Count - 1;
+        while (updateIndex >= 0) {
+            UpdatableObject obj = updateList[updateIndex];
+            if (obj.readyForDeletion)
+                PurgeObject(obj);
+            else
+                obj.Update();
+            updateIndex--;
+        }
+        ui.Update();
 
         // Spawn Tracks
         for (int i = 0; i < project.tracks.Count; i += 1)
@@ -151,7 +189,7 @@ public class EditorProcess : MainLoopProcess {
                     nearestTrack = activeTracks[i];
                 }
             }
-            if (nearestTrack != null) {
+            if (nearestTrack != null && !ui.HoveringOverSubmenuItem()) {
                 nearestTrack.activeHover = true;
                 if (!trackEditMode) {
                     ui.trackAdder.notePreviewVisible = true;
@@ -160,7 +198,7 @@ public class EditorProcess : MainLoopProcess {
                 }
 
                 // Add New Note to Hovered Track
-                if (InputManager.leftMousePushed && !HoveringOverAnyNote() && !ui.HoveringOverSubmenuItem() && !trackEditMode) {
+                if (InputManager.leftMousePushed && !HoveringOverAnyNote() && !trackEditMode) {
                     float desiredSongTime = ui.grid.GetSongTimeAtGridY(Input.mousePosition.y);
                     desiredSongTime = Mathf.Clamp(desiredSongTime, 0f, musicPlayer.source.clip.length);
                     if (!TrackOccupiedAtTime(nearestTrack.ID, desiredSongTime)) {
@@ -272,6 +310,17 @@ public class EditorProcess : MainLoopProcess {
         } else
             timeIncrement = 1f / selectedTimeSnap; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
         return timeIncrement;
+    }
+
+    public float SecondsToBeats(float seconds)
+    {
+        float secondsPerBeat = 60f / project.songBPM;
+        return seconds / secondsPerBeat; 
+    }
+
+    public string BeatTimeStamp(float seconds)
+    {
+        return String.Format("{0:0.###}", SecondsToBeats(seconds)) + " beats (" + String.Format("{0:0.###}", seconds) + "s)";
     }
 
     public void AddObject(UpdatableObject obj)

@@ -10,7 +10,7 @@
 },
 "bottomGradient.png":
 {
-	"frame": {"x":2,"y":293,"w":128,"h":66},
+	"frame": {"x":2,"y":360,"w":128,"h":66},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":66},
@@ -26,7 +26,7 @@
 },
 "color.png":
 {
-	"frame": {"x":65,"y":159,"w":65,"h":65},
+	"frame": {"x":132,"y":226,"w":65,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":65},
@@ -50,7 +50,7 @@
 },
 "evenGradient.png":
 {
-	"frame": {"x":215,"y":293,"w":4,"h":128},
+	"frame": {"x":209,"y":360,"w":4,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4,"h":128},
@@ -58,7 +58,15 @@
 },
 "grid.png":
 {
-	"frame": {"x":120,"y":226,"w":65,"h":65},
+	"frame": {"x":69,"y":293,"w":65,"h":65},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":65},
+	"sourceSize": {"w":65,"h":65}
+},
+"hitsound.png":
+{
+	"frame": {"x":2,"y":293,"w":65,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":65},
@@ -72,9 +80,17 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":123,"h":49},
 	"sourceSize": {"w":123,"h":49}
 },
+"metronome.png":
+{
+	"frame": {"x":64,"y":92,"w":65,"h":61},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":61},
+	"sourceSize": {"w":65,"h":61}
+},
 "mirror.png":
 {
-	"frame": {"x":64,"y":92,"w":65,"h":63},
+	"frame": {"x":131,"y":92,"w":65,"h":63},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":63},
@@ -90,7 +106,7 @@
 },
 "next.png":
 {
-	"frame": {"x":117,"y":2,"w":36,"h":33},
+	"frame": {"x":79,"y":2,"w":36,"h":33},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":36,"h":33},
@@ -98,7 +114,7 @@
 },
 "notes.png":
 {
-	"frame": {"x":53,"y":226,"w":65,"h":65},
+	"frame": {"x":65,"y":226,"w":65,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":65},
@@ -106,7 +122,7 @@
 },
 "outlineBoxMed.png":
 {
-	"frame": {"x":2,"y":423,"w":178,"h":178},
+	"frame": {"x":2,"y":490,"w":178,"h":178},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":178},
@@ -122,7 +138,7 @@
 },
 "pause.png":
 {
-	"frame": {"x":132,"y":159,"w":48,"h":65},
+	"frame": {"x":136,"y":293,"w":48,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":48,"h":65},
@@ -138,7 +154,7 @@
 },
 "play.png":
 {
-	"frame": {"x":198,"y":92,"w":54,"h":65},
+	"frame": {"x":2,"y":159,"w":54,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":54,"h":65},
@@ -146,7 +162,7 @@
 },
 "prev.png":
 {
-	"frame": {"x":79,"y":2,"w":36,"h":33},
+	"frame": {"x":117,"y":2,"w":36,"h":33},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":36,"h":33},
@@ -154,7 +170,7 @@
 },
 "save.png":
 {
-	"frame": {"x":2,"y":159,"w":61,"h":65},
+	"frame": {"x":2,"y":226,"w":61,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":61,"h":65},
@@ -162,11 +178,19 @@
 },
 "scale.png":
 {
-	"frame": {"x":131,"y":92,"w":65,"h":65},
+	"frame": {"x":160,"y":159,"w":65,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":65,"h":65},
 	"sourceSize": {"w":65,"h":65}
+},
+"scroll.png":
+{
+	"frame": {"x":126,"y":159,"w":32,"h":65},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":65},
+	"sourceSize": {"w":32,"h":65}
 },
 "slide.png":
 {
@@ -178,7 +202,7 @@
 },
 "swipe.png":
 {
-	"frame": {"x":182,"y":159,"w":66,"h":65},
+	"frame": {"x":58,"y":159,"w":66,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":66,"h":65},
@@ -186,7 +210,7 @@
 },
 "time.png":
 {
-	"frame": {"x":132,"y":293,"w":75,"h":74},
+	"frame": {"x":132,"y":360,"w":75,"h":74},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":75,"h":74},
@@ -194,7 +218,7 @@
 },
 "track.png":
 {
-	"frame": {"x":2,"y":226,"w":49,"h":65},
+	"frame": {"x":198,"y":92,"w":49,"h":65},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":49,"h":65},
@@ -202,7 +226,7 @@
 },
 "trackGradient.png":
 {
-	"frame": {"x":209,"y":293,"w":4,"h":128},
+	"frame": {"x":215,"y":360,"w":4,"h":128},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":4,"h":128},
@@ -213,8 +237,8 @@
 	"version": "1.0",
 	"image": "mainAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":254,"h":603},
+	"size": {"w":249,"h":670},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:f4f1b6d37ab36e7d22cae64110654cb7:ae4a6d371b5accded054a6e04bc21cf6:eb36726edbc7063f335dbc5f8316ac1e$"
+	"smartupdate": "$TexturePacker:SmartUpdate:b4e833f4ca58cb633438a49338da06c7:18bd59b1dd0865ab804f54bb5458cdd0:eb36726edbc7063f335dbc5f8316ac1e$"
 }
 }

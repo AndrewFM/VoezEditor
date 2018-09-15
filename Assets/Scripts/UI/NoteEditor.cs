@@ -15,8 +15,8 @@ public class NoteEditor : UIElement {
     public RectangleBorder border;
     public ProjectData.NoteData data;
     public static float WIDTH = 350f;
-    public static float HEIGHT = 250f;
-    public static float LINE_HEIGHT = 64f;
+    public static float HEIGHT = 220f;
+    public static float LINE_HEIGHT = 48f;
     public static float LINES_START = 85f;
     public int selectedLine;
     public int numLines;
@@ -31,10 +31,10 @@ public class NoteEditor : UIElement {
         this.data = data;
         this.pos = pos;
 
-        typeLabel = new FLabel("Raleway32", "Type:");
-        timeLabel = new FLabel("Raleway32", "Spawn Time: "+data.time.ToString("0.000"));
-        holdLabel = new FLabel("Raleway32", "Hold Duration: "+data.hold.ToString("0.000"));
-        dirLabel = new FLabel("Raleway32", "Direction:");
+        typeLabel = new FLabel("Raleway24", "Type:");
+        timeLabel = new FLabel("Raleway24", "Spawn Time: "+VoezEditor.Editor.BeatTimeStamp(data.time));
+        holdLabel = new FLabel("Raleway24", "Hold Duration: "+ VoezEditor.Editor.BeatTimeStamp(data.hold));
+        dirLabel = new FLabel("Raleway24", "Direction:");
     }
 
     public void SetPage(int pageID)
@@ -204,7 +204,7 @@ public class NoteEditor : UIElement {
         if (delta != 0) {
             if (selectedLine == 0) {
                 data.time = Mathf.Clamp(data.time + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.hold);
-                timeLabel.text = "Spawn Time: " + data.time.ToString("0.000");
+                timeLabel.text = "Spawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.time);
             }
             if (selectedLine == 1) {
                 data.hold = Mathf.Clamp(data.hold + delta, 0f, VoezEditor.Editor.musicPlayer.source.clip.length - data.time);
@@ -212,7 +212,7 @@ public class NoteEditor : UIElement {
                     data.type = ProjectData.NoteData.NoteType.HOLD;
                 else
                     data.type = ProjectData.NoteData.NoteType.CLICK;
-                holdLabel.text = "Hold Duration: " + data.hold.ToString("0.000"); 
+                holdLabel.text = "Hold Duration: " + VoezEditor.Editor.BeatTimeStamp(data.hold); 
             }
             VoezEditor.Editor.RefreshNote(data.id);
         }

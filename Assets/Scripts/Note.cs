@@ -114,18 +114,19 @@ public class Note : DrawableObject {
             if (noteProgress < 0f)
                 Destroy();
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
-                Destroy();
                 linkedTrack.flashEffectTime = 5;
-                if (VoezEditor.Editor.hitSoundsEnabled) {
+                if (VoezEditor.Editor.hitSoundsEnabled && !VoezEditor.Editor.EditMode) {
                     if (data.type == ProjectData.NoteData.NoteType.HOLD)
                         VoezEditor.Editor.sfxPlayer.ReleaseHitSound();
                     else if (data.type == ProjectData.NoteData.NoteType.SLIDE)
                         VoezEditor.Editor.sfxPlayer.SlideHitSound();
-                    else
+                    else {
                         VoezEditor.Editor.sfxPlayer.ClickHitSound();
+                    }
                 }
+                Destroy();
             }
-            if (noteProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD && !playedHoldHitSound) {
+            if (noteProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD && !playedHoldHitSound && !VoezEditor.Editor.EditMode) {
                 if (VoezEditor.Editor.hitSoundsEnabled)
                     VoezEditor.Editor.sfxPlayer.ClickHitSound();
                 playedHoldHitSound = true;

@@ -47,7 +47,7 @@ public class SFXPlayer {
     public void ClickHitSound()
     {
         if (!clickPlayedThisFrame) {
-            clickSource.volume = 0.6f;
+            clickSource.volume = 0.4f;
             if (clickSoundCount % 30 < 15)
                 clickSource.pitch = 0.75f + (clickSoundCount % 30) * 0.05f;
             else

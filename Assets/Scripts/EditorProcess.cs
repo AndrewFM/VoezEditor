@@ -29,6 +29,7 @@ public class EditorProcess : MainLoopProcess {
     public float currentFrame;
     public float currentTime;
     public float songTime;
+    public float lastSongTime;
     public int tempNoteID = -1;
     public bool metronomeEnabled;
     public bool hitSoundsEnabled;
@@ -107,7 +108,7 @@ public class EditorProcess : MainLoopProcess {
             currentFrame += 1 * musicPlayer.playbackSpeed;
         if (musicPlayer.source != null) {
             if (metronomeEnabled || hitSoundsEnabled)
-                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 0.2f, 0.03f);
+                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 0.3f, 0.03f);
             else
                 musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 1f, 0.01f);
         }
@@ -126,20 +127,15 @@ public class EditorProcess : MainLoopProcess {
         }
 
         currentTime = currentFrame / framesPerSecond;
+        lastSongTime = songTime;
         songTime = currentTime;
         musicPlayer.SyncTracker(songTime);
 
         // BPM Pulse Tracking
         if (musicPlayer.source.isPlaying) {
-            float timeIncrement = 0;
-            if (project.songBPM > 0) {
-                float secondsPerBeat = 60f / project.songBPM;
-                timeIncrement = secondsPerBeat; // BPM data available; set time snap to match BPM
-            } else
-                timeIncrement = 1f; // No BPM data; treat time snap as beats per second -- ie: 60 BPM
-            float offset = songTime - (Mathf.Floor(songTime / timeIncrement) * timeIncrement);
-
-            if (offset <= 1f / framesPerSecond) {
+            int lastBeatFloor = Mathf.FloorToInt(SecondsToBeats(lastSongTime));
+            int curBeatFloor = Mathf.FloorToInt(SecondsToBeats(songTime));
+            if (curBeatFloor > lastBeatFloor) {
                 bpmPulse = true;
                 if (metronomeEnabled) {
                     if (Mathf.FloorToInt(SecondsToBeats(songTime)) % 2 == 0)
@@ -171,7 +167,10 @@ public class EditorProcess : MainLoopProcess {
 
         // Spawn Notes
         for (int i = 0; i < project.notes.Count; i += 1) {
-            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime <= project.notes[i].time + project.notes[i].hold && !NoteSpawned(project.notes[i].id)) {
+            float effHold = 0f;
+            if (project.notes[i].type == ProjectData.NoteData.NoteType.HOLD)
+                effHold = project.notes[i].hold;
+            if (songTime >= project.notes[i].time - Note.NOTE_DURATION && songTime <= project.notes[i].time + effHold && !NoteSpawned(project.notes[i].id)) {
                 AddObject(new Note(project.notes[i]));
             }
         }

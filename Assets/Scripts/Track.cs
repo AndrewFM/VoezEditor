@@ -168,7 +168,7 @@ public class Track : DrawableObject {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        if (readyForDeletion)
+        if (readyForDeletion || VoezEditor.Editor == null)
             return;
 
         if (lastPos == Vector2.zero || pos == Vector2.zero) {

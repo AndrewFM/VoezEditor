@@ -354,13 +354,14 @@ public class ProjectData {
     {
         // Info File
         string infoString = "{\"info\":{";
+        infoString += "\"version\":\"" + VoezEditor.VERSION + "\",";
         infoString += "\"author\":\"" + author + "\",";
         infoString += "\"bpm\":" + songBPM.ToString() + ",";
         infoString += "\"name\":\"" + songName + "\"";
         infoString += "},\"level\":{";
         infoString += "\"easy\":" + Mathf.Max(1, easyLevel).ToString() + ",";
         infoString += "\"hard\":" + Mathf.Max(1, hardLevel).ToString() + ",";
-        infoString += "\"extra\":" + Mathf.Max(1, extraLevel).ToString();
+        infoString += "\"extra\":" + Mathf.Max(1, extraLevel).ToString() + "}";
         infoString += "}";
         File.WriteAllText(infoFileName, infoString);
 

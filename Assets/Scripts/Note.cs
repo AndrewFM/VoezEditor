@@ -233,7 +233,7 @@ public class Note : DrawableObject {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
-        if (readyForDeletion)
+        if (readyForDeletion || VoezEditor.Editor == null)
             return;
 
         Color useColor = QUANTIZATION_COLORS[0];

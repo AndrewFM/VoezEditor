@@ -81,6 +81,8 @@ public class SnapGrid : UIElement {
     }
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress) {
+        if (readyForDeletion || VoezEditor.Editor == null)
+            return;
         if (VoezEditor.Editor.selectedTimeSnap == 0 || !VoezEditor.Editor.EditMode) {
             foreach (FSprite fsprite in sGroup.sprites)
                 fsprite.RemoveFromContainer();

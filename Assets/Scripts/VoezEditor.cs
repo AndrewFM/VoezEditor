@@ -5,6 +5,7 @@ using System;
 
 public class VoezEditor : MonoBehaviour {
 
+    public static string VERSION = "v1.04";
     public static MainLoopProcess activeProcess;
     public static Vector2 windowRes;
     public static int musicSyncThreshold = 4;
@@ -29,6 +30,7 @@ public class VoezEditor : MonoBehaviour {
         Futile.atlasManager.LoadFont("Raleway16", "Raleway16", "Atlases/Raleway16", 0f, 0f);
 
         LoadConfigFile();
+        ProjectMigrator migrate = new ProjectMigrator();
         activeProcess = new ProjectsProcess();
     }
 

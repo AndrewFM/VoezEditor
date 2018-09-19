@@ -24,6 +24,7 @@ public class EditorUI {
     public SnapGrid grid;
     public TrackAddPreview trackAdder;
     public DropshadowLabel playbackTimeLabel;
+    public DropshadowLabel levelLabel;
     public static float BUTTON_SIZE = 75f;
     public static float BUTTON_PADDING = 5f;
 
@@ -61,6 +62,23 @@ public class EditorUI {
         playbackTimeLabel = new DropshadowLabel("Raleway32", BeatTimeStamp(0), new Vector2(VoezEditor.windowRes.x - 75f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
 
+        string levelText = "";
+        if (VoezEditor.editType == "easy")
+            levelText = "Easy Lv." + VoezEditor.Editor.project.easyLevel.ToString();
+        else if (VoezEditor.editType == "hard")
+            levelText = "Hard Lv." + VoezEditor.Editor.project.hardLevel.ToString();
+        else if (VoezEditor.editType == "extra")
+            levelText = "Special Lv." + VoezEditor.Editor.project.extraLevel.ToString();
+        levelLabel = new DropshadowLabel("Raleway32", levelText, new Vector2(VoezEditor.windowRes.x - BUTTON_PADDING*1.5f - 24f, VoezEditor.windowRes.y - BUTTON_PADDING*1.5f - 24f), new Vector2(1f, -1f));
+        levelLabel.normalText.alignment = FLabelAlignment.Right;
+        if (VoezEditor.editType == "easy")
+            levelLabel.normalText.color = ProjectsUI.EASY_COLOR;
+        else if (VoezEditor.editType == "hard")
+            levelLabel.normalText.color = ProjectsUI.HARD_COLOR;
+        else if (VoezEditor.editType == "extra")
+            levelLabel.normalText.color = ProjectsUI.SPECIAL_COLOR;
+        levelLabel.shadowText.alignment = FLabelAlignment.Right;
+        VoezEditor.Editor.AddObject(levelLabel);
         backButton = new Button("back", new Vector2(bbOrigin*1.5f, VoezEditor.windowRes.y - bbOrigin*1.5f), BUTTON_SIZE*1.5f, true);
         backButton.mySymbol.scale = 1.5f;
         VoezEditor.Editor.AddObject(backButton);

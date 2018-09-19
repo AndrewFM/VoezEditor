@@ -44,6 +44,11 @@ public class Util {
         return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
     }
 
+    public static bool CtrlDown()
+    {
+        return Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+    }
+
     public static bool EqualsPrecision(float a, float b, float prec)
     {
         return Mathf.Abs(a - b) <= prec;

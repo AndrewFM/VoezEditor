@@ -10,7 +10,7 @@ public class DropshadowLabel : UIElement {
 	public DropshadowLabel(string fontName, string text, Vector2 pos, Vector2 dropShadowOffset) {
         normalText = new FLabel(fontName, text);
         shadowText = new FLabel(fontName, text);
-        shadowText.color = Color.black;
+        shadowText.color = new Color(0f, 0f, 0f, 0.75f);
         this.pos = pos;
         offset = dropShadowOffset;
         normalText.x = this.pos.x;
@@ -39,5 +39,12 @@ public class DropshadowLabel : UIElement {
     {
         newContainer.AddChild(shadowText);
         newContainer.AddChild(normalText);
+    }
+
+    public override void Destroy()
+    {
+        base.Destroy();
+        shadowText.RemoveFromContainer();
+        normalText.RemoveFromContainer();
     }
 }

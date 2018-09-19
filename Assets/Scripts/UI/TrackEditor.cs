@@ -158,18 +158,61 @@ public class TrackEditor : UIElement {
             selectedLine = -1;
 
         if (delta != 0) {
-            if (selectedLine == 0) {
+            // Shift all times & keyframe times & attached notes simultaneously
+            if (Util.CtrlDown() && (selectedLine == 0 || selectedLine == 1)) {
+                float effectiveDelta = delta;
+                if ((delta < 0 && data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement() < 0f))
+                    effectiveDelta = -data.start / VoezEditor.Editor.GetBPMTimeIncrement();
+                if ((delta > 0 && data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement() > VoezEditor.Editor.musicPlayer.source.clip.length))
+                    effectiveDelta = (VoezEditor.Editor.musicPlayer.source.clip.length - data.end) / VoezEditor.Editor.GetBPMTimeIncrement();
+                effectiveDelta *= VoezEditor.Editor.GetBPMTimeIncrement();
+
+                data.start += effectiveDelta;
+                data.end += effectiveDelta;
+                startLabel.text = "Spawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.start);
+                endLabel.text = "Despawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.end);
+                for(int i=0; i<data.colorChange.Count; i+=1) {
+                    data.colorChange[i].start += effectiveDelta;
+                    data.colorChange[i].end += effectiveDelta;
+                }
+                for (int i = 0; i < data.move.Count; i += 1) {
+                    data.move[i].start += effectiveDelta;
+                    data.move[i].end += effectiveDelta;
+                }
+                for (int i = 0; i < data.scale.Count; i += 1) {
+                    data.scale[i].start += effectiveDelta;
+                    data.scale[i].end += effectiveDelta;
+                }
+                if (keyframeEditor != null) {
+                    for (int i=0; i<keyframeEditor.transUIElems.Length; i+=1) {
+                        if (keyframeEditor.transUIElems[i] != null)
+                            keyframeEditor.transUIElems[i].RefreshLabelValues();
+                    }
+                }
+                for (int i = 0; i < VoezEditor.Editor.project.notes.Count; i += 1) {
+                    if (VoezEditor.Editor.project.notes[i].track == data.id)
+                        VoezEditor.Editor.project.notes[i].time += effectiveDelta;
+                }
+                if (selectedLine == 0)
+                    VoezEditor.Editor.JumpToTime(data.start);
+                else
+                    VoezEditor.Editor.JumpToTime(data.end);
+                VoezEditor.Editor.RefreshAllNotes();
+            }
+            // Shift just start time
+            else if (selectedLine == 0) {
                 if (data.move.Count == 0 && data.colorChange.Count == 0 && data.scale.Count == 0)
                     data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0f, data.end);
                 else {
                     data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0f,
-                                             Mathf.Min(data.move.Count == 0 ? int.MaxValue : data.move[0].start, 
-                                                       data.scale.Count == 0 ? int.MaxValue : data.scale[0].start,
-                                                       data.colorChange.Count == 0 ? int.MaxValue : data.colorChange[0].start));
+                                                Mathf.Min(data.move.Count == 0 ? int.MaxValue : data.move[0].start,
+                                                        data.scale.Count == 0 ? int.MaxValue : data.scale[0].start,
+                                                        data.colorChange.Count == 0 ? int.MaxValue : data.colorChange[0].start));
                 }
                 startLabel.text = "Spawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.start);
                 VoezEditor.Editor.JumpToTime(data.start);
             }
+            // Shift just end time
             if (selectedLine == 1) {
                 if (data.move.Count == 0 && data.colorChange.Count == 0 && data.scale.Count == 0)
                     data.end = Mathf.Clamp(data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement(), data.start, VoezEditor.Editor.musicPlayer.source.clip.length);
@@ -183,6 +226,7 @@ public class TrackEditor : UIElement {
                 endLabel.text = "Despawn Time: " + VoezEditor.Editor.BeatTimeStamp(data.end);
                 VoezEditor.Editor.JumpToTime(data.end);
             }
+            // Change value
             if (selectedLine == 2) {
                 if (page == ProjectData.TrackTransformation.TransformType.COLOR) {
                     data.color += (int)Mathf.Sign(delta);

@@ -22,6 +22,12 @@ public class BackgroundImage : DrawableObject {
         base.Update();
     }
 
+    public override void Destroy()
+    {
+        base.Destroy();
+        Futile.atlasManager.UnloadAtlas("background");
+    }
+
     public override void InitiateSprites(SpriteGroup sGroup)
     {
         sGroup.sprites = new FSprite[4];

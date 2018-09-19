@@ -68,7 +68,7 @@ public class TrackEditor : UIElement {
         } else
             valueLabel.color = Color.white;
         if (page == ProjectData.TrackTransformation.TransformType.MOVE)
-            valueLabel.text = "Position: " + Mathf.FloorToInt(data.x * 100f).ToString() + "%";
+            valueLabel.text = "Position: " + (data.x * 100f).ToString("0.###") + "%";
         if (page == ProjectData.TrackTransformation.TransformType.SCALE)
             valueLabel.text = "Scale: " + data.size.ToString("0.00") + "x";
     }

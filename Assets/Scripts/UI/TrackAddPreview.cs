@@ -55,6 +55,7 @@ public class TrackAddPreview : UIElement {
 
         // Note Preview
         sGroup.sprites[1] = new FSprite("click");
+        sGroup.sprites[1].color = Note.QUANTIZATION_COLORS[0];
         sGroup.sprites[1].rotation = 45+180f;
         sGroup.sprites[1].alpha = 0.5f;
         sGroup.sprites[1].isVisible = false; // Only visible when in note edit mode and user is hovering mouse over a track.

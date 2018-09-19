@@ -44,6 +44,20 @@ public class SFXPlayer {
         slidePlayedThisFrame = false;
     }
 
+    public void Unload()
+    {
+        metroSource.Stop();
+        clickSource.Stop();
+        slideSource.Stop();
+        releaseSource.Stop();
+        metroTick1.UnloadAudioData();
+        metroTick2.UnloadAudioData();
+        hitSoundClick.UnloadAudioData();
+        hitSoundRelease.UnloadAudioData();
+        hitSoundSlide.UnloadAudioData();
+        Object.Destroy(sfxObj);
+    }
+
     public void ClickHitSound()
     {
         if (!clickPlayedThisFrame) {

@@ -44,6 +44,11 @@ public class Util {
         return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
     }
 
+    public static bool EqualsPrecision(float a, float b, float prec)
+    {
+        return Mathf.Abs(a - b) <= prec;
+    }
+
     // Easing Functions
     public static float LerpLinearEase(float start, float end, float perc)
     {

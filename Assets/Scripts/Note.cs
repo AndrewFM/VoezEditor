@@ -11,6 +11,8 @@ public class Note : DrawableObject {
     public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
     public List<HoldTick> holdTicks;
     private bool playedHoldHitSound;
+    public float lastTime = -1;
+    public int quantizationInd;
     public static float SELECTION_RADIUS = 85f;
     public static float NOTE_DURATION = 1.1f; // number of seconds to transition from top of track to bottom of track
     public static float[] SCROLL_DURATIONS = {
@@ -24,6 +26,15 @@ public class Note : DrawableObject {
         0.425f, // 8x
         0.3f,   // 9x
         0.2f,   // 10x
+    };
+    public static Color[] QUANTIZATION_COLORS = {
+        Util.Color255(250, 119, 119), // 1x
+        Util.Color255(119, 119, 250), // 1/2x
+        Util.Color255(245, 250, 119), // 1/4x
+        Util.Color255(119, 250, 248), // 1/8x
+        Util.Color255(122, 250, 119), // 1/16x
+        Util.Color255(255, 255, 255), // 1/32x
+        Util.Color255(128, 128, 128), // other
     };
 
     public Note(ProjectData.NoteData data)
@@ -65,6 +76,28 @@ public class Note : DrawableObject {
     public override void Update()
     {
         base.Update();
+        // Calculate quantization
+        if (data.time != lastTime) {
+            float beats = VoezEditor.Editor.SecondsToBeats(data.time);
+            double precBeats = double.Parse(beats.ToString("0.###"));
+            if (precBeats % 1 == 0)
+                quantizationInd = 0;
+            else if (precBeats * 10 % 5 == 0)
+                quantizationInd = 1;
+            else if (precBeats * 100 % 25 == 0)
+                quantizationInd = 2;
+            else if (precBeats * 1000 % 125 == 0)
+                quantizationInd = 3;
+            else if (precBeats * 10000 % 625 == 0)
+                quantizationInd = 4;
+            else if (precBeats * 100000 % 3125 == 0)
+                quantizationInd = 5;
+            else
+                quantizationInd = 6;
+        }
+        lastTime = data.time;
+
+        // Determine note time
         float spawnTime = data.time - NOTE_DURATION;
         float hitTime = data.time;
         noteProgress = (VoezEditor.Editor.songTime - spawnTime) / (hitTime - spawnTime);
@@ -200,6 +233,13 @@ public class Note : DrawableObject {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
+        if (readyForDeletion)
+            return;
+
+        Color useColor = QUANTIZATION_COLORS[0];
+        if (VoezEditor.Editor.quantizationEnabled)
+            useColor = QUANTIZATION_COLORS[quantizationInd];
+
         if (lastPos == Vector2.zero || pos == Vector2.zero) {
             for (int i = 0; i < sGroup.sprites.Length; i += 1)
                 sGroup.sprites[i].isVisible = false;
@@ -227,6 +267,8 @@ public class Note : DrawableObject {
 
         sGroup.sprites[0].x = Mathf.Lerp(lastPos.x, pos.x, frameProgress);
         sGroup.sprites[0].y = Mathf.Lerp(lastPos.y, pos.y, frameProgress);
+        if ((data.type == ProjectData.NoteData.NoteType.HOLD || data.type == ProjectData.NoteData.NoteType.CLICK) && sGroup.sprites[0].color != Color.red)
+        sGroup.sprites[0].color = useColor;
 
         if (data.type == ProjectData.NoteData.NoteType.HOLD && sGroup.sprites.Length > 2) {
             float pixelsPerSecond = (VoezEditor.windowRes.y * Track.TRACK_SCREEN_HEIGHT) / NOTE_DURATION;
@@ -236,6 +278,8 @@ public class Note : DrawableObject {
             sGroup.sprites[1].y = sGroup.sprites[0].y;
             sGroup.sprites[1].x = sGroup.sprites[0].x;
             sGroup.sprites[1].scaleY = (holdPixels) / sGroup.sprites[1].element.sourceRect.height;
+            if (sGroup.sprites[2].color != Color.red)
+                sGroup.sprites[2].color = useColor;
         }
 
         base.DrawSprites(sGroup, frameProgress);

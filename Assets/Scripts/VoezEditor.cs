@@ -6,12 +6,15 @@ using System;
 public class VoezEditor : MonoBehaviour {
 
     public static MainLoopProcess activeProcess;
-    public static Vector2 windowRes = new Vector2(1280f, 720f);
+    public static Vector2 windowRes;
     public static int musicSyncThreshold = 4;
+    public static string activeProjectFolder = "";
+    public static string editType = "easy";
 
     // Use this for initialization
     void Start()
     {
+        windowRes = new Vector2(Screen.width, Screen.height);
         FutileParams futileParams = new FutileParams(true, true, true, true);
         futileParams.AddResolutionLevel(windowRes.x, 1f, 1f, string.Empty);
         futileParams.origin = new Vector2(0f, 0f);
@@ -26,7 +29,7 @@ public class VoezEditor : MonoBehaviour {
         Futile.atlasManager.LoadFont("Raleway16", "Raleway16", "Atlases/Raleway16", 0f, 0f);
 
         LoadConfigFile();
-        activeProcess = new EditorProcess();
+        activeProcess = new ProjectsProcess();
     }
 
     // Update is called once per frame
@@ -37,6 +40,11 @@ public class VoezEditor : MonoBehaviour {
 
     public static EditorProcess Editor {
         get { return (activeProcess != null && activeProcess is EditorProcess) ? (activeProcess as EditorProcess) : null;  }
+    }
+
+    public static ProjectsProcess ProjectsPage
+    {
+        get { return (activeProcess != null && activeProcess is ProjectsProcess) ? (activeProcess as ProjectsProcess) : null; }
     }
 
     private void Awake()

@@ -1,0 +1,44 @@
+{"frames": {
+
+"bigGrad.png":
+{
+	"frame": {"x":387,"y":363,"w":257,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":257,"h":256},
+	"sourceSize": {"w":257,"h":256}
+},
+"defaultThumbnail.png":
+{
+	"frame": {"x":3,"y":383,"w":256,"h":256},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":256,"h":256},
+	"sourceSize": {"w":256,"h":256}
+},
+"outlineBoxLargest.png":
+{
+	"frame": {"x":387,"y":3,"w":356,"h":356},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":356,"h":356},
+	"sourceSize": {"w":356,"h":356}
+},
+"outlineBoxLargestBlur.png":
+{
+	"frame": {"x":3,"y":3,"w":380,"h":376},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":380,"h":376},
+	"sourceSize": {"w":380,"h":376}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "projectsAtlas.png",
+	"format": "RGBA8888",
+	"size": {"w":746,"h":642},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:8bf18a9e0ba15729d96aac5ef13c3d15:dce5bd46d0ff0616c3b2ed344a930967:0a51df9d3e4bd722ff3942248c5562c9$"
+}
+}

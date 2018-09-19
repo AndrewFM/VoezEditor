@@ -5,25 +5,33 @@ using System.Text.RegularExpressions;
 
 public class ProjectData {
     public Texture2D background;
-    public AudioClip songClip;
+    public Texture2D thumbnail;
+    public string songPath;
+    public string songPVPath;
     public List<NoteData> notes;
     public List<TrackData> tracks;
+    public string songName = "";
+    public string author = "";
     public string projectFolder;
     public string notesFileName;
     public string tracksFileName;
     public string infoFileName;
     public string infoString;
     public int songBPM = 120;
+    public int easyLevel = -1;
+    public int hardLevel = -1;
+    public int extraLevel = -1;
 
     public List<TrackTransformation> transformClipboard;
     public TrackTransformation.TransformType clipboardContentsType;
     public float transformClipboardStartTime;
 
-    public ProjectData()
+    public ProjectData(string projectFolder)
     {
-        projectFolder = Application.dataPath + "/../ActiveProject";
-        notesFileName = projectFolder + "/note_song.txt";
-        tracksFileName = projectFolder + "/track_song.txt";
+        this.projectFolder = projectFolder; 
+        notesFileName = projectFolder + "/note_" + VoezEditor.editType + ".txt";
+        tracksFileName = projectFolder + "/track_" + VoezEditor.editType + ".txt";
+        infoFileName = projectFolder + "/info_song.txt";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
@@ -65,19 +73,80 @@ public class ProjectData {
         tracks.Add(data);
     }
 
+    // Load only the basic project information needed for displaying stuff on the project listing page
+    public void LoadPreviewData()
+    {
+        string[] projectFiles = Directory.GetFiles(projectFolder, "*.*", SearchOption.TopDirectoryOnly);
+        songName = Path.GetFileName(projectFolder);
+        bool hasEasyNotes = false;
+        bool hasEasyTrack = false;
+        bool hasHardNotes = false;
+        bool hasHardTrack = false;
+        bool hasExtraNotes = false;
+        bool hasExtraTrack = false;
+        int pendingEasyLevel = -1;
+        int pendingHardLevel = -1;
+        int pendingExtraLevel = -1;
+
+        for (int i = 0; i < projectFiles.Length; i += 1) {
+            // Audio Preview File
+            if (projectFiles[i].Contains("song_pv") && projectFiles[i].Contains(".wav")) {
+                songPVPath = "file://" + projectFiles[i];
+            }
+
+            // Thumbnail File
+            if (projectFiles[i].Contains("image_thumbnail") && projectFiles[i].Contains(".png")) {
+                byte[] fileData = File.ReadAllBytes(projectFiles[i]);
+                thumbnail = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+                thumbnail.LoadImage(fileData);
+            }
+
+            // Note and Track Files
+            if (projectFiles[i].Contains("note_easy"))
+                hasEasyNotes = true;
+            if (projectFiles[i].Contains("track_easy"))
+                hasEasyTrack = true;
+            if (projectFiles[i].Contains("note_hard"))
+                hasHardNotes = true;
+            if (projectFiles[i].Contains("track_hard"))
+                hasHardTrack = true;
+            if (projectFiles[i].Contains("note_extra"))
+                hasExtraNotes = true;
+            if (projectFiles[i].Contains("track_extra"))
+                hasExtraTrack = true;
+
+            // Info File
+            if (projectFiles[i].Contains("info_")) {
+                ParseInfoFile(projectFiles[i]);
+                pendingEasyLevel = easyLevel;
+                pendingHardLevel = hardLevel;
+                pendingExtraLevel = extraLevel;
+                easyLevel = -1;
+                hardLevel = -1;
+                extraLevel = -1;
+            }
+        }
+
+        if (pendingEasyLevel > 0 && hasEasyNotes && hasEasyTrack)
+            easyLevel = pendingEasyLevel;
+        if (pendingHardLevel > 0 && hasHardNotes && hasHardTrack)
+            hardLevel = pendingHardLevel;
+        if (pendingExtraLevel > 0 && hasExtraNotes && hasExtraTrack)
+            extraLevel = pendingExtraLevel;
+    }
+
     // Load Project from disk
-    public void LoadFromActiveProject()
+    public void LoadAllProjectData()
     {
         string[] projectFiles = Directory.GetFiles(projectFolder, "*.*", SearchOption.TopDirectoryOnly);
         for (int i = 0; i < projectFiles.Length; i += 1) {
             // Audio File
-            if (projectFiles[i].Contains("song_") && projectFiles[i].Contains(".wav")) {
-                WWW www = new WWW("file://" + projectFiles[i]);
-                songClip = www.GetAudioClip(false, false, AudioType.WAV);
+            if (projectFiles[i].Contains("song_") && projectFiles[i].Contains(".wav") && !projectFiles[i].Contains("song_pv")) {
+                songPath = "file://" + projectFiles[i];
             }
 
             // Background Image File
-            if (projectFiles[i].Contains("image_") && projectFiles[i].Contains(".png")) {
+            if (projectFiles[i].Contains("image_") && projectFiles[i].Contains(".png") && !projectFiles[i].Contains("thumbnail") && !projectFiles[i].Contains("blur")) {
                 byte[] fileData = File.ReadAllBytes(projectFiles[i]);
                 background = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 background.LoadImage(fileData);
@@ -86,18 +155,11 @@ public class ProjectData {
             // Info File
             if (projectFiles[i].Contains("info_")) {
                 infoFileName = projectFiles[i];
-                infoString = File.ReadAllText(projectFiles[i]);
-                if (infoString.Contains("\"bpm\"")) {
-                    string bpmPart = infoString.Substring(infoString.IndexOf("\"bpm\""));
-                    int bpmStartInd = bpmPart.IndexOf(":");
-                    int bpmEndInd = bpmPart.IndexOf(",");
-                    songBPM = int.Parse(bpmPart.Substring(bpmStartInd + 1, bpmEndInd - bpmStartInd - 1));
-                    songBPM = Mathf.Clamp(songBPM, 10, 250);
-                }
+                ParseInfoFile(infoFileName);
             }
 
             // Notes Mapping File
-            if (projectFiles[i].Contains("note_")) {
+            if (projectFiles[i].Contains("note_" + VoezEditor.editType)) {
                 notesFileName = projectFiles[i];
                 string notesString = File.ReadAllText(projectFiles[i]);
                 if (notesString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no notes
@@ -128,7 +190,7 @@ public class ProjectData {
             }
 
             // Tracks Mapping File
-            if (projectFiles[i].Contains("track_")) {
+            if (projectFiles[i].Contains("track_" + VoezEditor.editType)) {
                 tracksFileName = projectFiles[i];
                 string tracksString = File.ReadAllText(projectFiles[i]);
                 if (tracksString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no notes
@@ -182,6 +244,46 @@ public class ProjectData {
                 }
             }
         }
+    }
+
+    // Load data from info file
+    public void ParseInfoFile(string filename)
+    {
+        string infoFileContents = File.ReadAllText(filename);
+
+        // Info JSON
+        if (infoFileContents.Contains("\"info\":")) {
+            string infoString = infoFileContents.Substring(infoFileContents.IndexOf("\"info\":") + 7);
+            infoString = infoString.Substring(0, infoString.IndexOf("}") + 1);
+            Dictionary<string, object> infoProps = (Dictionary<string, object>)Json.Deserialize(infoString);
+            if (infoProps.ContainsKey("author"))
+                author = (string)infoProps["author"];
+            if (infoProps.ContainsKey("name"))
+                songName = (string)infoProps["name"];
+            if (infoProps.ContainsKey("bpm"))
+                songBPM = (int)((long)infoProps["bpm"]);
+        }
+
+        // Level JSON
+        if (infoFileContents.Contains("\"level\":")) {
+            string levelString = infoFileContents.Substring(infoFileContents.IndexOf("\"level\":") + 8);
+            levelString = levelString.Substring(0, levelString.IndexOf("}") + 1);
+            Dictionary<string, object> levelProps = (Dictionary<string, object>)Json.Deserialize(levelString);
+            if (levelProps.ContainsKey("easy"))
+                easyLevel = (int)((long)levelProps["easy"]);
+            if (levelProps.ContainsKey("hard"))
+                hardLevel = (int)((long)levelProps["hard"]);
+            if (levelProps.ContainsKey("extra"))
+                extraLevel = (int)((long)levelProps["extra"]);
+        }
+    }
+
+    public void UnloadData()
+    {
+        if (background != null)
+            Object.DestroyImmediate(background);
+        if (thumbnail != null)
+            Object.DestroyImmediate(background);
     }
 
     private List<TrackTransformation> parseTransformationList(string jsonList)
@@ -251,12 +353,16 @@ public class ProjectData {
     public void ExportActiveProject()
     {
         // Info File
-        if (infoFileName == null) {
-            File.WriteAllText(projectFolder+"/info_song.txt", "{\"bpm\":"+songBPM.ToString()+",\"id\":0}");
-        } else {
-            infoString = Regex.Replace(infoString, "\"bpm\":[0-9]+,", "\"bpm\":" + songBPM.ToString() + ",");
-            File.WriteAllText(infoFileName, infoString);
-        }
+        string infoString = "{\"info\":{";
+        infoString += "\"author\":\"" + author + "\",";
+        infoString += "\"bpm\":" + songBPM.ToString() + ",";
+        infoString += "\"name\":\"" + songName + "\"";
+        infoString += "},\"level\":{";
+        infoString += "\"easy\":" + Mathf.Max(1, easyLevel).ToString() + ",";
+        infoString += "\"hard\":" + Mathf.Max(1, hardLevel).ToString() + ",";
+        infoString += "\"extra\":" + Mathf.Max(1, extraLevel).ToString();
+        infoString += "}";
+        File.WriteAllText(infoFileName, infoString);
 
         // Track Mapping File
         // WARNING: Order matters here. Track mapping needs to be exported first before notes mapping.

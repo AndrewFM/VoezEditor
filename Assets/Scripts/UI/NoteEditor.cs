@@ -122,6 +122,7 @@ public class NoteEditor : UIElement {
             slideNote = new Button("slide", new Vector2(pos.x - WIDTH * 0.5f + 20f + buttonSize * 0.5f + buttonSize + 100f, pos.y + HEIGHT * 0.5f - 10f - buttonSize * 0.5f), buttonSize, false);
             swipeNote = new Button("swipe", new Vector2(pos.x - WIDTH * 0.5f + 30f + buttonSize * 0.5f + buttonSize * 2f + 100f, pos.y + HEIGHT * 0.5f - 10f - buttonSize * 0.5f), buttonSize, false);
             clickNote.mySymbol.rotation = 45f;
+            clickNote.mySymbol.color = Note.QUANTIZATION_COLORS[0];
             slideNote.mySymbol.rotation = 45f;
             swipeNote.mySymbol.rotation = 45f;
             VoezEditor.Editor.AddObject(clickNote);

@@ -4,6 +4,7 @@ public abstract class MainLoopProcess {
     public int framesPerSecond;
     private float cumulativeDelta;
     public int framesSinceStart;
+    public bool readyToShutDown;
     public InputManager inputManager;
 
     public MainLoopProcess()

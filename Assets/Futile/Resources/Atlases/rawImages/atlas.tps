@@ -82,15 +82,15 @@
         <key>atfFormats</key>
         <string></string>
         <key>textureFormat</key>
-        <enum type="SettingsBase::TextureFormat">png</enum>
+        <enum type="SettingsBase::TextureFormat">png8</enum>
         <key>borderPadding</key>
         <uint>2</uint>
         <key>maxTextureSize</key>
         <QSize>
             <key>width</key>
-            <int>2048</int>
+            <int>512</int>
             <key>height</key>
-            <int>2048</int>
+            <int>512</int>
         </QSize>
         <key>fixedTextureSize</key>
         <QSize>
@@ -194,6 +194,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">back.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>16,16,31,33</rect>
+                <key>scale9Paddings</key>
+                <rect>16,16,31,33</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">bottomGradient.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -208,6 +221,7 @@
                 <false/>
             </struct>
             <key type="filename">click.png</key>
+            <key type="filename">quantization.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -518,6 +532,8 @@
             <filename>hitsound.png</filename>
             <filename>metronome.png</filename>
             <filename>scroll.png</filename>
+            <filename>back.png</filename>
+            <filename>quantization.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

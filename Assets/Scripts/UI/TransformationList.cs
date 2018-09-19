@@ -222,9 +222,14 @@ public class TransformationList : UIElement {
 
         // Mirror X
         if (mirrorButton != null && mirrorButton.clicked) {
-            parent.data.x = 1f - parent.data.x;
-            for (int i = 0; i < transList.Count; i += 1)
-                transList[i].to = 1f - transList[i].to;
+            if (Util.ShiftDown()) {
+                if (transSelected != -1)
+                    transList[transSelected].to = 1f - transList[transSelected].to;
+            } else {
+                parent.data.x = 1f - parent.data.x;
+                for (int i = 0; i < transList.Count; i += 1)
+                    transList[i].to = 1f - transList[i].to;
+            }
             RefreshPages();
             parent.RefreshValueLabel();
             mirrorButton.clicked = false;
@@ -471,7 +476,7 @@ public class TransformationList : UIElement {
                 labels[0].text = "Color: " + ProjectData.colorNames[(int)data.to];
                 labels[0].color = ProjectData.colors[(int)data.to];
             } else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                labels[0].text = "Position: " + Mathf.FloorToInt(data.to * 100f).ToString() + "%";
+                labels[0].text = "Position: " + (data.to * 100f).ToString("0.###") + "%";
             else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                 labels[0].text = "Scale: " + data.to.ToString("0.00") + "x";
 

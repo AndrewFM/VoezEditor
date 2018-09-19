@@ -33,6 +33,7 @@ public class EditorProcess : MainLoopProcess {
     public int tempNoteID = -1;
     public bool metronomeEnabled;
     public bool hitSoundsEnabled;
+    public bool quantizationEnabled;
     public bool trackEditMode;
     public bool confirmBoxOpen;
     public bool bpmPulse;
@@ -75,8 +76,8 @@ public class EditorProcess : MainLoopProcess {
 
     public void InitiateSong()
     {
-        if (project.songClip != null)
-            musicPlayer.PlayAudioClip(project.songClip);
+        if (project.songPath != null)
+            musicPlayer.PlayAudioClip(project.songPath);
         bg = new BackgroundImage(project.background);
         AddObject(bg);
     }
@@ -88,8 +89,8 @@ public class EditorProcess : MainLoopProcess {
         // Post-Initialization
         if (!init) {
             init = true;
-            project = new ProjectData();
-            project.LoadFromActiveProject();
+            project = new ProjectData(VoezEditor.activeProjectFolder);
+            project.LoadAllProjectData();
             musicPlayer = new MusicPlayer();
             ui = new EditorUI();
             InitiateSong();
@@ -101,16 +102,16 @@ public class EditorProcess : MainLoopProcess {
         musicPlayer.Update();
         if (!musicPlayer.source.isPlaying && musicPlayer.hasStarted && !musicPlayer.paused) {
             currentFrame = 0f;
-            if (project.songClip != null)
-                musicPlayer.PlayAudioClip(project.songClip);
+            if (project.songPath != null)
+                musicPlayer.PlayAudioClip(project.songPath);
         }
         if (musicPlayer.source.isPlaying)
             currentFrame += 1 * musicPlayer.playbackSpeed;
         if (musicPlayer.source != null) {
             if (metronomeEnabled || hitSoundsEnabled)
-                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 0.3f, 0.03f);
+                musicPlayer.desiredVolume = Mathf.Lerp(musicPlayer.source.volume, 0.3f, 0.03f);
             else
-                musicPlayer.source.volume = Mathf.Lerp(musicPlayer.source.volume, 1f, 0.01f);
+                musicPlayer.desiredVolume = Mathf.Lerp(musicPlayer.source.volume, 1f, 0.01f);
         }
 
         // Frame Advancing while Paused
@@ -214,6 +215,27 @@ public class EditorProcess : MainLoopProcess {
                 ui.trackAdder.notePreviewVisible = false;
         } else
             ui.trackAdder.notePreviewVisible = false;
+
+        if (readyToShutDown) {
+            ShutDownProcess();
+            VoezEditor.activeProcess = new ProjectsProcess();
+        }
+    }
+
+    public override void ShutDownProcess()
+    {
+        base.ShutDownProcess();
+        if (musicPlayer != null)
+            musicPlayer.Destroy();
+        sfxPlayer.Unload();
+        activeNotes.Clear();
+        activeTracks.Clear();
+        int updateIndex = updateList.Count - 1;
+        while (updateIndex >= 0) {
+            PurgeObject(updateList[updateIndex]);
+            updateIndex--;
+        }
+        project.UnloadData();
     }
 
     public void RefreshAllTracks()
@@ -360,9 +382,9 @@ public class EditorProcess : MainLoopProcess {
     {
         base.DrawUpdate(frameProgress);
         for (int i = spriteGroups.Count - 1; i >= 0; i--) {
-            this.spriteGroups[i].Update(frameProgress);
-            if (this.spriteGroups[i].deleteMeNextFrame)
-                this.spriteGroups.RemoveAt(i);
+            spriteGroups[i].Update(frameProgress);
+            if (spriteGroups[i].deleteMeNextFrame)
+                spriteGroups.RemoveAt(i);
         }
     }
 }

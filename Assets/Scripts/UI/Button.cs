@@ -11,12 +11,16 @@ public class Button : UIElement {
     public bool clicked;
     public bool rightClicked;
     public bool toggled;
+    public float myAlpha;
+    public Color myColor;
 
     public Button(string symbolName, Vector2 pos, float size, bool diamond)
     {
         this.pos = pos;
         this.size = size;
         this.diamond = diamond;
+        myColor = Color.black;
+        myAlpha = 0.75f;
         visible = true;
         mySymbol = new FSprite(symbolName);
     }
@@ -26,6 +30,8 @@ public class Button : UIElement {
         this.pos = pos;
         this.size = size;
         this.diamond = diamond;
+        myColor = Color.black;
+        myAlpha = 0.75f;
         visible = true;
         myText = new FLabel(fontName, text);
     }
@@ -37,9 +43,9 @@ public class Button : UIElement {
             if (diamond) {
                 float dx = Mathf.Abs(mouse.x - pos.x);
                 float dy = Mathf.Abs(mouse.y - pos.y);
-                return (dx / size + dy / size) <= 0.5f;
+                return visible && (dx / size + dy / size) <= 0.5f;
             }
-            return mouse.x > pos.x - size*0.5f && mouse.x < pos.x + size*0.5f && mouse.y > pos.y - size*0.5f && mouse.y < pos.y + size*0.5f;
+            return visible && mouse.x > pos.x - size*0.5f && mouse.x < pos.x + size*0.5f && mouse.y > pos.y - size*0.5f && mouse.y < pos.y + size*0.5f;
         }
     }
 
@@ -48,7 +54,7 @@ public class Button : UIElement {
         if (toggled)
             return Color.red;
         else
-            return Color.black;
+            return myColor;
     }
 
     public override void Update()
@@ -69,7 +75,7 @@ public class Button : UIElement {
 
         sGroup.sprites[0] = new FSprite("Futile_White");
         sGroup.sprites[0].color = DefaultColor();
-        sGroup.sprites[0].alpha = 0.75f;
+        sGroup.sprites[0].alpha = myAlpha;
         if (diamond) {
             sGroup.sprites[0].rotation = 45f;
             float newEffectiveWidth = Mathf.Sqrt(2f * Mathf.Pow(sGroup.sprites[0].width, 2));
@@ -124,6 +130,7 @@ public class Button : UIElement {
                 sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, Color.gray, 0.15f);
             else
                 sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, DefaultColor(), 0.15f);
+            sGroup.sprites[0].alpha = myAlpha;
         }
         base.DrawSprites(sGroup, frameProgress);
     }

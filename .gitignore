@@ -5,6 +5,7 @@
 [Bb]uilds/
 ActiveProject/
 Assets/AssetStoreTools*
+*.ttf
 
 # Visual Studio cache directory
 .vs/

@@ -18,6 +18,8 @@ public class EditorUI {
     public Button[] scrollRates;
     public Button metronomeToggle;
     public Button hitSoundToggle;
+    public Button quantizationToggle;
+    public Button backButton;
     public Slider playbackSlider;
     public SnapGrid grid;
     public TrackAddPreview trackAdder;
@@ -33,6 +35,7 @@ public class EditorUI {
         playbackTimeButton = new Button("time", new Vector2(bbOrigin + BUTTON_SIZE + BUTTON_PADDING, bbOrigin), BUTTON_SIZE, false);
         notesButton = new Button("click", new Vector2(bbOrigin + BUTTON_SIZE * 2 + BUTTON_PADDING * 2, bbOrigin), BUTTON_SIZE, false);
         notesButton.mySymbol.rotation = 45f;
+        notesButton.mySymbol.color = Note.QUANTIZATION_COLORS[0];
         gridButton = new Button("grid", new Vector2(bbOrigin + BUTTON_SIZE * 3 + BUTTON_PADDING * 3, bbOrigin), BUTTON_SIZE, false);
         scrollButton = new Button("scroll", new Vector2(bbOrigin + BUTTON_SIZE * 4 + BUTTON_PADDING * 4, bbOrigin), BUTTON_SIZE, false);
         soundAssistButton = new Button("metronome", new Vector2(bbOrigin + BUTTON_SIZE * 5 + BUTTON_PADDING * 5, bbOrigin), BUTTON_SIZE, false);
@@ -57,6 +60,10 @@ public class EditorUI {
         VoezEditor.Editor.AddObject(trackAdder);
         playbackTimeLabel = new DropshadowLabel("Raleway32", BeatTimeStamp(0), new Vector2(VoezEditor.windowRes.x - 75f, BUTTON_PADDING + BUTTON_SIZE * 0.5f), new Vector2(2f, -2f));
         VoezEditor.Editor.AddObject(playbackTimeLabel);
+
+        backButton = new Button("back", new Vector2(bbOrigin*1.5f, VoezEditor.windowRes.y - bbOrigin*1.5f), BUTTON_SIZE*1.5f, true);
+        backButton.mySymbol.scale = 1.5f;
+        VoezEditor.Editor.AddObject(backButton);
     }
 
     public bool HoveringOverSubmenuItem()
@@ -85,8 +92,11 @@ public class EditorUI {
             return true;
         if (hitSoundToggle != null && (hitSoundToggle.visible && hitSoundToggle.MouseOver))
             return true;
+        if (quantizationToggle != null && quantizationToggle.visible && quantizationToggle.MouseOver)
+            return true;
         if (playbackSlider.MouseOver || playButton.MouseOver || playbackTimeButton.MouseOver || notesButton.MouseOver 
-            || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver || scrollButton.MouseOver || soundAssistButton.MouseOver)
+            || gridButton.MouseOver || saveButton.MouseOver || bpmButton.MouseOver || scrollButton.MouseOver 
+            || soundAssistButton.MouseOver || backButton.MouseOver)
             return true;
         return false;
     }
@@ -140,6 +150,8 @@ public class EditorUI {
                 , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
                 , 128f, true);
             noteTypes[i].visible = true;
+            if (i == 0)
+                noteTypes[i].mySymbol.color = Note.QUANTIZATION_COLORS[0];
             if (i != 3)
                 noteTypes[i].mySymbol.rotation = 45f;
             else
@@ -244,14 +256,24 @@ public class EditorUI {
                 , 128f, true);
         hitSoundToggle.toggled = VoezEditor.Editor.hitSoundsEnabled;
         VoezEditor.Editor.AddObject(hitSoundToggle);
+        i = 7;
+        quantizationToggle = new Button("quantization"
+                , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
+                , 128f, true);
+        quantizationToggle.mySymbol.rotation = 45f;
+        quantizationToggle.mySymbol.scale = 1.5f;
+        quantizationToggle.toggled = VoezEditor.Editor.quantizationEnabled;
+        VoezEditor.Editor.AddObject(quantizationToggle);
     }
 
     public void DespawnSoundAssistButtons()
     {
         metronomeToggle.Destroy();
         hitSoundToggle.Destroy();
+        quantizationToggle.Destroy();
         metronomeToggle = null;
         hitSoundToggle = null;
+        quantizationToggle = null;
     }
 
     public void UntoggleAllSubmenus()
@@ -280,6 +302,12 @@ public class EditorUI {
     {
         if ((InputManager.leftMousePushed && !HoveringOverSubmenuItem()) || InputManager.anyPushed) {
             UntoggleAllSubmenus();
+        }
+
+        // Exit
+        if (backButton.clicked) {
+            VoezEditor.Editor.readyToShutDown = true;
+            backButton.clicked = false;
         }
 
         // Handle Playback Slider Dragged
@@ -483,6 +511,7 @@ public class EditorUI {
             else {
                 VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
                 notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
+                notesButton.mySymbol.color = Note.QUANTIZATION_COLORS[0];
                 VoezEditor.Editor.trackEditMode = false;
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
@@ -493,6 +522,7 @@ public class EditorUI {
             else {
                 VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
                 notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
+                notesButton.mySymbol.color = Color.white;
                 VoezEditor.Editor.trackEditMode = false;
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
@@ -503,6 +533,7 @@ public class EditorUI {
             else {
                 VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
                 notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
+                notesButton.mySymbol.color = Color.white;
                 VoezEditor.Editor.trackEditMode = false;
                 notesButton.mySymbol.rotation = 45f + 180f;
             }
@@ -513,6 +544,7 @@ public class EditorUI {
             else {
                 VoezEditor.Editor.trackEditMode = true;
                 notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
+                notesButton.mySymbol.color = Color.white;
                 notesButton.mySymbol.rotation = 0f;
             }
         }
@@ -526,17 +558,21 @@ public class EditorUI {
                     if (i == 0) {
                         VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.CLICK;
                         notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("click");
+                        notesButton.mySymbol.color = Note.QUANTIZATION_COLORS[0];
                     } else if (i == 1) {
                         VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SLIDE;
                         notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("slide");
+                        notesButton.mySymbol.color = Color.white;
                     } else if (i == 2) {
                         VoezEditor.Editor.selectedNoteType = ProjectData.NoteData.NoteType.SWIPE;
                         notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("swipe");
+                        notesButton.mySymbol.color = Color.white;
                     }
 
                     if (i == 3) {
                         VoezEditor.Editor.trackEditMode = true;
                         notesButton.mySymbol.element = Futile.atlasManager.GetElementWithName("track");
+                        notesButton.mySymbol.color = Color.white;
                         notesButton.mySymbol.rotation = 0f;
                     } else {
                         VoezEditor.Editor.trackEditMode = false;
@@ -655,6 +691,11 @@ public class EditorUI {
             hitSoundToggle.toggled = !hitSoundToggle.toggled;
             VoezEditor.Editor.hitSoundsEnabled = hitSoundToggle.toggled;
             hitSoundToggle.clicked = false;
+        }
+        if (quantizationToggle != null && quantizationToggle.clicked) {
+            quantizationToggle.toggled = !quantizationToggle.toggled;
+            VoezEditor.Editor.quantizationEnabled = quantizationToggle.toggled;
+            quantizationToggle.clicked = false;
         }
 
     }

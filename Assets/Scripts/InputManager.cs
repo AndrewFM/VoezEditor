@@ -25,9 +25,13 @@ public class InputManager {
     public static bool spacePushed;
     public static bool returnPushed;
     public static bool leftMousePushed;
+    public static bool leftMouseReleased;
     public static bool rightMousePushed;
+    public static bool rightMouseReleased;
     public static bool middleMousePushed;
+    public static bool middleMouseReleased;
     public static bool anyPushed;
+    public static Vector2 screenPosOnLeftMousePush;
 
     public void Update()
     {
@@ -52,9 +56,11 @@ public class InputManager {
         UpdateKeyPushTracker(KeyCode.Delete, ref delLastDown, ref delNowDown, ref delPushed);
         UpdateKeyPushTracker(KeyCode.Space, ref spaceLastDown, ref spaceNowDown, ref spacePushed);
         UpdateKeyPushTracker(KeyCode.Return, ref returnLastDown, ref returnNowDown, ref returnPushed);
-        UpdateMousePushTracker(0, ref mouseLeftLastDown, ref mouseLeftNowDown, ref leftMousePushed);
-        UpdateMousePushTracker(1, ref mouseRightLastDown, ref mouseRightNowDown, ref rightMousePushed);
-        UpdateMousePushTracker(2, ref mouseMiddleLastDown, ref mouseMiddleNowDown, ref middleMousePushed);
+        UpdateMousePushTracker(0, ref mouseLeftLastDown, ref mouseLeftNowDown, ref leftMousePushed, ref leftMouseReleased);
+        UpdateMousePushTracker(1, ref mouseRightLastDown, ref mouseRightNowDown, ref rightMousePushed, ref rightMouseReleased);
+        UpdateMousePushTracker(2, ref mouseMiddleLastDown, ref mouseMiddleNowDown, ref middleMousePushed, ref middleMouseReleased);
+        if (leftMousePushed)
+            screenPosOnLeftMousePush = Input.mousePosition;
 
         anyLastDown = anyNowDown;
         if (Input.anyKeyDown && !Input.GetMouseButtonDown(0) && !Input.GetMouseButtonDown(1) && !Input.GetMouseButtonDown(2))
@@ -80,7 +86,7 @@ public class InputManager {
             pushStatus = false;
     }
 
-    public static void UpdateMousePushTracker(int button, ref bool lastDown, ref bool nowDown, ref bool pushStatus)
+    public static void UpdateMousePushTracker(int button, ref bool lastDown, ref bool nowDown, ref bool pushStatus, ref bool releaseStatus)
     {
         lastDown = nowDown;
         if (Input.GetMouseButton(button))
@@ -91,6 +97,10 @@ public class InputManager {
             pushStatus = true;
         else
             pushStatus = false;
+        if (!nowDown && lastDown)
+            releaseStatus = true;
+        else
+            releaseStatus = false;
     }
 
     public static bool UpTick()

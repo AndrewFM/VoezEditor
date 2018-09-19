@@ -168,6 +168,9 @@ public class Track : DrawableObject {
 
     public override void DrawSprites(SpriteGroup sGroup, float frameProgress)
     {
+        if (readyForDeletion)
+            return;
+
         if (lastPos == Vector2.zero || pos == Vector2.zero) {
             for(int i=0; i<sGroup.sprites.Length; i+=1)
                 sGroup.sprites[i].isVisible = false;

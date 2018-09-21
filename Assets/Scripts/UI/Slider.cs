@@ -48,9 +48,9 @@ public class Slider : UIElement {
 
     public override void Update()
     {
-        if (InputManager.leftMousePushed && allowScrubbing && MouseOver)
+        if (InputManager.leftMousePushed && allowScrubbing && MouseOver && !VoezEditor.confirmBoxOpen)
             clicked = true;
-        if (InputManager.rightMousePushed && allowScrubbing && MouseOver)
+        if (InputManager.rightMousePushed && allowScrubbing && MouseOver && !VoezEditor.confirmBoxOpen)
             rightClicked = true;
         if (clicked)
             pendingProgress = Mathf.Clamp((Input.mousePosition.x - (pos.x - width * 0.5f)) / width, 0f, 1f);
@@ -112,7 +112,7 @@ public class Slider : UIElement {
         sGroup.sprites[Spr_SliderScrubberFront].x = (int)(sGroup.sprites[Spr_SliderScrubberBack].x);
         sGroup.sprites[Spr_SliderScrubberFront].y = (int)(sGroup.sprites[Spr_SliderScrubberBack].y);
 
-        if ((MouseOver || clicked) && allowScrubbing) {
+        if ((MouseOver || clicked) && allowScrubbing && !VoezEditor.confirmBoxOpen) {
             sGroup.sprites[Spr_SliderScrubberBack].color = Color.Lerp(sGroup.sprites[Spr_SliderScrubberBack].color, Color.red, 0.15f);
             sGroup.sprites[Spr_SliderScrubberBack].alpha = 1f;
         } else {

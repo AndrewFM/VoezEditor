@@ -25,6 +25,7 @@ public class EditorUI {
     public TrackAddPreview trackAdder;
     public DropshadowLabel playbackTimeLabel;
     public DropshadowLabel levelLabel;
+    public ConfirmBox exitConfirm;
     public static float BUTTON_SIZE = 75f;
     public static float BUTTON_PADDING = 5f;
 
@@ -324,8 +325,28 @@ public class EditorUI {
 
         // Exit
         if (backButton.clicked) {
-            VoezEditor.Editor.readyToShutDown = true;
+            Vector2 windowCenter = new Vector2(VoezEditor.windowRes.x * 0.5f, VoezEditor.windowRes.y * 0.5f);
+            exitConfirm = new ConfirmBox(new Rect(new Vector2(windowCenter.x - 300f, windowCenter.y - 150f), new Vector2(600f, 300f)), "Save your changes before exiting?");
+            exitConfirm.enableCancel = true;
+            VoezEditor.Editor.AddObject(exitConfirm);
             backButton.clicked = false;
+        }
+        if (exitConfirm != null) {
+            if (exitConfirm.yesButton != null && exitConfirm.yesButton.clicked) {
+                VoezEditor.Editor.project.ExportActiveProject();
+                VoezEditor.Editor.readyToShutDown = true;
+                InputManager.ignoreNextLeftRelease = true;
+                exitConfirm.Destroy();
+                exitConfirm = null;
+            } else if (exitConfirm.noButton != null && exitConfirm.noButton.clicked) {
+                VoezEditor.Editor.readyToShutDown = true;
+                InputManager.ignoreNextLeftRelease = true;
+                exitConfirm.Destroy();
+                exitConfirm = null;
+            } else if (exitConfirm.cancelButton != null && exitConfirm.cancelButton.clicked) {
+                exitConfirm.Destroy();
+                exitConfirm = null;
+            }
         }
 
         // Handle Playback Slider Dragged

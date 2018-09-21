@@ -7,14 +7,16 @@ public class ConfirmBox : UIElement {
     public FLabel text;
     public Button yesButton;
     public Button noButton;
+    public Button cancelButton;
     public RectangleBorder border;
     public bool init;
+    public bool enableCancel;
 
     public ConfirmBox(Rect bounds, string caption)
     {
         this.bounds = bounds;
         pos = bounds.center;
-        VoezEditor.Editor.confirmBoxOpen = true;
+        VoezEditor.confirmBoxOpen = true;
         text = new FLabel("Raleway32", caption);
     }
 
@@ -25,9 +27,16 @@ public class ConfirmBox : UIElement {
             init = true;
             yesButton = new Button("Raleway32", "Yes", Vector2.zero, buttonSize, true);
             noButton = new Button("Raleway32", "No", Vector2.zero, buttonSize, true);
+            yesButton.confirmComponent = true;
+            noButton.confirmComponent = true;
             border = new RectangleBorder(new Rect(new Vector2(bounds.x + 5, bounds.y + 5), new Vector2(bounds.width - 10, bounds.height - 10)), 3f);
             VoezEditor.Editor.AddObject(yesButton);
             VoezEditor.Editor.AddObject(noButton);
+            if (enableCancel) {
+                cancelButton = new Button("Raleway32", "Cancel", Vector2.zero, buttonSize, true);
+                cancelButton.confirmComponent = true;
+                VoezEditor.Editor.AddObject(cancelButton);
+            }
             VoezEditor.Editor.AddObject(border);
         }
 
@@ -36,6 +45,10 @@ public class ConfirmBox : UIElement {
         noButton.pos.x = pos.x + bounds.width * 0.5f - buttonSize * 0.5f - 20f;
         yesButton.pos.y = pos.y - bounds.height * 0.5f + buttonSize * 0.5f + 20f;
         noButton.pos.y = yesButton.pos.y;
+        if (cancelButton != null) {
+            cancelButton.pos.x = (yesButton.pos.x + noButton.pos.x) / 2f;
+            cancelButton.pos.y = yesButton.pos.y;
+        }
         text.x = pos.x;
         text.y = pos.y + bounds.height * 0.5f - text.textRect.height * 0.5f - 20f;
 
@@ -74,8 +87,10 @@ public class ConfirmBox : UIElement {
         base.Destroy();
         yesButton.Destroy();
         noButton.Destroy();
+        if (cancelButton != null)
+            cancelButton.Destroy();
         border.Destroy();
         text.RemoveFromContainer();
-        VoezEditor.Editor.confirmBoxOpen = false;
+        VoezEditor.confirmBoxOpen = false;
     }
 }

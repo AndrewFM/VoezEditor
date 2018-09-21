@@ -11,6 +11,7 @@ public class Button : UIElement {
     public bool clicked;
     public bool rightClicked;
     public bool toggled;
+    public bool confirmComponent;
     public float myAlpha;
     public Color myColor;
 
@@ -59,9 +60,9 @@ public class Button : UIElement {
 
     public override void Update()
     {
-        if (InputManager.leftMousePushed && visible && MouseOver)
+        if (InputManager.leftMousePushed && visible && MouseOver && (!VoezEditor.confirmBoxOpen || confirmComponent))
             clicked = true;
-        if (InputManager.rightMousePushed && visible && MouseOver)
+        if (InputManager.rightMousePushed && visible && MouseOver && (!VoezEditor.confirmBoxOpen || confirmComponent))
             rightClicked = true;
         base.Update();
     }
@@ -126,7 +127,7 @@ public class Button : UIElement {
                 myText.y = sGroup.sprites[1].y;
             }
 
-            if (MouseOver)
+            if (MouseOver && (!VoezEditor.confirmBoxOpen || confirmComponent))
                 sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, Color.gray, 0.15f);
             else
                 sGroup.sprites[0].color = Color.Lerp(sGroup.sprites[0].color, DefaultColor(), 0.15f);

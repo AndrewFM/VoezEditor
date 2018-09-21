@@ -7,29 +7,29 @@ public class VoezEditor : MonoBehaviour {
 
     public static string VERSION = "v1.04";
     public static MainLoopProcess activeProcess;
-    public static Vector2 windowRes;
+    public static Vector2 windowRes = new Vector2(Screen.width, Screen.height);
+    public static bool confirmBoxOpen;
     public static int musicSyncThreshold = 4;
     public static string activeProjectFolder = "";
     public static string editType = "easy";
+    public static float projectScrollOff;
 
     // Use this for initialization
     void Start()
     {
-        windowRes = new Vector2(Screen.width, Screen.height);
         FutileParams futileParams = new FutileParams(true, true, true, true);
         futileParams.AddResolutionLevel(windowRes.x, 1f, 1f, string.Empty);
         futileParams.origin = new Vector2(0f, 0f);
         Futile.instance.Init(futileParams);
         Futile.displayScale = 1f;
-
         // Load Resources
         Futile.atlasManager.LoadAtlas("Atlases/mainAtlas");
         Futile.atlasManager.LoadAtlas("Atlases/fontAtlas");
         Futile.atlasManager.LoadFont("Raleway32", "Raleway32", "Atlases/Raleway32", 0f, 0f);
         Futile.atlasManager.LoadFont("Raleway24", "Raleway24", "Atlases/Raleway24", 0f, 0f);
         Futile.atlasManager.LoadFont("Raleway16", "Raleway16", "Atlases/Raleway16", 0f, 0f);
-
         LoadConfigFile();
+        projectScrollOff = ProjectIcon.size * 0.5f;
         ProjectMigrator migrate = new ProjectMigrator();
         activeProcess = new ProjectsProcess();
     }

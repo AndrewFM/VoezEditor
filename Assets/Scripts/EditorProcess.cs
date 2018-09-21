@@ -35,7 +35,6 @@ public class EditorProcess : MainLoopProcess {
     public bool hitSoundsEnabled;
     public bool quantizationEnabled;
     public bool trackEditMode;
-    public bool confirmBoxOpen;
     public bool bpmPulse;
     public bool init;
 
@@ -71,7 +70,7 @@ public class EditorProcess : MainLoopProcess {
 
     public bool MenuOpen
     {
-        get { return noteEditor != null || trackEditor != null || confirmBoxOpen; }
+        get { return noteEditor != null || trackEditor != null || VoezEditor.confirmBoxOpen; }
     }
 
     public void InitiateSong()
@@ -232,9 +231,11 @@ public class EditorProcess : MainLoopProcess {
         activeTracks.Clear();
         int updateIndex = updateList.Count - 1;
         while (updateIndex >= 0) {
+            updateList[updateIndex].Destroy();
             PurgeObject(updateList[updateIndex]);
             updateIndex--;
         }
+        updateList.Clear();
         project.UnloadData();
     }
 

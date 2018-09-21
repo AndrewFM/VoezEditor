@@ -14,7 +14,6 @@ public class ProjectsProcess : MainLoopProcess {
     public List<string> projectDirectories;
     public ProjectsUI ui;
     public bool init;
-    public float scrollOffset;
     public float targetScroll;
     public float lastScrollOffset;
     public bool mouseDragInit;
@@ -42,8 +41,7 @@ public class ProjectsProcess : MainLoopProcess {
             }
         }
 
-        scrollOffset = ProjectIcon.size * 0.5f;
-        targetScroll = scrollOffset;
+        targetScroll = VoezEditor.projectScrollOff;
 
         // Setup drawing layers (order matters here)
         songsContainer = new FContainer();
@@ -61,13 +59,13 @@ public class ProjectsProcess : MainLoopProcess {
             init = true;
             AddObject(new SolidBackground(Color.white));
             ProjectIcon activeIcon = null;
-            icons = new ProjectIcon[26];
+            icons = new ProjectIcon[24];
             for (int i = 0; i < icons.Length; i += 1) {
                 int projectInd = IconIndToProjectInd(i) - 3;
                 if (projectInd < 0 || projectInd >= projectDirectories.Count)
-                    icons[i] = new ProjectIcon(null, Vector2.zero);
+                    icons[i] = new ProjectIcon(null, Vector2.zero, i);
                 else {
-                    icons[i] = new ProjectIcon(projectDirectories[projectInd], Vector2.zero);
+                    icons[i] = new ProjectIcon(projectDirectories[projectInd], Vector2.zero, i);
                     if (projectDirectories[projectInd] == VoezEditor.activeProjectFolder)
                         activeIcon = icons[i];
                 }
@@ -82,7 +80,7 @@ public class ProjectsProcess : MainLoopProcess {
 
         // Control of scrolling the list around
         float snap = (ProjectIcon.size + GRID_MARGIN) * 0.5f;
-        scrollOffset = Mathf.Lerp(scrollOffset, targetScroll, 0.1f);
+        VoezEditor.projectScrollOff = Mathf.Lerp(VoezEditor.projectScrollOff, targetScroll, 0.1f);
         if (!Input.GetMouseButton(0))
             mouseDragInit = false;
         if (InputManager.leftMousePushed && !ui.HoveringOverSubmenuItem()) {
@@ -106,8 +104,12 @@ public class ProjectsProcess : MainLoopProcess {
             if (InputManager.DownTick() || InputManager.LeftTick())
                 targetScroll -= snap * multi;
         }
+        float maxTargetScroll = Mathf.Max((projectDirectories.Count/2)*snap, snap*5);
         if (targetScroll < 0)
             targetScroll = 0;
+        if (targetScroll > maxTargetScroll)
+            targetScroll = maxTargetScroll;
+
 
         musicPlayer.Update();
         LayoutProjectIcons();
@@ -133,11 +135,14 @@ public class ProjectsProcess : MainLoopProcess {
     public void SetSelectedProject(ProjectIcon project)
     {
         ui.selector.linkedIcon = project;
-        ui.SetSongName(project.data.songName);
-        ui.SetAuthorName(project.data.author);
-        musicPlayer.CrossfadeIntoClip(project.data.songPVPath);
-        ui.UpdateEditInterface();
-        VoezEditor.activeProjectFolder = project.data.projectFolder;
+        if (project.index != ui.selector.linkedIndex) {
+            ui.SetSongName(project.data.songName);
+            ui.SetAuthorName(project.data.author);
+            musicPlayer.CrossfadeIntoClip(project.data.songPVPath);
+            ui.UpdateEditInterface();
+            VoezEditor.activeProjectFolder = project.data.projectFolder;
+        }
+        ui.selector.linkedIndex = project.index;
     }
 
     public int ProjectIndToIconInd(int ind)
@@ -164,11 +169,53 @@ public class ProjectsProcess : MainLoopProcess {
         return baseInd + 4 * Mathf.FloorToInt(ind / 4);
     }
 
+    public void RemoveIcon(int iconListIndex)
+    {
+        icons[iconListIndex].Destroy();
+        for (int i = iconListIndex; i < icons.Length-1; i += 1) {
+            icons[i] = icons[i + 1];
+        }
+        icons[icons.Length - 1] = null;
+    }
+
+    public void AddIcon(int iconListIndex, int displayIndex)
+    {
+        if (icons[icons.Length - 1] != null)
+            icons[icons.Length-1].Destroy();
+        for(int i=icons.Length-1; i>iconListIndex; i-=1) {
+            icons[i] = icons[i - 1];
+        }
+        ProjectIcon activeIcon = null;
+        int projectInd = IconIndToProjectInd(displayIndex) - 3;
+        if (projectInd < 0 || projectInd >= projectDirectories.Count)
+            icons[iconListIndex] = new ProjectIcon(null, Vector2.zero, displayIndex);
+        else {
+            icons[iconListIndex] = new ProjectIcon(projectDirectories[projectInd], Vector2.zero, displayIndex);
+            if (projectDirectories[projectInd] == VoezEditor.activeProjectFolder)
+                activeIcon = icons[iconListIndex];
+        }
+        AddObject(icons[iconListIndex]);
+        if (activeIcon != null)
+            SetSelectedProject(activeIcon);
+    }
+
     public void LayoutProjectIcons()
     {
-        float relScrollOff = -scrollOffset;
+        float relScrollOff = -VoezEditor.projectScrollOff;
+        float snap = (ProjectIcon.size + GRID_MARGIN) * 0.5f;
+        int displayMinInd = Mathf.Max(0, Mathf.RoundToInt(((Mathf.Round(VoezEditor.projectScrollOff / snap)*snap - snap * 2) / snap) * 2f));
+        
+        // Delete/Add project icons if they are scrolled out of view
         for (int i = 0; i < icons.Length; i += 1) {
-            int posInd = i;
+            while (icons[i] != null && (icons[i].index < displayMinInd || icons[i].index > displayMinInd + icons.Length - 1))
+                RemoveIcon(i);
+            if ((icons[i] != null && (displayMinInd+i < icons[i].index)) || icons[i] == null)
+                AddIcon(i, i + displayMinInd);
+        }
+
+        // Position all project icons
+        for (int i = 0; i < icons.Length; i += 1) {
+            int posInd = displayMinInd + i;
             icons[i].pos.x = relScrollOff + (ProjectIcon.size + GRID_MARGIN) * Mathf.Floor(posInd / 4);
             icons[i].pos.y = VoezEditor.windowRes.y - ProjectIcon.margin - (ProjectIcon.size + GRID_MARGIN) * (i % 2);
             if (posInd % 4 >= 2) {
@@ -182,7 +229,7 @@ public class ProjectsProcess : MainLoopProcess {
 
     public void AddObject(UpdatableObject obj)
     {
-        this.updateList.Add(obj);
+        updateList.Add(obj);
         if (obj is IDrawable) {
             SpriteGroup group = new SpriteGroup(obj as IDrawable);
             spriteGroups.Add(group);
@@ -224,9 +271,11 @@ public class ProjectsProcess : MainLoopProcess {
             musicPlayer.Destroy();
         int updateIndex = updateList.Count - 1;
         while (updateIndex >= 0) {
+            updateList[updateIndex].Destroy();
             PurgeObject(updateList[updateIndex]);
             updateIndex--;
         }
+        updateList.Clear();
         ui.Unload();
     }
 }

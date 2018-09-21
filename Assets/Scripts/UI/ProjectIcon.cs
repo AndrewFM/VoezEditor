@@ -5,12 +5,14 @@ using UnityEngine;
 public class ProjectIcon : DrawableObject {
 
     public ProjectData data;
+    public int index; // used for sorting in project list
     public static float margin = 50f;
     public static float size = (VoezEditor.windowRes.y - margin * 2f) / 2.5f;
 
-	public ProjectIcon(string projectPath, Vector2 pos)
+	public ProjectIcon(string projectPath, Vector2 pos, int index)
     {
         this.pos = pos;
+        this.index = index;
         if (projectPath != null) {
             data = new ProjectData(projectPath);
             data.LoadPreviewData();
@@ -25,8 +27,10 @@ public class ProjectIcon : DrawableObject {
     public override void Destroy()
     {
         base.Destroy();
-        Futile.atlasManager.UnloadAtlas("thumbnail_" + data.songName);
-        data.UnloadData();
+        if (data != null) {
+            Futile.atlasManager.UnloadAtlas("thumbnail_" + data.songName);
+            data.UnloadData();
+        }
     }
 
     public bool MouseOver
@@ -42,7 +46,7 @@ public class ProjectIcon : DrawableObject {
     public override void Update()
     {
         base.Update();
-        if (data != null && MouseOver && InputManager.leftMouseReleased && Vector2.Distance(Input.mousePosition, InputManager.screenPosOnLeftMousePush) < 20f) {
+        if (data != null && MouseOver && InputManager.leftMouseReleased && !VoezEditor.ProjectsPage.ui.HoveringOverSubmenuItem() && Vector2.Distance(Input.mousePosition, InputManager.screenPosOnLeftMousePush) < 20f) {
             VoezEditor.ProjectsPage.SetSelectedProject(this);
         }
     }

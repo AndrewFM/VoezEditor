@@ -32,6 +32,7 @@ public class InputManager {
     public static bool middleMouseReleased;
     public static bool anyPushed;
     public static Vector2 screenPosOnLeftMousePush;
+    public static bool ignoreNextLeftRelease;
 
     public void Update()
     {
@@ -97,9 +98,14 @@ public class InputManager {
             pushStatus = true;
         else
             pushStatus = false;
-        if (!nowDown && lastDown)
-            releaseStatus = true;
-        else
+        if (!nowDown && lastDown) {
+            if (button == 0 && ignoreNextLeftRelease) {
+                ignoreNextLeftRelease = false;
+                releaseStatus = false;
+            }
+            else
+                releaseStatus = true;
+        } else
             releaseStatus = false;
     }
 

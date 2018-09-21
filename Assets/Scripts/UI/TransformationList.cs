@@ -81,20 +81,60 @@ public class TransformationList : UIElement {
 
             border = new RectangleBorder(new Rect(new Vector2(pos.x - WIDTH * 0.5f, pos.y - HEIGHT * 0.5f), new Vector2(WIDTH, HEIGHT)), 3f);
             VoezEditor.Editor.AddObject(border);
+            page = TotalPages - 1;
             RefreshPages();
             init = true;
         }
 
         // Edit Values
         if (transSelected >= 0 && transUIElems[transSelected % transUIElems.Length] != null) {
+            int delta = 0;
             if (InputManager.UpTick())
-                transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, 1);
+                delta = 1;
             if (InputManager.DownTick())
-                transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, -1);
+                delta = -1;
             if (InputManager.RightTick())
-                transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, 5);
+                delta = 5;
             if (InputManager.LeftTick())
-                transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, -5);
+                delta = -5;
+            if (delta != 0) {
+                if (Util.CtrlDown() && (itemSelected == 1 || itemSelected == 2)) {
+                    // Shift all keyframes after this one
+                    float shiftAmount = delta * VoezEditor.Editor.GetBPMTimeIncrement();
+                    float endShiftLimit = parent.data.end - transList[transList.Count - 1].end;
+                    float startShiftLimit = 0;
+                    if (itemSelected == 2)
+                        startShiftLimit = transList[transSelected].start - transList[transSelected].end;
+                    else {
+                        if (transSelected == 0)
+                            startShiftLimit = parent.data.start - transList[transSelected].start;
+                        else
+                            startShiftLimit = transList[transSelected-1].end - transList[transSelected].start;
+                    }
+                    if (shiftAmount > endShiftLimit)
+                        shiftAmount = endShiftLimit;
+                    if (shiftAmount < startShiftLimit)
+                        shiftAmount = startShiftLimit;
+
+                    if (itemSelected == 1)
+                        transList[transSelected].start += shiftAmount;
+                    transList[transSelected].end += shiftAmount;
+                    for(int i=transSelected+1; i<transList.Count; i+=1) {
+                        transList[i].start += shiftAmount;
+                        transList[i].end += shiftAmount;
+                    }
+                    if (itemSelected == 1)
+                        VoezEditor.Editor.JumpToTime(transList[transSelected].start);
+                    else
+                        VoezEditor.Editor.JumpToTime(transList[transSelected].end);
+                    for (int i=0; i<transUIElems.Length; i+=1) {
+                        if (transUIElems[i] != null)
+                            transUIElems[i].RefreshLabelValues();
+                    }
+                }
+                else
+                    transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, delta);
+            }
         }
 
         // Mouse Slide Value Editing
@@ -135,15 +175,21 @@ public class TransformationList : UIElement {
                 else
                     page -= 1;
                 RefreshPages();
+            } else if (transList.Count > 0) {
+                transSelected = transList.Count-1;
+                RefreshPages();
             }
             prevPageButton.clicked = false;
         }
         if (nextPageButton.clicked) {
-            if (page < TotalPages-1) {
+            if (page < TotalPages - 1) {
                 if (transSelected >= 0)
                     transSelected = Mathf.Clamp(transSelected + transUIElems.Length, 0, transList.Count - 1);
                 else
                     page += 1;
+                RefreshPages();
+            } else if (transList.Count > 0) {
+                transSelected = 0;
                 RefreshPages();
             }
             nextPageButton.clicked = false;
@@ -225,6 +271,8 @@ public class TransformationList : UIElement {
             if (Util.ShiftDown()) {
                 if (transSelected != -1)
                     transList[transSelected].to = 1f - transList[transSelected].to;
+                else
+                    parent.data.x = 1f - parent.data.x;
             } else {
                 parent.data.x = 1f - parent.data.x;
                 for (int i = 0; i < transList.Count; i += 1)

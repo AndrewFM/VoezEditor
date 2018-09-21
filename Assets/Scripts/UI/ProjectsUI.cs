@@ -42,20 +42,20 @@ public class ProjectsUI {
         Vector2 editButtonPos = new Vector2(VoezEditor.windowRes.x - 16f - editButtonSize / 2f, 16f + editButtonSize / 2f);
         editButton = new Button("Raleway32", "Edit", editButtonPos, editButtonSize, true);
         editButton.myColor = EASY_COLOR;
-        editButton.myAlpha = 0.9f;
+        editButton.myAlpha = 0.95f;
         editButton.visible = false;
         VoezEditor.ProjectsPage.AddObject(editButton);
         easyButton = new Button("Raleway24", "?"+Environment.NewLine+"Easy", new Vector2(editButtonPos.x - editButtonSize/2f, editButtonPos.y + editButtonSize/4f), editButtonSize/2f, true);
         easyButton.myColor = EASY_COLOR;
-        easyButton.myAlpha = 0.9f;
+        easyButton.myAlpha = 0.95f;
         easyButton.visible = false;
         hardButton = new Button("Raleway24", "?" + Environment.NewLine + "Hard", new Vector2(editButtonPos.x - editButtonSize / 2f, editButtonPos.y - editButtonSize / 4f), editButtonSize / 2f, true);
         hardButton.myColor = HARD_COLOR;
-        hardButton.myAlpha = 0.9f;
+        hardButton.myAlpha = 0.95f;
         hardButton.visible = false;
         specialButton = new Button("Raleway24", "?" + Environment.NewLine + "Special", new Vector2(editButtonPos.x - editButtonSize * 0.75f, editButtonPos.y), editButtonSize / 2f, true);
         specialButton.myColor = SPECIAL_COLOR;
-        specialButton.myAlpha = 0.9f;
+        specialButton.myAlpha = 0.95f;
         specialButton.visible = false;
         VoezEditor.ProjectsPage.AddObject(easyButton);
         VoezEditor.ProjectsPage.AddObject(hardButton);
@@ -172,6 +172,7 @@ public class ProjectsUI {
     public class ProjectSelector : UIElement {
         public float sinTimer;
         public ProjectIcon linkedIcon;
+        public int linkedIndex = -1;
         public Color myColor;
 
         public ProjectSelector()

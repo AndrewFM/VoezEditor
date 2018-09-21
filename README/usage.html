@@ -59,6 +59,33 @@ div.title {
   color:white;
   font-style:italic;
 }
+.tos_head {
+    border-bottom: solid #7D90E0 2pt;
+    background: #DBDBF2;
+    font-family: "Calibri","sans-serif";
+    font-style: italic;
+    margin: 0in;
+    line-height: normal;
+    font-size: 20.0pt;
+    text-align: center;
+    font-size: 20px;
+    color: #232462;
+}
+.tos {
+    /* float: right; */
+    font-size: 14px;
+    width: 296px;
+    border: 2px solid #7D90E0;
+    background: white;
+    margin-top: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: -32px;
+}
+.centered {
+	display: block;
+	margin: 0 auto;
+}
 </style>
 </head>
 <body style="font-family:Verdana">
@@ -70,15 +97,36 @@ div.title {
 <b>By <a href="http://eggzero.tumblr.com/" target="_blank" >AndrewFM</a></b>
 </td></tr>
 <tr><td>
+<div class="tos">
+	<div class="tos_head"><b>Contents</b></div>
+	<ul>
+	<li><a href="#newproject">Starting a new Project</a></li>
+	<li><a href="#interface">General Interface and Tools</a></li>
+	<li><a href="#bpm">Setting the BPM</a></li>
+	<li><a href="#trackedit">Track Editing Mode</a></li>
+	<li><a href="#noteedit">Note Editing Mode</a></li>
+	<li><a href="#songinfo">Editing Song Info</a></li>
+	</ul>
+</div>
+</td></tr>
+<tr><td><a id="newproject" />
 <h2>Starting a new Project</h2>
-In order to start a new project, the following files need to be placed into the <b>ActiveProject</b> folder:
+In order to start a new project, start by navigating into the <b>ActiveProject</b> folder, and then creating a new subdirectory in there for your song. At minimum you need to place the following file into the folder:
 <ul>
 	<li>The audio file for the song. This should be a <b>.wav</b> file whose name starts with "song_".</li>
-	<li>Optionally, a background image for the song. This should be a <b>.png</b> file whose name starts with "image_".</li>
 </ul>
+<br>Optionally, you can also add any of the following into your subdirectory: 
+<ul>
+	<li>A background image for the song. This should be a <b>.png</b> file whose name starts with "image_", and it should be 1024x1024 pixels large.</li>
+	<li>A thumbnail image for the song. This should be a <b>.png</b> file whose name starts with "image_thumbnail", and it should be 256x256 pixels large.</li>
+	<li>A preview track for the song. This should be a <b>.wav</b> file whose name starts with "song_pv", and it should be 20 seconds long.</li>
+</ul>
+<br>Note that the length of your "song_" audio file will be the length of your project's song. If you want your song to be shortened, you need to edit the file with an audio editor.
+<br><br><img src="manual_imgs/theFuture.PNG" width=800 class="centered"/><br><br>
+Boot up the program and you should see the song you added in the list of projects. Each project is three beatmaps in one... one for Easy difficulty, one for Hard, and one for Special. Select your song, 
+then select the difficulty that you'd like to start building, and hit 'Edit' to enter the main editor interface.
 
-Note that the length of your audio file will be the length of your project's song. If you want your song to be shortened, you need to edit the file with an audio editor.
-
+<a id="interface" />
 <h2>General Interface and Tools</h2>
 <img src="manual_imgs/tools.PNG" /><br><br>
 From left to right, the tools are:
@@ -110,11 +158,12 @@ From left to right, the tools are:
 		<li>Shift + 6 Key: 1 Beat Per Measure</li></ul>
 	</li>
 	<li><b>Scroll Speed</b>: Change the speed at which the notes scroll down along the tracks. This is a visual change only, it does not affect the timings of the song at all.</li>
-	<li><b>Audio Assistance</b>: Provides a couple audio guide tools:
+	<li><b>Audio Assistance</b>: Provides a few audio guide tools:
 		<ul><li><b>Metronome</b>: When this is enabled, a click will be heard every time one beat elapses.</li>
-			<li><b>Hit Sounds</b>: When this is enabled, a sound will play whenever a note on a track intersects with the play line.</li></ul>
+			<li><b>Hit Sounds</b>: When this is enabled, a sound will play whenever a note on a track intersects with the play line.</li>
+			<li><b>Note Quantization</b>: Colors the click notes different colors depending if they fall on-beat, on half-beat, on quarter-beat, etc.</li></ul>
 	</li> 
-	<li><b>Beats Per Minute</b>: Adjusts the BPM value for the song. If this value is not correct, then the time signature grid (and thus, the notes you place) will be out of sync with the beats in the song. Calibrating this value is the very first thing you should do before starting creating a beat map for your song. Performing this calibration is explained in the next section.</li>
+	<li><b>Beats Per Minute</b>: Adjusts the BPM value for the song. If this value is not correct, then the time signature grid (and thus, the notes you place) will be out of sync with the beats in the song. Calibrating this value is the very first thing you should do before starting creating a beatmap for your song. Performing this calibration is explained in the next section.</li>
 	<li><b>Save</b>: Saves all of your edits to disk. Note that this will overwrite your previous save files every time. If you want to keep periodic backups, you'll need to manually backup the ActiveProjects folder from time to time.</li>
 	<li><b>Scrubber</b>: This bar shows the current playback progress through the song, and allows you to navigate to any time in the song by clicking and dragging the scrubber.<ul>
 		<li><b>Loop Point</b>: You can right-click the scrubber to set a loop point at its current location. Once the loop point is placed, the scrubber can be jumped back to that position at any point by pressing the <b>Enter</b> key, or by pressing the <b>Middle Mouse Button</b>, or by right-clicking the Play button.</li>
@@ -123,6 +172,7 @@ From left to right, the tools are:
 	<li><b>Timer</b>: The current song time. The number on top is the time in seconds, the number on bottom in parentheses is the cumulative beat count.</li>
 </ol>
 
+<a id="bpm" />
 <h2>Setting the BPM</h2>
 Click on the BPM button to enable BPM editing mode. While active you can use the Scroll Wheel on the mouse, or the Arrow Keys/WASD Keys to edit the value of the BPM. Hold down the Shift key to scroll the value at a faster pace. (This is the standard control scheme for editing any numeric values in the editor)
 <br><br>
@@ -130,12 +180,13 @@ While BPM editing mode is enabled, if you start playing the song, the screen wil
 <br><br>
 When done, click the BPM button again to exit BPM editing mode.
 
+<a id="trackedit" />
 <h2>Track Editing Mode</h2>
-<img src="manual_imgs/newTrack.PNG" width=800/><br><br>
+<img src="manual_imgs/newTrack.PNG" class="centered" width=800/><br><br>
 
 Track Editing mode allows for the adding, deleting, and editing of <b>tracks</b>, which are the vertical columns that notes scroll over.
 <ul><li>To add a new track, hold down the <b>Left Mouse Button</b> while <i>also</i> keeping the <b>Shift</b> key held down through the whole process. A pending track will appear over the mouse's position (in the screenshot above, the red track in the middle is the pending track, while the others are actual tracks that had previously been added). Drag the pending track to the position you want it to be located at, then let go of the left mouse button to finalize its position and add the actual track.</li>
-	<li>To delete a track, press the <b>Delete</b> button while hovering over a track, or right click on a track while also holding down the shift key. If you try to delete a track that currently has notes at it, the warning below will be displayed. Be very careful as <b>the editor does <i>NOT</i> have an undo feature</b>. Anything you delete cannot be recovered.<br><br><img src="manual_imgs/deletionWarning.PNG" width=350/></li>
+	<li>To delete a track, press the <b>Delete</b> button while hovering over a track, or right click on a track while also holding down the shift key. If you try to delete a track that currently has notes at it, the warning below will be displayed. Be very careful as <b>the editor does <i>NOT</i> have an undo feature</b>. Anything you delete cannot be recovered.<br><br><img src="manual_imgs/deletionWarning.PNG" width=350 class="centered"/></li>
 </ul>
 
 Once you have tracks placed down, they need to be configured to adjust their duration, animations, etc... to begin editing the properties of a specific track, left click on it to bring up the track edit window:<br><br>
@@ -166,12 +217,15 @@ Use the left mouse button on the different fields in the window to select them f
 		<li><b>Delete:</b> Deletes the selected keyframe.</li>
 		<li><b>Copy:</b> Copies ALL keyframes in this tab to the program's clipboard.</li>
 		<li><b>Paste:</b> Pastes the list of copied keyframes. This will not append the keyframes to the list, it will overwrite the whole list with the pasted contents. Also note that each tab has its own clipboard, so if for example, you copy keyframes from the Position tab, you can only paste in into another Position tab.</li>
-		<li><b>Mirror:</b> This button only exists for the Positions tab. Clicking it will mirror the track's position and mirror all of its keyframes' positions so the track is on the opposite side of the screen. You can use this option to help make symmetric animations.</li>
+		<li><b>Mirror:</b> This button only exists for the Positions tab. Clicking it will mirror the track's position and mirror all of its keyframes' positions so the track is on the opposite side of the screen. You can use this option to help make symmetric animations. If you hold the <b>Shift</b> key, then only the selected keyframe will be mirrored, rather than all the keyframes.</li>
 	</ol>
-</td></tr></table>
 
+</td></tr></table>
+<b>Tip:</b> You can hold the <b>Ctrl</b> key while ajdusting the track's start/end time to shift the time of the entire track, all its keyframes, and all attached notes simultaneously. Likewise, if you hold the Ctrl key when editing a keyframe's start/end time, it will simultaneously shift the time of all keyframes that come after it as well.
+
+<a id="noteedit" />
 <h2>Note Editing Mode</h2>
-<img src="manual_imgs/noteEdit.PNG" width=800/><br><br>
+<img src="manual_imgs/noteEdit.PNG" width=800 class="centered"/><br><br>
 
 Set the Editing Mode selection to any of the other options other than track, to enter note editing mode. This mode allows for the adding, deleting, and editing of notes onto any of the tracks you've placed down.
 <ul><li>To add a new note, hover you mouse over any of the tracks, and a ghost image of the note will appear. <b>Left Click</b> to place the note down.</li>
@@ -184,6 +238,34 @@ The three buttons on the top will change which type of note this is. The value f
 	<li><b>Spawn Time:</b> The time in the song when this note needs to be tapped/swiped by the player.</li>
 	<li><b>Hold Duration:</b> Only available for click notes. If this is set to a value other than 0, then the click note becomes a hold note. If you want to make a hold note that moves around, you need to keyframe the track's position. See the previous section on track editing above.</li>
 	<li><b>Direction:</b> Only available for swipe notes. Lets you select whether it should be swiped to the left, or swiped to the right.
+</ul>
+
+<a id="songinfo" />
+<h2>Editing Song Info</h2>
+After saving your song at least once, navigate back to your project's subdirectory on your harddrive, and there will be a new file called "info_song.txt". Open this file up in a text editor to edit the information about your song:
+<pre>
+{
+	"info":{
+		"version":"1.04",
+		"name":"The Song Name",
+		"author":"The Author",
+		"bpm":155,
+	}
+	,"level":{
+		"easy":1,
+		"hard":1,
+		"extra":1
+	}
+}
+</pre>
+<ul>
+	<li><b>version:</b> This is the version of the editor your song was last edited with. Don't modify the value of this.</li>
+	<li><b>name:</b> The title of the song. Make sure the name is between double quotes, as shown.</li>
+	<li><b>author:</b> The author of the song. Make sure the name is between double quotes, as shown.</li>
+	<li><b>bpm:</b> The BPM value of your song. Best to use the in-editor tools to properly calibrate this value.</li>
+	<li><b>easy:</b> The level of the song on Easy mode. Set this to any whole number greater than zero.</li>
+	<li><b>hard:</b> The level of the song on Hard mode. Set this to any whole number greater than zero.</li>
+	<li><b>extra:</b> The level of the song on Special mode. Set this to any whole number greater than zero.</li>
 </ul>
 
 </td></tr></table>

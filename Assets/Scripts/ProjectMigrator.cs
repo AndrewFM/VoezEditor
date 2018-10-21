@@ -7,6 +7,22 @@ public class ProjectMigrator {
     public ProjectMigrator()
     {
         MigrateToV104();
+        MigrateToV105();
+    }
+
+    // v1.04 Project -> v1.05 Project
+    public void MigrateToV105()
+    {
+        string rootFolder = Application.dataPath + "/../ActiveProject";
+        string[] projectFolders = Directory.GetDirectories(rootFolder);
+        for(int i=0; i<projectFolders.Length; i++) {
+            string[] projectFiles = Directory.GetFiles(projectFolders[i], "*.*", SearchOption.TopDirectoryOnly);
+            for(int j=0; j<projectFiles.Length; j++) {
+                if (projectFiles[j].EndsWith(".txt")) {
+                    File.Move(projectFiles[j], projectFiles[j].Substring(0, projectFiles[j].Length - 4) + ".json");
+                }
+            }
+        }
     }
 
     // v1.00-v1.03 Project -> v1.04 Project

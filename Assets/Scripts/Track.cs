@@ -105,9 +105,12 @@ public class Track : DrawableObject {
                 else
                     lastSubMove = data.move[i - 1].to;
                 float subMoveProgress = (time - data.move[i].start) / (data.move[i].end - data.move[i].start);
-                desiredX = data.move[i].GetEaseFunction()(lastSubMove, data.move[i].to, Mathf.Clamp(subMoveProgress, 0, 1));
+                System.Func<float, float, float, float> easeFunc = data.move[i].GetEaseFunction();
+                if (data.move[i].ease == ProjectData.Easing.EXIT)
+                    easeFunc = Util.LerpExitPosition;
+                desiredX = easeFunc(lastSubMove, data.move[i].to, Mathf.Clamp(subMoveProgress, 0, 1));
             } else if ((i < data.move.Count - 1 && time >= data.move[i].end && time < data.move[i + 1].start)
-                   || ((i == data.move.Count - 1 && time >= data.move[i].end && time < data.end)))
+                   || ((i == data.move.Count - 1 && time >= data.move[i].end && time <= data.end)))
                 desiredX = data.move[i].to;
         }
         return desiredX;
@@ -211,7 +214,10 @@ public class Track : DrawableObject {
                     lastSubScale = data.scale[i - 1].to;
                 float subScaleProgress = (VoezEditor.Editor.songTime - data.scale[i].start) / (data.scale[i].end - data.scale[i].start);
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH;
-                currentWidth *= data.scale[i].GetEaseFunction()(lastSubScale, data.scale[i].to, Mathf.Clamp(subScaleProgress, 0, 1));
+                System.Func<float, float, float, float> easeFunc = data.scale[i].GetEaseFunction();
+                if (data.scale[i].ease == ProjectData.Easing.EXIT)
+                    easeFunc = Util.LerpExitScale;
+                currentWidth *= easeFunc(lastSubScale, data.scale[i].to, Mathf.Clamp(subScaleProgress, 0, 1));
             } else if ((i < data.scale.Count - 1 && VoezEditor.Editor.songTime >= data.scale[i].end && VoezEditor.Editor.songTime < data.scale[i + 1].start)
                    || ((i == data.scale.Count - 1 && VoezEditor.Editor.songTime >= data.scale[i].end && VoezEditor.Editor.songTime <= data.end)))
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH * data.scale[i].to;

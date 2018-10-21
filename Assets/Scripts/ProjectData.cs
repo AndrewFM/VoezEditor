@@ -29,9 +29,9 @@ public class ProjectData {
     public ProjectData(string projectFolder)
     {
         this.projectFolder = projectFolder; 
-        notesFileName = projectFolder + "/note_" + VoezEditor.editType + ".txt";
-        tracksFileName = projectFolder + "/track_" + VoezEditor.editType + ".txt";
-        infoFileName = projectFolder + "/info_song.txt";
+        notesFileName = projectFolder + "/note_" + VoezEditor.editType + ".json";
+        tracksFileName = projectFolder + "/track_" + VoezEditor.editType + ".json";
+        infoFileName = projectFolder + "/info_song.json";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
@@ -90,12 +90,12 @@ public class ProjectData {
 
         for (int i = 0; i < projectFiles.Length; i += 1) {
             // Audio Preview File
-            if (projectFiles[i].Contains("song_pv") && projectFiles[i].Contains(".wav")) {
+            if (projectFiles[i].Contains("song_pv") && (projectFiles[i].ToLower().Contains(".wav") || projectFiles[i].ToLower().Contains(".ogg"))) {
                 songPVPath = "file://" + projectFiles[i];
             }
 
             // Thumbnail File
-            if (projectFiles[i].Contains("image_thumbnail") && projectFiles[i].Contains(".png")) {
+            if (projectFiles[i].Contains("image_thumbnail") && projectFiles[i].ToLower().Contains(".png")) {
                 byte[] fileData = File.ReadAllBytes(projectFiles[i]);
                 thumbnail = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 thumbnail.LoadImage(fileData);
@@ -141,12 +141,12 @@ public class ProjectData {
         string[] projectFiles = Directory.GetFiles(projectFolder, "*.*", SearchOption.TopDirectoryOnly);
         for (int i = 0; i < projectFiles.Length; i += 1) {
             // Audio File
-            if (projectFiles[i].Contains("song_") && projectFiles[i].Contains(".wav") && !projectFiles[i].Contains("song_pv")) {
+            if (projectFiles[i].Contains("song_") && (projectFiles[i].ToLower().Contains(".wav") || projectFiles[i].ToLower().Contains(".ogg")) && !projectFiles[i].Contains("song_pv")) {
                 songPath = "file://" + projectFiles[i];
             }
 
             // Background Image File
-            if (projectFiles[i].Contains("image_") && projectFiles[i].Contains(".png") && !projectFiles[i].Contains("thumbnail") && !projectFiles[i].Contains("blur")) {
+            if (projectFiles[i].Contains("image_") && projectFiles[i].ToLower().Contains(".png") && !projectFiles[i].Contains("thumbnail") && !projectFiles[i].Contains("blur")) {
                 byte[] fileData = File.ReadAllBytes(projectFiles[i]);
                 background = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 background.LoadImage(fileData);
@@ -330,7 +330,7 @@ public class ProjectData {
             else if (easeStyle == "easeinback")
                 transObj.ease = Easing.BACK_IN;
             else if (easeStyle == "easeinoutback")
-                transObj.ease = Easing.BACK_INOUT;
+                transObj.ease = Easing.EXIT; // Replicates the buggy behavior of BACK_INOUT in the original game
             else if (easeStyle == "easeoutinback")
                 transObj.ease = Easing.BACK_OUTIN;
             else if (easeStyle == "easeintelastic") // not a typo
@@ -392,11 +392,11 @@ public class ProjectData {
             tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
             tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
             tracksString += "\"Move\":[";
-            tracksString += TransformationsListToString(tracks[i].move, false);
+            tracksString += TransformationsListToString(tracks[i].move, false, tracks[i].x);
             tracksString += "],\"Scale\":[";
-            tracksString += TransformationsListToString(tracks[i].scale, false);
+            tracksString += TransformationsListToString(tracks[i].scale, false, tracks[i].size);
             tracksString += "],\"ColorChange\":[";
-            tracksString += TransformationsListToString(tracks[i].colorChange, true);
+            tracksString += TransformationsListToString(tracks[i].colorChange, true, tracks[i].color);
             if (i == tracks.Count - 1)
                 tracksString += "]}";
             else
@@ -438,60 +438,82 @@ public class ProjectData {
         VoezEditor.Editor.RefreshAllTracks();
     }
 
-    private string TransformationsListToString(List<TrackTransformation> transformList, bool intValue)
+    private string TransformationsListToString(List<TrackTransformation> transformList, bool intValue, float startingValue)
     {
         string retStr = "";
         for (int i = 0; i < transformList.Count; i += 1) {
             retStr += "{";
-            if (intValue)
-                retStr += "\"To\":" + ((int)transformList[i].to).ToString() + ",";
-            else
+            if (transformList[i].ease == Easing.BACK_INOUT && !intValue) {
+                // This one is glitched(?) in the original game, save it instead as a combination of BACK_IN followed by BACK_OUT
+                float start = startingValue;
+                if (i > 0)
+                    start = transformList[i - 1].to;
+                float halfTo = (start + transformList[i].to) * 0.5f;
+                float halfTime = (transformList[i].start + transformList[i].end) * 0.5f;
+
+                retStr += "\"To\":" + halfTo.ToString() + ",";
+                retStr += "\"Ease\":\"easeinback\",";
+                retStr += "\"Start\":" + transformList[i].start.ToString() + ",";
+                retStr += "\"End\":" + halfTime.ToString();
+                retStr += "},{";
                 retStr += "\"To\":" + transformList[i].to.ToString() + ",";
-            retStr += "\"Ease\":\"";
-            if (transformList[i].ease == Easing.LINEAR)
-                retStr += "easelinear";
-            else if (transformList[i].ease == Easing.EXP_IN)
-                retStr += "easeinexpo";
-            else if (transformList[i].ease == Easing.EXP_OUT)
-                retStr += "easeoutexpo";
-            else if (transformList[i].ease == Easing.EXP_INOUT)
-                retStr += "easeinoutexpo";
-            else if (transformList[i].ease == Easing.EXP_OUTIN)
-                retStr += "easeoutinexpo";
-            else if (transformList[i].ease == Easing.QUAD_IN)
-                retStr += "easeinquad";
-            else if (transformList[i].ease == Easing.QUAD_OUT)
-                retStr += "easeoutquad";
-            else if (transformList[i].ease == Easing.QUAD_INOUT)
-                retStr += "easeinoutquad";
-            else if (transformList[i].ease == Easing.QUAD_OUTIN)
-                retStr += "easeoutinquad";
-            else if (transformList[i].ease == Easing.CIRC_IN)
-                retStr += "easeincirc";
-            else if (transformList[i].ease == Easing.CIRC_OUT)
-                retStr += "easeoutcirc";
-            else if (transformList[i].ease == Easing.CIRC_INOUT)
-                retStr += "easeinoutcirc";
-            else if (transformList[i].ease == Easing.CIRC_OUTIN)
-                retStr += "easeoutincirc";
-            else if (transformList[i].ease == Easing.BACK_IN)
-                retStr += "easeinback";
-            else if (transformList[i].ease == Easing.BACK_OUT)
-                retStr += "easeoutback";
-            else if (transformList[i].ease == Easing.BACK_INOUT)
-                retStr += "easeinoutback";
-            else if (transformList[i].ease == Easing.BACK_OUTIN)
-                retStr += "easeoutinback";
-            else if (transformList[i].ease == Easing.ELASTIC_IN)
-                retStr += "easeintelastic"; // not a typo
-            else if (transformList[i].ease == Easing.ELASTIC_OUT)
-                retStr += "easeoutelastic";
-            else if (transformList[i].ease == Easing.ELASTIC_INOUT)
-                retStr += "easeinoutelastic";
-            else if (transformList[i].ease == Easing.ELASTIC_OUTIN)
-                retStr += "easeoutinelastic";
-            retStr += "\",\"Start\":" + transformList[i].start.ToString() + ",";
-            retStr += "\"End\":" + transformList[i].end.ToString();
+                retStr += "\"Ease\":\"easeoutback\",";
+                retStr += "\"Start\":" + halfTime.ToString() + ",";
+                retStr += "\"End\":" + transformList[i].end.ToString();
+            } else {
+                // All other ease modes other than BACK_INOUT
+                if (intValue)
+                    retStr += "\"To\":" + ((int)transformList[i].to).ToString() + ",";
+                else
+                    retStr += "\"To\":" + transformList[i].to.ToString() + ",";
+                retStr += "\"Ease\":\"";
+                if (transformList[i].ease == Easing.LINEAR)
+                    retStr += "easelinear";
+                else if (transformList[i].ease == Easing.EXP_IN)
+                    retStr += "easeinexpo";
+                else if (transformList[i].ease == Easing.EXP_OUT)
+                    retStr += "easeoutexpo";
+                else if (transformList[i].ease == Easing.EXP_INOUT)
+                    retStr += "easeinoutexpo";
+                else if (transformList[i].ease == Easing.EXP_OUTIN)
+                    retStr += "easeoutinexpo";
+                else if (transformList[i].ease == Easing.QUAD_IN)
+                    retStr += "easeinquad";
+                else if (transformList[i].ease == Easing.QUAD_OUT)
+                    retStr += "easeoutquad";
+                else if (transformList[i].ease == Easing.QUAD_INOUT)
+                    retStr += "easeinoutquad";
+                else if (transformList[i].ease == Easing.QUAD_OUTIN)
+                    retStr += "easeoutinquad";
+                else if (transformList[i].ease == Easing.CIRC_IN)
+                    retStr += "easeincirc";
+                else if (transformList[i].ease == Easing.CIRC_OUT)
+                    retStr += "easeoutcirc";
+                else if (transformList[i].ease == Easing.CIRC_INOUT)
+                    retStr += "easeinoutcirc";
+                else if (transformList[i].ease == Easing.CIRC_OUTIN)
+                    retStr += "easeoutincirc";
+                else if (transformList[i].ease == Easing.BACK_IN)
+                    retStr += "easeinback";
+                else if (transformList[i].ease == Easing.BACK_OUT)
+                    retStr += "easeoutback";
+                else if (transformList[i].ease == Easing.BACK_INOUT)
+                    retStr += "easeinoutback";
+                else if (transformList[i].ease == Easing.EXIT)
+                    retStr += "easeinoutback";
+                else if (transformList[i].ease == Easing.BACK_OUTIN)
+                    retStr += "easeoutinback";
+                else if (transformList[i].ease == Easing.ELASTIC_IN)
+                    retStr += "easeintelastic"; // not a typo
+                else if (transformList[i].ease == Easing.ELASTIC_OUT)
+                    retStr += "easeoutelastic";
+                else if (transformList[i].ease == Easing.ELASTIC_INOUT)
+                    retStr += "easeinoutelastic";
+                else if (transformList[i].ease == Easing.ELASTIC_OUTIN)
+                    retStr += "easeoutinelastic";
+                retStr += "\",\"Start\":" + transformList[i].start.ToString() + ",";
+                retStr += "\"End\":" + transformList[i].end.ToString();
+            }
             if (i == transformList.Count - 1)
                 retStr += "}";
             else
@@ -544,7 +566,8 @@ public class ProjectData {
         ELASTIC_IN,
         ELASTIC_OUT,
         ELASTIC_INOUT,
-        ELASTIC_OUTIN
+        ELASTIC_OUTIN,
+        EXIT
     };
 
     public static Color[] colors = new Color[]
@@ -665,6 +688,8 @@ public class ProjectData {
             if (ease == Easing.BACK_OUT)
                 return Util.LerpBackEaseOut;
             if (ease == Easing.BACK_INOUT)
+                return Util.LerpBackEaseInOut;
+            if (ease == Easing.EXIT)
                 return Util.LerpBackEaseInOut;
             if (ease == Easing.BACK_OUTIN)
                 return Util.LerpBackEaseOutIn;

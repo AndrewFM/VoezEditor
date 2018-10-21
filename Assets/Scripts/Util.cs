@@ -188,13 +188,32 @@ public class Util {
 
     public static float LerpBackEaseOutIn(float start, float end, float perc)
     {
-        // TODO: Not correct formulas
         float x = 0;
         if (perc >= 0.5f)
             x = 2f * (perc - 0.5f) * (perc - 0.5f) * (7.189819f * (perc - 0.5f) - 2.5949095f) + 0.5f;
         else
             x = 0.5f * ((2f * (perc + 0.5f) - 2f) * (2f * (perc + 0.5f) - 2f) * (3.5949095f * (2f * (perc + 0.5f) - 2f) + 2.5949095f) + 2f) - 0.5f;
         return (end - start) * x + start;
+    }
+
+    public static float LerpExitPosition(float start, float end, float perc)
+    {
+        // Replicates buggy behavior of BACK_INOUT in the original game, for position easing
+        float newend = -10f;
+        if (end > start)
+            newend = 10f;
+        float x = perc * perc * (2.70158f * (perc * 2f) - 1.20158f);
+        return (newend - start) * x + start;
+    }
+
+    public static float LerpExitScale(float start, float end, float perc)
+    {
+        // Replicates buggy behavior of BACK_INOUT in the original game, for scale easing
+        float newend = -20f;
+        if (end > start)
+            newend = 20f;
+        float x = perc * perc * (2.70158f * (perc * 4f) - 1.20158f);
+        return (newend - start) * x + start;
     }
 
     // Elastic Easings
@@ -222,7 +241,6 @@ public class Util {
 
     public static float LerpElasticEaseOutIn(float start, float end, float perc)
     {
-        // TODO: Not correct formulas
         float x = 0;
         if (perc >= 0.5f)
             x = (-0.5f * Mathf.Pow(2f, 10f * (2f * (perc-0.5f) - 1f)) * Mathf.Sin(((2f * (perc-0.5f) - 1f) - 0.1f) * 2f * Mathf.PI / 0.4f)) + 0.5f;

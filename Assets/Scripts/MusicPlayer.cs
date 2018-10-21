@@ -115,7 +115,11 @@ public class MusicPlayer {
     {
         Unload();
         WWW www = new WWW(filePath);
-        AudioClip songClip = www.GetAudioClip(false, false, AudioType.WAV);
+        AudioClip songClip = null;
+        if (filePath.ToLower().EndsWith(".ogg"))
+            songClip = www.GetAudioClip(false, false, AudioType.OGGVORBIS);
+        else
+            songClip = www.GetAudioClip(false, false, AudioType.WAV);
         activeClip = songClip;
         readyToPlay = true;
     }

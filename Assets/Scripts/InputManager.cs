@@ -9,6 +9,9 @@ public class InputManager {
     public static bool fourPushed;
     public static bool fivePushed;
     public static bool sixPushed;
+    public static bool sevenPushed;
+    public static bool eightPushed;
+    public static bool ninePushed;
     public static bool upPushed;
     public static bool downPushed;
     public static bool leftPushed;
@@ -42,6 +45,9 @@ public class InputManager {
         UpdateKeyPushTracker(KeyCode.Alpha4, ref fourLastDown, ref fourNowDown, ref fourPushed);
         UpdateKeyPushTracker(KeyCode.Alpha5, ref fiveLastDown, ref fiveNowDown, ref fivePushed);
         UpdateKeyPushTracker(KeyCode.Alpha6, ref sixLastDown, ref sixNowDown, ref sixPushed);
+        UpdateKeyPushTracker(KeyCode.Alpha7, ref sevenLastDown, ref sevenNowDown, ref sevenPushed);
+        UpdateKeyPushTracker(KeyCode.Alpha8, ref eightLastDown, ref eightNowDown, ref eightPushed);
+        UpdateKeyPushTracker(KeyCode.Alpha9, ref nineLastDown, ref nineNowDown, ref ninePushed);
         UpdateKeyPushTracker(KeyCode.UpArrow, ref upLastDown, ref upNowDown, ref upPushed);
         UpdateKeyPushTracker(KeyCode.DownArrow, ref downLastDown, ref downNowDown, ref downPushed);
         UpdateKeyPushTracker(KeyCode.LeftArrow, ref leftLastDown, ref leftNowDown, ref leftPushed);
@@ -148,6 +154,12 @@ public class InputManager {
     private bool fiveLastDown;
     private bool sixNowDown;
     private bool sixLastDown;
+    private bool sevenNowDown;
+    private bool sevenLastDown;
+    private bool eightNowDown;
+    private bool eightLastDown;
+    private bool nineNowDown;
+    private bool nineLastDown;
 
     private bool upNowDown;
     private bool upLastDown;

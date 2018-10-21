@@ -237,7 +237,7 @@ public class TrackEditor : UIElement {
                 } else if (page == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.size = Mathf.Clamp(data.size + 0.1f * delta, 0f, 10f);
                 else if (page == ProjectData.TrackTransformation.TransformType.MOVE)
-                    data.x = Mathf.RoundToInt(Mathf.Clamp(data.x + 0.01f * delta, 0f, 1f)*100f)/100f;
+                    data.x = Mathf.RoundToInt(Mathf.Clamp(data.x + 0.01f * delta, -0.5f, 1.5f)*100f)/100f;
                 RefreshValueLabel();
             }
             if (selectedLine <= 1)

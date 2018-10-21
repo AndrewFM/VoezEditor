@@ -128,15 +128,15 @@ public class ProjectsUI {
         if (data.easyLevel <= 0)
             easyButton.myText.text = "?";
         else
-            easyButton.myText.text = data.easyLevel.ToString();
+            easyButton.myText.text = Mathf.FloorToInt(data.easyLevel).ToString();
         if (data.hardLevel <= 0)
             hardButton.myText.text = "?";
         else
-            hardButton.myText.text = data.hardLevel.ToString();
+            hardButton.myText.text = Mathf.FloorToInt(data.hardLevel).ToString();
         if (data.extraLevel <= 0)
             specialButton.myText.text = "?";
         else
-            specialButton.myText.text = data.extraLevel.ToString();
+            specialButton.myText.text = Mathf.FloorToInt(data.extraLevel).ToString();
         easyButton.myText.text += Environment.NewLine + "Easy";
         hardButton.myText.text += Environment.NewLine + "Hard";
         specialButton.myText.text += Environment.NewLine + "Special";

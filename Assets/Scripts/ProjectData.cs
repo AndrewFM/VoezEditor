@@ -17,10 +17,10 @@ public class ProjectData {
     public string tracksFileName;
     public string infoFileName;
     public string infoString;
-    public int songBPM = 120;
-    public int easyLevel = -1;
-    public int hardLevel = -1;
-    public int extraLevel = -1;
+    public float songBPM = 120;
+    public float easyLevel = -1;
+    public float hardLevel = -1;
+    public float extraLevel = -1;
 
     public List<TrackTransformation> transformClipboard;
     public TrackTransformation.TransformType clipboardContentsType;
@@ -84,9 +84,9 @@ public class ProjectData {
         bool hasHardTrack = false;
         bool hasExtraNotes = false;
         bool hasExtraTrack = false;
-        int pendingEasyLevel = -1;
-        int pendingHardLevel = -1;
-        int pendingExtraLevel = -1;
+        float pendingEasyLevel = -1;
+        float pendingHardLevel = -1;
+        float pendingExtraLevel = -1;
 
         for (int i = 0; i < projectFiles.Length; i += 1) {
             // Audio Preview File
@@ -261,7 +261,7 @@ public class ProjectData {
             if (infoProps.ContainsKey("name"))
                 songName = (string)infoProps["name"];
             if (infoProps.ContainsKey("bpm"))
-                songBPM = (int)((long)infoProps["bpm"]);
+                songBPM = Util.ParseJSONFloat(infoProps["bpm"]);
         }
 
         // Level JSON
@@ -270,11 +270,11 @@ public class ProjectData {
             levelString = levelString.Substring(0, levelString.IndexOf("}") + 1);
             Dictionary<string, object> levelProps = (Dictionary<string, object>)Json.Deserialize(levelString);
             if (levelProps.ContainsKey("easy"))
-                easyLevel = (int)((long)levelProps["easy"]);
+                easyLevel = Util.ParseJSONFloat(levelProps["easy"]);
             if (levelProps.ContainsKey("hard"))
-                hardLevel = (int)((long)levelProps["hard"]);
+                hardLevel = Util.ParseJSONFloat(levelProps["hard"]);
             if (levelProps.ContainsKey("extra"))
-                extraLevel = (int)((long)levelProps["extra"]);
+                extraLevel = Util.ParseJSONFloat(levelProps["extra"]);
         }
     }
 

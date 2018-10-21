@@ -549,7 +549,7 @@ public class TransformationList : UIElement {
                 } else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.to = Mathf.Clamp(data.to + 0.1f * delta, 0f, 10f);
                 else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                    data.to = Mathf.RoundToInt(Mathf.Clamp(data.to + 0.01f * delta, 0f, 1f)*100f)/100f;
+                    data.to = Mathf.RoundToInt(Mathf.Clamp(data.to + 0.01f * delta, -0.5f, 1.5f)*100f)/100f;
             } else if (valueID == 1) {
                 data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), parent.StartTimeBound(data), data.end);
                 VoezEditor.Editor.JumpToTime(data.start);

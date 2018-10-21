@@ -30,11 +30,13 @@ public class Note : DrawableObject {
     public static Color[] QUANTIZATION_COLORS = {
         Util.Color255(250, 119, 119), // 1x
         Util.Color255(119, 119, 250), // 1/2x
+        Util.Color255(255, 255, 255), // 1/3x
         Util.Color255(245, 250, 119), // 1/4x
+        Util.Color255(255, 119, 255), // 1/6x
         Util.Color255(119, 250, 248), // 1/8x
+        Util.Color255(128, 128, 128), // 1/12x
         Util.Color255(122, 250, 119), // 1/16x
-        Util.Color255(255, 255, 255), // 1/32x
-        Util.Color255(128, 128, 128), // other
+        Util.Color255(45, 45, 45), // other
     };
 
     public Note(ProjectData.NoteData data)
@@ -79,21 +81,27 @@ public class Note : DrawableObject {
         // Calculate quantization
         if (data.time != lastTime) {
             float beats = VoezEditor.Editor.SecondsToBeats(data.time);
-            double precBeats = double.Parse(beats.ToString("0.###"));
-            if (precBeats % 1 == 0)
+            double precBeats = double.Parse(beats.ToString("0.####"));
+            int precBeatsMod = (int)(precBeats * 10000) % 10000;
+            if (precBeatsMod == 0) // 1x
                 quantizationInd = 0;
-            else if (precBeats * 10 % 5 == 0)
+            else if (precBeatsMod == 5000) // 1/2x
                 quantizationInd = 1;
-            else if (precBeats * 100 % 25 == 0)
+            else if (precBeatsMod == 3333 || precBeatsMod == 6666 || precBeatsMod == 6667) // 1/3x
                 quantizationInd = 2;
-            else if (precBeats * 1000 % 125 == 0)
+            else if (precBeatsMod == 2500 || precBeatsMod == 7500) // 1/4x
                 quantizationInd = 3;
-            else if (precBeats * 10000 % 625 == 0)
+            else if (precBeatsMod == 1666 || precBeatsMod == 1667 || precBeatsMod == 8333) // 1/6x
                 quantizationInd = 4;
-            else if (precBeats * 100000 % 3125 == 0)
+            else if (precBeatsMod % 1250 == 0) // 1/8x
                 quantizationInd = 5;
-            else
+            else if (precBeatsMod == 833 || precBeatsMod == 4166 || precBeatsMod == 4167 || precBeatsMod == 5833 || precBeatsMod == 9166 || precBeatsMod == 9167) // 1/12x
                 quantizationInd = 6;
+            else if (precBeatsMod % 625 == 0) // 1/16x
+                quantizationInd = 7;
+            else {
+                quantizationInd = 8;
+            }
         }
         lastTime = data.time;
 

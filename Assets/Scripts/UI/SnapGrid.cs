@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SnapGrid : UIElement {
     public float lastSnapGridSetting;
-    public int lastBPM;
+    public float lastBPM;
     public bool despawned;
 
     public SnapGrid() {

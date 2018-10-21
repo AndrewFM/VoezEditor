@@ -65,11 +65,11 @@ public class EditorUI {
 
         string levelText = "";
         if (VoezEditor.editType == "easy")
-            levelText = "Easy Lv." + VoezEditor.Editor.project.easyLevel.ToString();
+            levelText = "Easy Lv." + Mathf.FloorToInt(VoezEditor.Editor.project.easyLevel).ToString();
         else if (VoezEditor.editType == "hard")
-            levelText = "Hard Lv." + VoezEditor.Editor.project.hardLevel.ToString();
+            levelText = "Hard Lv." + Mathf.FloorToInt(VoezEditor.Editor.project.hardLevel).ToString();
         else if (VoezEditor.editType == "extra")
-            levelText = "Special Lv." + VoezEditor.Editor.project.extraLevel.ToString();
+            levelText = "Special Lv." + Mathf.FloorToInt(VoezEditor.Editor.project.extraLevel).ToString();
         levelLabel = new DropshadowLabel("Raleway32", levelText, new Vector2(VoezEditor.windowRes.x - BUTTON_PADDING*1.5f - 24f, VoezEditor.windowRes.y - BUTTON_PADDING*1.5f - 24f), new Vector2(1f, -1f));
         levelLabel.normalText.alignment = FLabelAlignment.Right;
         if (VoezEditor.editType == "easy")
@@ -198,18 +198,24 @@ public class EditorUI {
 
     public void SpawnGridButtons()
     {
-        snapTimes = new Button[6];
+        snapTimes = new Button[9];
         for (int i = 0; i < snapTimes.Length; i += 1) {
             string buttonText = "Off";
             if (i == 1)
                 buttonText = "1/16";
             if (i == 2)
-                buttonText = "1/8";
+                buttonText = "1/12";
             if (i == 3)
-                buttonText = "1/4";
+                buttonText = "1/8";
             if (i == 4)
-                buttonText = "1/2";
+                buttonText = "1/6";
             if (i == 5)
+                buttonText = "1/4";
+            if (i == 6)
+                buttonText = "1/3";
+            if (i == 7)
+                buttonText = "1/2";
+            if (i == 8)
                 buttonText = "1";
             snapTimes[i] = new Button("Raleway32", buttonText
                 , new Vector2(playButton.pos.x + i * 69f + 32f, playButton.pos.y + BUTTON_SIZE * 0.5f + 74f + (i % 2) * 69f)
@@ -219,13 +225,19 @@ public class EditorUI {
                 snapTimes[i].toggled = true;
             if (i == 1 && VoezEditor.Editor.selectedTimeSnap == 16)
                 snapTimes[i].toggled = true;
-            if (i == 2 && VoezEditor.Editor.selectedTimeSnap == 8)
+            if (i == 2 && VoezEditor.Editor.selectedTimeSnap == 12)
                 snapTimes[i].toggled = true;
-            if (i == 3 && VoezEditor.Editor.selectedTimeSnap == 4)
+            if (i == 3 && VoezEditor.Editor.selectedTimeSnap == 8)
                 snapTimes[i].toggled = true;
-            if (i == 4 && VoezEditor.Editor.selectedTimeSnap == 2)
+            if (i == 4 && VoezEditor.Editor.selectedTimeSnap == 6)
                 snapTimes[i].toggled = true;
-            if (i == 5 && VoezEditor.Editor.selectedTimeSnap == 1)
+            if (i == 5 && VoezEditor.Editor.selectedTimeSnap == 4)
+                snapTimes[i].toggled = true;
+            if (i == 6 && VoezEditor.Editor.selectedTimeSnap == 3)
+                snapTimes[i].toggled = true;
+            if (i == 7 && VoezEditor.Editor.selectedTimeSnap == 2)
+                snapTimes[i].toggled = true;
+            if (i == 8 && VoezEditor.Editor.selectedTimeSnap == 1)
                 snapTimes[i].toggled = true;
             VoezEditor.Editor.AddObject(snapTimes[i]);
         }
@@ -646,23 +658,41 @@ public class EditorUI {
             if (snapTimes != null)
                 snapTimes[2].clicked = true;
             else
-                VoezEditor.Editor.selectedTimeSnap = 8;
+                VoezEditor.Editor.selectedTimeSnap = 12;
         }
         if (InputManager.fourPushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[3].clicked = true;
             else
-                VoezEditor.Editor.selectedTimeSnap = 4;
+                VoezEditor.Editor.selectedTimeSnap = 8;
         }
         if (InputManager.fivePushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[4].clicked = true;
             else
-                VoezEditor.Editor.selectedTimeSnap = 2;
+                VoezEditor.Editor.selectedTimeSnap = 6;
         }
         if (InputManager.sixPushed && Util.ShiftDown()) {
             if (snapTimes != null)
                 snapTimes[5].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 4;
+        }
+        if (InputManager.sevenPushed && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[6].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 3;
+        }
+        if (InputManager.eightPushed && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[7].clicked = true;
+            else
+                VoezEditor.Editor.selectedTimeSnap = 2;
+        }
+        if (InputManager.ninePushed && Util.ShiftDown()) {
+            if (snapTimes != null)
+                snapTimes[8].clicked = true;
             else
                 VoezEditor.Editor.selectedTimeSnap = 1;
         }
@@ -677,12 +707,18 @@ public class EditorUI {
                     else if (i == 1)
                         VoezEditor.Editor.selectedTimeSnap = 16;
                     else if (i == 2)
-                        VoezEditor.Editor.selectedTimeSnap = 8;
+                        VoezEditor.Editor.selectedTimeSnap = 12;
                     else if (i == 3)
-                        VoezEditor.Editor.selectedTimeSnap = 4;
+                        VoezEditor.Editor.selectedTimeSnap = 8;
                     else if (i == 4)
-                        VoezEditor.Editor.selectedTimeSnap = 2;
+                        VoezEditor.Editor.selectedTimeSnap = 6;
                     else if (i == 5)
+                        VoezEditor.Editor.selectedTimeSnap = 4;
+                    else if (i == 6)
+                        VoezEditor.Editor.selectedTimeSnap = 3;
+                    else if (i == 7)
+                        VoezEditor.Editor.selectedTimeSnap = 2;
+                    else if (i == 8)
                         VoezEditor.Editor.selectedTimeSnap = 1;
                     snapTimes[i].clicked = false;
                     grid.SnapPlaytimeToGrid();

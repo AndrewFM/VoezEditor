@@ -113,13 +113,13 @@ div.title {
 <h2>Starting a new Project</h2>
 In order to start a new project, start by navigating into the <b>ActiveProject</b> folder, and then creating a new subdirectory in there for your song. At minimum you need to place the following file into the folder:
 <ul>
-	<li>The audio file for the song. This should be a <b>.wav</b> file whose name starts with "song_".</li>
+	<li>The audio file for the song. This should be a <b>.wav</b> or an <b>.ogg</b> file whose name starts with "song_".</li>
 </ul>
 <br>Optionally, you can also add any of the following into your subdirectory: 
 <ul>
 	<li>A background image for the song. This should be a <b>.png</b> file whose name starts with "image_", and it should be 1024x1024 pixels large.</li>
 	<li>A thumbnail image for the song. This should be a <b>.png</b> file whose name starts with "image_thumbnail", and it should be 256x256 pixels large.</li>
-	<li>A preview track for the song. This should be a <b>.wav</b> file whose name starts with "song_pv", and it should be 20 seconds long.</li>
+	<li>A preview track for the song. This should be a <b>.wav</b> or an <b>.ogg</b> file whose name starts with "song_pv", and it should be 20 seconds long.</li>
 </ul>
 <br>Note that the length of your "song_" audio file will be the length of your project's song. If you want your song to be shortened, you need to edit the file with an audio editor.
 <br><br><img src="manual_imgs/theFuture.PNG" width=800 class="centered"/><br><br>
@@ -152,10 +152,13 @@ From left to right, the tools are:
 		<ul><li><b>Keyboard Shortcuts:</b></li>
 		<li>Shift + 1 Key: Turn off the Grid</li>
 		<li>Shift + 2 Key: 16 Beats per Measure</li>
-		<li>Shift + 3 Key: 8 Beats Per Measure</li>
-		<li>Shift + 4 Key: 4 Beats Per Measure</li>
-		<li>Shift + 5 Key: 2 Beats Per Measure</li>
-		<li>Shift + 6 Key: 1 Beat Per Measure</li></ul>
+		<li>Shift + 3 Key: 12 Beats Per Measure</li>
+		<li>Shift + 4 Key: 8 Beats Per Measure</li>
+		<li>Shift + 5 Key: 6 Beats Per Measure</li>
+		<li>Shift + 6 Key: 4 Beats Per Measure</li>
+		<li>Shift + 7 Key: 3 Beats Per Measure</li>
+		<li>Shift + 8 Key: 2 Beats Per Measure</li>
+		<li>Shift + 9 Key: 1 Beat Per Measure</li></ul>
 	</li>
 	<li><b>Scroll Speed</b>: Change the speed at which the notes scroll down along the tracks. This is a visual change only, it does not affect the timings of the song at all.</li>
 	<li><b>Audio Assistance</b>: Provides a few audio guide tools:
@@ -242,7 +245,7 @@ The three buttons on the top will change which type of note this is. The value f
 
 <a id="songinfo" />
 <h2>Editing Song Info</h2>
-After saving your song at least once, navigate back to your project's subdirectory on your harddrive, and there will be a new file called "info_song.txt". Open this file up in a text editor to edit the information about your song:
+After saving your song at least once, navigate back to your project's subdirectory on your harddrive, and there will be a new file called "info_song.json". Open this file up in a text editor to edit the information about your song:
 <pre>
 {
 	"info":{

@@ -1,0 +1,200 @@
+<html>
+<head>
+<style type="text/css">
+.td1 {
+	padding-left:10px;
+	vertical-align:top;
+}
+body {
+      font-family: "Calibri","sans-serif";
+      font-size:12pt;
+    }
+td {
+  font-size:12pt;
+}
+p {
+  margin-bottom:0in;
+  line-height:normal;
+  font-size:14pt;
+  font-style: italic;
+  margin-top:0px;
+}
+table.center {
+    margin-left:auto; 
+    margin-right:auto;
+}
+h2 {
+  border:solid #7D90E0; 1pt;
+  background:#DBDBF2;
+  color:#232462;
+  font-family:"Calibri","sans-serif";
+  font-style:italic;
+  margin:0in;
+  line-height: normal;
+  font-size:22.0pt;
+  padding-left:16px;
+  margin-bottom:10px;
+  margin-top:64px;
+  padding-top:4px;
+  padding-bottom:4px;
+}
+h1 {
+  font-size:28pt;
+  font-style:italic;
+  text-align:center;
+  margin-top:32px;
+}
+li {
+  padding-left:8px;
+}
+div.title {
+  padding: 8px 0px 8px 0px;
+  background: #4D50C0;
+  text-align: center;
+  margin: 0in;
+  margin-bottom: 32px;
+  margin-top: 24px;
+  font-size: 25pt;
+  font-family: "Cambria","serif";
+  color:white;
+  font-style:italic;
+}
+.tos_head {
+    border-bottom: solid #7D90E0 2pt;
+    background: #DBDBF2;
+    font-family: "Calibri","sans-serif";
+    font-style: italic;
+    margin: 0in;
+    line-height: normal;
+    font-size: 20.0pt;
+    text-align: center;
+    font-size: 20px;
+    color: #232462;
+}
+.tos {
+    /* float: right; */
+    font-size: 14px;
+    width: 296px;
+    border: 2px solid #7D90E0;
+    background: white;
+    margin-top: 32px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: -32px;
+}
+.centered {
+	display: block;
+	margin: 0 auto;
+}
+</style>
+</head>
+<body style="font-family:Verdana">
+
+<table style="width:1280px;">
+<tr><td style="text-align:center;">
+<img src="manual_imgs/title.png" /><br><br>
+<b>Exporting Songs to the Nintendo Switch</b><br>
+</td></tr>
+<tr><td>
+<h2>What you will need</h2>
+<ul>
+	<li><a href="https://unity3d.com/unity/qa/patch-releases/5.5.0p1" target="_blank">Unity 5.5.0p1</a></li>
+	<li>A Hex Editor</li>
+	<li>A Nintendo Switch with a CFW running LayeredFS</li>
+	<li>VOEZ for the Nintendo Switch (obviously)</li>
+	<li>Your project files outputted by the Song Editor</li>
+</ul>
+<h2>Setting up the Asset Bundler</h2>
+Create a new 2D Unity project. In the Project window, add the following three folders to your project's Assets:
+<ul>
+	<li>assetbundle</li>
+	<li>AssetBundles</li>
+	<li>Editor</li>
+</ul>
+
+Inside the <b>Editor</b> folder create a new C# Script called CreateAssetBundles. Its contents should be:
+<pre><code>
+	using UnityEditor;
+
+	public class CreateAssetBundles {
+	    [MenuItem("Assets/Build AssetBundles")]
+	    static void BuildAllAssetBundles()
+	    {
+	        BuildPipeline.BuildAssetBundles("Assets/AssetBundles", BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.StandaloneWindows);
+	    }
+	}
+</code></pre>
+
+Inside the <b>assetbundle</b> folder, create another folder called <b>songs</b>.
+<br><br>
+That's it. This is a one-time setup, and you can reuse this Unity Project from now on for exporting any future tracks that you create.
+
+<h2>Bundling a Track Mod</h2>
+Create a new folder for your song inside of the <b>assetbundle/songs</b> folder. The name of this folder can be anything, though keep it all lowercase, no spaces, no special characters, just letters and numbers. Remember the name of the folder because you will need to reuse it several times later.
+<br><br>
+Populate this new folder with your project files. It should contain all of the following files, named and formatted exactly as described:
+<ul>
+	<li><b>image_regular.png</b>: A 1024x1024 background image for your song.</li>
+	<li><b>image_blur.png</b>: The same image as above, resized to 256x256, and blurred.</li>
+	<li><b>image_thumbnail.png</b>: A 256x256 image used for the icon thumbnail in the song select menu.</li>
+	<li><b>song_full.mp3</b>: The full music track for your song.</li>
+	<li><b>song_pv.mp3</b>: A preview music track for your song, exactly 20 seconds long, for use in the song select menu.</li>
+	<li><b>note_easy.json</b>: Notes definitions for your song, exported by the Song Editor. For Easy mode.</li>
+	<li><b>note_hard.json</b>: Notes definitions for your song, exported by the Song Editor. For Hard mode.</li>
+	<li><b>note_extra.json</b>: Notes definitions for your song, exported by the Song Editor. For Special mode.</li>
+	<li><b>track_easy.json</b>: Tracks definitions for your song, exported by the Song Editor. For Easy mode.</li>
+	<li><b>track_hard.json</b>: Tracks definitions for your song, exported by the Song Editor. For Hard mode.</li>
+	<li><b>track_extra.json</b>: Tracks definitions for your song, exported by the Song Editor. For Special mode.</li>
+</ul>
+
+Since your music files are likely in wav/ogg format for use with the song editor, you can use a program like <a href="https://www.audacityteam.org/" target="_blank">Audacity</a> to convert them to mp3 for use with the game.
+<br><br>
+
+For the <b>image_blur</b> file, change the import settings in the Inspector to match the following (otherwise the blurred image will look pixelated in-game):
+<br><br><img src="manual_imgs/image_blur_settings.png" /><br><br>
+
+For all other files, the import settings can be left as the defaults.
+<br><br>
+Once all of the project files are there, select all of them in the Project window, and at the bottom of the Inspector, you will see a dropdown called "AssetBundle". From that dropdown box, select <b>New...</b>, then name the new AssetBundle <b>songs/XXXX</b>, where <b>XXXX</b> is the same name as the folder you created for your project files.
+<br><br>
+Once everything is done succesfully, your setup should be looking something like this:
+<br><br><img src="manual_imgs/completed_bundle.png" /><br><br>
+
+From the menu options at the top of the Unity Window, select "Assets &gt; Build AssetBundles". Once this process finishes running, the bundle for your project files will be available in the <b>AssetBundles/songs</b> folder. The bundle file is the one that's named the same as the project folder you created. It won't have any file extension, so rename it to add the extention ".assetbundle" onto the file. Then open the file up in your hex editor:
+<br><br><img src="manual_imgs/hexedit.png" /><br><br>
+You want to look for the part of the file that has the second occurance of the unity version number (5.5.0p1, highlighted in green in the image above), and find the value located two bytes after the version number (0x05, highlighted in red in the image above). Change that value from 05 to 26. Then save the file.
+<br><br>
+All done. Your project is bundled and ready to be put onto the Nintendo Switch.
+<h2>Deploying the Track Mod</h2>
+In your titles folder for LayeredFS on the microSD card for your Switch, create the following directory structure:
+<br><br>
+<b>0100A7F002830000/romfs/Data/StreamingAssets/songs2.0</b>
+<br><br>
+The 2.0 at the end of the folder name denotes the version number that your songs will be categorized under if you sort by version in the game's song menu. It helps to have all your custom songs in their own category so you can find them easily. You can change that number to something else, but just don't use one of the actual version numbers from the original game, otherwise you'll overwrite the entire song list for that version. 
+<br><br>
+Inside that songs folder, place the .assetbundle file you bundled for your project. Additionally, in that folder you need to have a <b>song_asset_list.json</b> file. That is a listing of all the songs that will be listed under that version category. <a download="song_asset_list.json" href="song_asset_list.json">Click here</a> to download an example song_asset_list.json file to use as your base. 
+<br><br>
+Open the <b>song_asset_list.json</b> file in a text editor, and add your new song as an entry in the list. The song_asset_list.json file downloaded above has two placeholder entries in it, just to illustrate the format and structure of the file. You should remove/replace those with your song(s). Your entry should look like:
+<pre><code>
+{
+  "info": {
+    "author": "Song Author",
+    "bpm": 120,
+    "id": "XXXX",
+    "name": "Song Name"
+  },
+  "level": {
+    "hard": 7,
+    "easy": 1,
+    "extra": 10
+  }
+}
+</code></pre>
+The values to put here can be taken from the <b>info.json</b> file outputted by the Song Editor for your project. The only additional piece of information is the <b>"id"</b> field, which should be set to have the same name as your assetbundle.
+<br><br>
+That's it. Now start-up/restart VOEZ on your Switch with LayeredFS, and you should find your song in the songs list.
+<br><br>
+<b>Tip:</b> Install ftpd on your Switch, and use a FTP client like WinSCP or Filezilla on your computer. With those, you can transfer files to the MicroSD card on your Switch over Wi-Fi, instead of having to turn off the console and eject the card every time you want to add/modify the files.
+</td></tr></table>
+</body>
+</html>

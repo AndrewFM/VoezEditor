@@ -1,0 +1,30 @@
+{  
+   "song_list":[
+	    {
+	      "info": {
+	        "author": "artist",
+	        "bpm": 123,
+	        "id": "000000000000000000000000",
+	        "name": "title"
+	      },
+	      "level": {
+	      	"easy": 1,
+	        "hard": 1,
+	        "extra": 1
+	      }
+	    },
+	    {
+	      "info": {
+	        "author": "artist",
+	        "bpm": 123,
+	        "id": "000000000000000000000000",
+	        "name": "title"
+	      },
+	      "level": {
+	      	"easy": 1,
+	        "hard": 1,
+	        "extra": 1
+	      }
+	    }
+    ]
+}

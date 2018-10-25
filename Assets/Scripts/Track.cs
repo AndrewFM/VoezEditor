@@ -4,7 +4,7 @@ using System.Collections;
 public class Track : DrawableObject {
     public ProjectData.TrackData data;
     public float trackProgress;
-    public static float TRACK_SCREEN_HEIGHT = 0.85f;
+    public static float TRACK_SCREEN_HEIGHT = 0.835f;
     public static float TRACK_SCREEN_WIDTH = 0.12f; // at size = 1.0f
     public int ID;
     public bool activeHover;
@@ -16,7 +16,7 @@ public class Track : DrawableObject {
     public Track(ProjectData.TrackData data)
     {
         this.data = data;
-        ID = data.id; 
+        ID = data.id;
     }
 
     public bool MouseOver
@@ -43,23 +43,22 @@ public class Track : DrawableObject {
             pulseFlashEffectTime -= 1;
 
         if (VoezEditor.Editor.ui.bpmButton.toggled && VoezEditor.Editor.bpmPulse)
-                pulseFlashEffectTime = 5;
+            pulseFlashEffectTime = 5;
 
         if (VoezEditor.Editor.EditMode && !VoezEditor.Editor.MenuOpen && VoezEditor.Editor.trackEditMode) {
             // Delete Track
             if (activeHover && (InputManager.delPushed || (Util.ShiftDown() && InputManager.rightMousePushed))) {
                 Vector2 windowCenter = new Vector2(VoezEditor.windowRes.x * 0.5f, VoezEditor.windowRes.y * 0.5f);
                 int damageCount = 0;
-                for(int i=0; i<VoezEditor.Editor.project.notes.Count; i+=1) {
+                for (int i = 0; i < VoezEditor.Editor.project.notes.Count; i += 1) {
                     if (VoezEditor.Editor.project.notes[i].track == data.id)
                         damageCount += 1;
                 }
                 if (damageCount > 0) {
                     // There are notes attached to this track. Warn the user before deleting it!
-                    deletionConfirm = new ConfirmBox(new Rect(new Vector2(windowCenter.x - 300f, windowCenter.y - 150f), new Vector2(600f, 300f)), "Warning:\nThere are notes attached to this track!\nDeleting it will also delete "+damageCount.ToString()+" note"+(damageCount != 1 ? "s" : "")+".\nAre you sure you want to delete?");
+                    deletionConfirm = new ConfirmBox(new Rect(new Vector2(windowCenter.x - 300f, windowCenter.y - 150f), new Vector2(600f, 300f)), "Warning:\nThere are notes attached to this track!\nDeleting it will also delete " + damageCount.ToString() + " note" + (damageCount != 1 ? "s" : "") + ".\nAre you sure you want to delete?");
                     VoezEditor.Editor.AddObject(deletionConfirm);
-                }
-                else {
+                } else {
                     // Empty track, delete it immediately.
                     VoezEditor.Editor.project.DeleteTrack(data.id);
                     VoezEditor.Editor.RefreshAllTracks();
@@ -85,8 +84,7 @@ public class Track : DrawableObject {
                 VoezEditor.Editor.project.DeleteTrack(data.id);
                 VoezEditor.Editor.RefreshAllNotes();
                 VoezEditor.Editor.RefreshAllTracks();
-            }
-            else if (deletionConfirm.noButton != null && deletionConfirm.noButton.clicked) {
+            } else if (deletionConfirm.noButton != null && deletionConfirm.noButton.clicked) {
                 deletionConfirm.Destroy();
                 deletionConfirm = null;
             }
@@ -99,7 +97,7 @@ public class Track : DrawableObject {
         float desiredX = data.x;
         float lastSubMove = data.x;
         for (int i = 0; i < data.move.Count; i += 1) {
-            if (time >= data.move[i].start && time < data.move[i].end) {
+            if (time >= data.move[i].start && time <= data.move[i].end) {
                 if (i == 0)
                     lastSubMove = data.x;
                 else
@@ -126,24 +124,26 @@ public class Track : DrawableObject {
     public override void InitiateSprites(SpriteGroup sGroup)
     {
         sGroup.sprites = new FSprite[6];
-        sGroup.sprites[Spr_BackGradient] = new FSprite("trackGradient");
+        sGroup.sprites[Spr_BackGradient] = new FSprite("trackGradient") {
+            color = ProjectData.colors[data.color],
+            anchorY = 0f,
+            alpha = 0.9f
+        };
         sGroup.sprites[Spr_BackGradient].scaleY = (VoezEditor.windowRes.y / sGroup.sprites[Spr_BackGradient].height) * TRACK_SCREEN_HEIGHT;
         sGroup.sprites[Spr_BackGradient].scaleX = (VoezEditor.windowRes.x / sGroup.sprites[Spr_BackGradient].width) * TRACK_SCREEN_WIDTH * data.size;
-        sGroup.sprites[Spr_BackGradient].color = ProjectData.colors[data.color];
-        sGroup.sprites[Spr_BackGradient].anchorY = 0f;
-        sGroup.sprites[Spr_BackGradient].alpha = 0.9f;
 
-        sGroup.sprites[Spr_BottomGradFade] = new FSprite("bottomGradient");
-        sGroup.sprites[Spr_BottomGradFade].scaleY = 1f;
+        sGroup.sprites[Spr_BottomGradFade] = new FSprite("bottomGradient") {
+            scaleY = 1f,
+            color = Color.white,
+            anchorY = 0f,
+            alpha = 1f
+        };
         sGroup.sprites[Spr_BottomGradFade].scaleX = (VoezEditor.windowRes.x / sGroup.sprites[Spr_BottomGradFade].width) * TRACK_SCREEN_WIDTH * data.size;
-        sGroup.sprites[Spr_BottomGradFade].color = Color.white;
-        sGroup.sprites[Spr_BottomGradFade].anchorY = 0f;
-        sGroup.sprites[Spr_BottomGradFade].alpha = 1f;
 
-        for (int i=Spr_LeftGradLine; i<=Spr_MiddleGradLine; i+=1) {
+        for (int i = Spr_LeftGradLine; i <= Spr_MiddleGradLine; i += 1) {
             sGroup.sprites[i] = new FSprite("trackGradient");
-            sGroup.sprites[i].scaleY = sGroup.sprites[Spr_BackGradient].scaleY;
             sGroup.sprites[i].scaleX = 0.5f;
+            sGroup.sprites[i].scaleY = sGroup.sprites[Spr_BackGradient].scaleY;
             if (i == Spr_MiddleGradLine)
                 sGroup.sprites[i].color = Color.black;
             else
@@ -151,10 +151,11 @@ public class Track : DrawableObject {
             sGroup.sprites[i].anchorY = 0f;
         }
 
-        sGroup.sprites[Spr_BottomDiamond] = new FSprite("slide");
-        sGroup.sprites[Spr_BottomDiamond].color = Color.black;
-        sGroup.sprites[Spr_BottomDiamond].rotation = 45f;
-        sGroup.sprites[Spr_BottomDiamond].scale = 0.5f;
+        sGroup.sprites[Spr_BottomDiamond] = new FSprite("slide") {
+            color = Color.black,
+            rotation = 45f,
+            scale = 0.5f
+        };
     }
 
     public override void AddToContainer(SpriteGroup sGroup, FContainer newContainer)
@@ -186,13 +187,39 @@ public class Track : DrawableObject {
         int lastSubColor = data.color;
         bool appliedColor = false;
         for (int i = 0; i < data.colorChange.Count; i += 1) {
-            if (VoezEditor.Editor.songTime >= data.colorChange[i].start && VoezEditor.Editor.songTime < data.colorChange[i].end) {
+            if (VoezEditor.Editor.songTime >= data.colorChange[i].start && VoezEditor.Editor.songTime <= data.colorChange[i].end) {
                 if (i == 0)
                     lastSubColor = data.color;
                 else
                     lastSubColor = (int)data.colorChange[i - 1].to;
                 float subColorProgress = (VoezEditor.Editor.songTime - data.colorChange[i].start) / (data.colorChange[i].end - data.colorChange[i].start);
-                sGroup.sprites[Spr_BackGradient].color = Color.Lerp(ProjectData.colors[lastSubColor], ProjectData.colors[(int)data.colorChange[i].to], data.colorChange[i].GetEaseFunction()(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
+
+                float targetRed = ProjectData.colors[(int)data.colorChange[i].to].r;
+                float targetGreen = ProjectData.colors[(int)data.colorChange[i].to].g;
+                float targetBlue = ProjectData.colors[(int)data.colorChange[i].to].b;
+                if (data.colorChange[i].ease == ProjectData.Easing.EXIT) {
+                    if (ProjectData.colors[(int)data.colorChange[i].to].r > ProjectData.colors[lastSubColor].r)
+                        targetRed = 1.0f;
+                    else if (ProjectData.colors[(int)data.colorChange[i].to].r < ProjectData.colors[lastSubColor].r)
+                        targetRed = 0.0f;
+                    if (ProjectData.colors[(int)data.colorChange[i].to].g > ProjectData.colors[lastSubColor].g)
+                        targetGreen = 1.0f;
+                    else if (ProjectData.colors[(int)data.colorChange[i].to].g < ProjectData.colors[lastSubColor].g)
+                        targetGreen = 0.0f;
+                    if (ProjectData.colors[(int)data.colorChange[i].to].b > ProjectData.colors[lastSubColor].b)
+                        targetBlue = 1.0f;
+                    else if (ProjectData.colors[(int)data.colorChange[i].to].b < ProjectData.colors[lastSubColor].b)
+                        targetBlue = 0.0f;
+                    if ((int)data.colorChange[i].to == 1 && lastSubColor == 0)
+                        targetRed = 0.8f;
+                }
+                System.Func<float, float, float, float> easeFunc = data.colorChange[i].GetEaseFunction();
+                if (data.colorChange[i].ease == ProjectData.Easing.EXIT)
+                    easeFunc = Util.LerpExitColor;
+                float newRed = Mathf.Lerp(ProjectData.colors[lastSubColor].r, targetRed, easeFunc(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
+                float newGreen = Mathf.Lerp(ProjectData.colors[lastSubColor].g, targetGreen, easeFunc(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
+                float newBlue = Mathf.Lerp(ProjectData.colors[lastSubColor].b, targetBlue, easeFunc(0f, 1f, Mathf.Clamp(subColorProgress, 0, 1)));
+                sGroup.sprites[Spr_BackGradient].color = new Color(newRed, newGreen, newBlue);
                 appliedColor = true;
             } else if ((i < data.colorChange.Count - 1 && VoezEditor.Editor.songTime >= data.colorChange[i].end && VoezEditor.Editor.songTime < data.colorChange[i + 1].start)
                    || ((i == data.colorChange.Count - 1 && VoezEditor.Editor.songTime >= data.colorChange[i].end && VoezEditor.Editor.songTime <= data.end))) {
@@ -207,7 +234,7 @@ public class Track : DrawableObject {
         currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH * data.size;
         float lastSubScale = data.size;
         for (int i = 0; i < data.scale.Count; i += 1) {
-            if (VoezEditor.Editor.songTime >= data.scale[i].start && VoezEditor.Editor.songTime < data.scale[i].end) {
+            if (VoezEditor.Editor.songTime >= data.scale[i].start && VoezEditor.Editor.songTime <= data.scale[i].end) {
                 if (i == 0)
                     lastSubScale = data.size;
                 else

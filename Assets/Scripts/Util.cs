@@ -216,6 +216,12 @@ public class Util {
         return (newend - start) * x + start;
     }
 
+    public static float LerpExitColor(float start, float end, float perc)
+    {
+        float x = perc * perc * (2.70158f * (perc * 6f) - 1.00158f);
+        return (end - start) * x + start;
+    }
+
     // Elastic Easings
     public static float LerpElasticEaseIn(float start, float end, float perc)
     {

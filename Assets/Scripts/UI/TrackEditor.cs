@@ -235,7 +235,7 @@ public class TrackEditor : UIElement {
                     if (data.color > ProjectData.colors.Length - 1)
                         data.color = 0;
                 } else if (page == ProjectData.TrackTransformation.TransformType.SCALE)
-                    data.size = Mathf.Clamp(data.size + 0.1f * delta, 0f, 10f);
+                    data.size = Mathf.Clamp(data.size + 0.1f * delta, 1f, 10f);
                 else if (page == ProjectData.TrackTransformation.TransformType.MOVE)
                     data.x = Mathf.RoundToInt(Mathf.Clamp(data.x + 0.01f * delta, -0.5f, 1.5f)*100f)/100f;
                 RefreshValueLabel();

@@ -572,16 +572,16 @@ public class ProjectData {
 
     public static Color[] colors = new Color[]
     {
-        Util.Color255(234, 138, 142), // 0 - Red
-        Util.Color255(234, 217, 160), // 1 - Yellow
-        Util.Color255(206, 206, 206), // 2 - Gray
-        Util.Color255(121, 212, 230), // 3 - Light Blue
-        Util.Color255(159, 234, 152), // 4 - Green
-        Util.Color255(216, 173, 128), // 5 - Orange
-        Util.Color255(209, 139, 193), // 6 - Violet
-        Util.Color255(139, 174, 226), // 7 - Blue
-        Util.Color255(118, 202, 195), // 8 - Cyan
-        Util.Color255(208, 176, 252), // 9 - Purple
+        Util.Color255(249, 143, 149), // 0 - Red
+        Util.Color255(249, 229, 161), // 1 - Yellow
+        Util.Color255(211, 211, 211), // 2 - Gray
+        Util.Color255(119, 209, 222), // 3 - Light Blue
+        Util.Color255(151, 211, 132), // 4 - Green
+        Util.Color255(243, 182, 126), // 5 - Orange
+        Util.Color255(226, 160, 203), // 6 - Violet
+        Util.Color255(140, 188, 231), // 7 - Blue
+        Util.Color255(118, 219, 203), // 8 - Cyan
+        Util.Color255(174, 166, 240) // 9 - Purple
     };
 
     public static string[] colorNames = new string[]

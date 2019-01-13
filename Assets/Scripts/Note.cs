@@ -10,7 +10,7 @@ public class Note : DrawableObject {
     public int ID;
     public float tempNoteX = -1000; // temporary X position of note if its linked track hasn't spawned yet.
     public List<HoldTick> holdTicks;
-    private bool playedHoldHitSound;
+    private bool playedHitSound;
     public float lastTime = -1;
     public int quantizationInd;
     public static float SELECTION_RADIUS = 85f;
@@ -148,6 +148,9 @@ public class Note : DrawableObject {
             }
         }
 
+        if (VoezEditor.Editor.musicPlayer.source != null && !VoezEditor.Editor.musicPlayer.source.isPlaying)
+            playedHitSound = false;
+
         if (linkedTrack != null) {
             tempNoteX = -1000;
             pos.x = linkedTrack.pos.x;
@@ -156,7 +159,7 @@ public class Note : DrawableObject {
                 Destroy();
             if ((noteProgress > 1f && data.type != ProjectData.NoteData.NoteType.HOLD) || (holdProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD)) {
                 linkedTrack.flashEffectTime = 5;
-                if (VoezEditor.Editor.hitSoundsEnabled && !VoezEditor.Editor.EditMode) {
+                if (VoezEditor.Editor.hitSoundsEnabled && !VoezEditor.Editor.EditMode && !playedHitSound) {
                     if (data.type == ProjectData.NoteData.NoteType.HOLD)
                         VoezEditor.Editor.sfxPlayer.ReleaseHitSound();
                     else if (data.type == ProjectData.NoteData.NoteType.SLIDE)
@@ -164,16 +167,17 @@ public class Note : DrawableObject {
                     else {
                         VoezEditor.Editor.sfxPlayer.ClickHitSound();
                     }
+                    playedHitSound = true;
                 }
                 Destroy();
             }
-            if (noteProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD && !playedHoldHitSound && !VoezEditor.Editor.EditMode) {
+            if (noteProgress > 1f && data.type == ProjectData.NoteData.NoteType.HOLD && !playedHitSound && !VoezEditor.Editor.EditMode) {
                 if (VoezEditor.Editor.hitSoundsEnabled)
                     VoezEditor.Editor.sfxPlayer.ClickHitSound();
-                playedHoldHitSound = true;
+                playedHitSound = true;
             }
             if (noteProgress < 1)
-                playedHoldHitSound = false;
+                playedHitSound = false;
             if (linkedTrack.readyForDeletion)
                 linkedTrack = null;
 

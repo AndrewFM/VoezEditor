@@ -5,7 +5,7 @@ using System;
 
 public class VoezEditor : MonoBehaviour {
 
-    public static string VERSION = "v1.06";
+    public static string VERSION = "v1.07";
     public static MainLoopProcess activeProcess;
     public static Vector2 windowRes = new Vector2(Screen.width, Screen.height);
     public static bool confirmBoxOpen;

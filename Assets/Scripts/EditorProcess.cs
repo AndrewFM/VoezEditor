@@ -110,12 +110,23 @@ public class EditorProcess : MainLoopProcess {
             // If editor playback time out of sync with music time, begin to speed up or slow down editor playback scrolling
             float nextTime = currentFrame / framesPerSecond;
             if (Mathf.Abs(musicPlayer.source.time - nextTime) > ((1f / VoezEditor.Editor.framesPerSecond) * VoezEditor.musicSyncThreshold)) {
-                if (musicPlayer.source.time > nextTime)
-                    syncSpeedup = Mathf.Max(0f, syncSpeedup + 0.1f);
-                else
-                    syncSpeedup = Mathf.Min(0f, syncSpeedup - 0.1f);
-                currentFrame += syncSpeedup * musicPlayer.playbackSpeed;
+                if (musicPlayer.source.time > nextTime) {
+                    if (syncSpeedup < 0f)
+                        syncSpeedup += 0.25f;
+                    else
+                        syncSpeedup += 0.1f;
+                } else {
+                    if (syncSpeedup > 0f)
+                        syncSpeedup -= 0.25f;
+                    else
+                        syncSpeedup -= 0.1f;
+                }
+            } else {
+                syncSpeedup *= 0.5f;
+                if (Mathf.Abs(syncSpeedup) < 0.25f)
+                    syncSpeedup = 0f;
             }
+            currentFrame += syncSpeedup * musicPlayer.playbackSpeed;
         }
         if (musicPlayer.source != null) {
             if (metronomeEnabled || hitSoundsEnabled)

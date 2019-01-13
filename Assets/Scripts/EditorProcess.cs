@@ -30,6 +30,7 @@ public class EditorProcess : MainLoopProcess {
     public float currentTime;
     public float songTime;
     public float lastSongTime;
+    public float syncSpeedup;
     public int tempNoteID = -1;
     public bool metronomeEnabled;
     public bool hitSoundsEnabled;
@@ -104,8 +105,18 @@ public class EditorProcess : MainLoopProcess {
             if (project.songPath != null)
                 musicPlayer.PlayAudioClip(project.songPath);
         }
-        if (musicPlayer.source.isPlaying)
+        if (musicPlayer.source.isPlaying) {
             currentFrame += 1 * musicPlayer.playbackSpeed;
+            // If editor playback time out of sync with music time, begin to speed up or slow down editor playback scrolling
+            float nextTime = currentFrame / framesPerSecond;
+            if (Mathf.Abs(musicPlayer.source.time - nextTime) > ((1f / VoezEditor.Editor.framesPerSecond) * VoezEditor.musicSyncThreshold)) {
+                if (musicPlayer.source.time > nextTime)
+                    syncSpeedup = Mathf.Max(0f, syncSpeedup + 0.1f);
+                else
+                    syncSpeedup = Mathf.Min(0f, syncSpeedup - 0.1f);
+                currentFrame += syncSpeedup * musicPlayer.playbackSpeed;
+            }
+        }
         if (musicPlayer.source != null) {
             if (metronomeEnabled || hitSoundsEnabled)
                 musicPlayer.desiredVolume = Mathf.Lerp(musicPlayer.source.volume, 0.3f, 0.03f);
@@ -129,7 +140,6 @@ public class EditorProcess : MainLoopProcess {
         currentTime = currentFrame / framesPerSecond;
         lastSongTime = songTime;
         songTime = currentTime;
-        musicPlayer.SyncTracker(songTime);
 
         // BPM Pulse Tracking
         if (musicPlayer.source.isPlaying) {

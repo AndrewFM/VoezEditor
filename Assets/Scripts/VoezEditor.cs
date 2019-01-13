@@ -5,7 +5,7 @@ using System;
 
 public class VoezEditor : MonoBehaviour {
 
-    public static string VERSION = "v1.04";
+    public static string VERSION = "v1.06";
     public static MainLoopProcess activeProcess;
     public static Vector2 windowRes = new Vector2(Screen.width, Screen.height);
     public static bool confirmBoxOpen;
@@ -13,6 +13,7 @@ public class VoezEditor : MonoBehaviour {
     public static string activeProjectFolder = "";
     public static string editType = "easy";
     public static float projectScrollOff;
+    public static bool syncGraphics = false;
 
     // Use this for initialization
     void Start()
@@ -72,6 +73,13 @@ public class VoezEditor : MonoBehaviour {
             if (dictionary != null) {
                 if (dictionary.ContainsKey("syncTime")) {
                     musicSyncThreshold = (int)((long)dictionary["syncTime"]);
+                }
+                if (dictionary.ContainsKey("syncGraphics")) {
+                    int syncMethod = (int)((long)dictionary["syncGraphics"]);
+                    if (syncMethod == 1)
+                        syncGraphics = true;
+                    else
+                        syncGraphics = false;
                 }
             }
         }

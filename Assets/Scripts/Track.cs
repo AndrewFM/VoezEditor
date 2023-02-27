@@ -5,7 +5,7 @@ public class Track : DrawableObject {
     public ProjectData.TrackData data;
     public float trackProgress;
     public static float TRACK_SCREEN_HEIGHT = 0.835f;
-    public static float TRACK_SCREEN_WIDTH = 0.12f; // at size = 1.0f
+    public static float TRACK_SCREEN_WIDTH = 0.115f; // at size = 1.0f
     public int ID;
     public bool activeHover;
     public float currentWidth;

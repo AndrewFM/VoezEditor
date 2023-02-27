@@ -102,8 +102,14 @@ public class Track : DrawableObject {
                     lastSubMove = data.x;
                 else
                     lastSubMove = data.move[i - 1].to;
-                float subMoveProgress = (time - data.move[i].start) / (data.move[i].end - data.move[i].start);
-                System.Func<float, float, float, float> easeFunc = data.move[i].GetEaseFunction();
+                //float subMoveProgress = (time - data.move[i].start) / (data.move[i].end - data.move[i].start);
+                float subMoveProgress=(time - data.move[i].start)/(data.move[i].end - data.move[i].start);
+				if (data.move[i].ease == ProjectData.Easing.EXIT)
+				{
+					subMoveProgress=(time - data.move[i].start)/(2);
+				}
+				
+				System.Func<float, float, float, float> easeFunc = data.move[i].GetEaseFunction();
                 if (data.move[i].ease == ProjectData.Easing.EXIT)
                     easeFunc = Util.LerpExitPosition;
                 desiredX = easeFunc(lastSubMove, data.move[i].to, Mathf.Clamp(subMoveProgress, 0, 1));
@@ -192,7 +198,12 @@ public class Track : DrawableObject {
                     lastSubColor = data.color;
                 else
                     lastSubColor = (int)data.colorChange[i - 1].to;
-                float subColorProgress = (VoezEditor.Editor.songTime - data.colorChange[i].start) / (data.colorChange[i].end - data.colorChange[i].start);
+                //float subColorProgress = (VoezEditor.Editor.songTime - data.colorChange[i].start) / (data.colorChange[i].end - data.colorChange[i].start);
+				float subColorProgress=(VoezEditor.Editor.songTime - data.colorChange[i].start)/(data.colorChange[i].end - data.colorChange[i].start);
+				if (data.colorChange[i].ease == ProjectData.Easing.EXIT)
+				{
+					subColorProgress=(VoezEditor.Editor.songTime - data.colorChange[i].start)/(2);
+				}
 
                 float targetRed = ProjectData.colors[(int)data.colorChange[i].to].r;
                 float targetGreen = ProjectData.colors[(int)data.colorChange[i].to].g;
@@ -239,7 +250,12 @@ public class Track : DrawableObject {
                     lastSubScale = data.size;
                 else
                     lastSubScale = data.scale[i - 1].to;
-                float subScaleProgress = (VoezEditor.Editor.songTime - data.scale[i].start) / (data.scale[i].end - data.scale[i].start);
+                //float subScaleProgress = (VoezEditor.Editor.songTime - data.scale[i].start) / (data.scale[i].end - data.scale[i].start);
+				float subScaleProgress=(VoezEditor.Editor.songTime - data.scale[i].start)/(data.scale[i].end - data.scale[i].start);
+				if (data.scale[i].ease == ProjectData.Easing.EXIT)
+				{
+					subScaleProgress=(VoezEditor.Editor.songTime - data.scale[i].start)/(2);
+				}
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH;
                 System.Func<float, float, float, float> easeFunc = data.scale[i].GetEaseFunction();
                 if (data.scale[i].ease == ProjectData.Easing.EXIT)

@@ -106,7 +106,7 @@ public class Track : DrawableObject {
                 float subMoveProgress=(time - data.move[i].start)/(data.move[i].end - data.move[i].start);
 				if (data.move[i].ease == ProjectData.Easing.EXIT)
 				{
-					subMoveProgress=(time - data.move[i].start)/(2);
+					subMoveProgress=(time - data.move[i].start)/(4);
 				}
 				
 				System.Func<float, float, float, float> easeFunc = data.move[i].GetEaseFunction();
@@ -202,7 +202,7 @@ public class Track : DrawableObject {
 				float subColorProgress=(VoezEditor.Editor.songTime - data.colorChange[i].start)/(data.colorChange[i].end - data.colorChange[i].start);
 				if (data.colorChange[i].ease == ProjectData.Easing.EXIT)
 				{
-					subColorProgress=(VoezEditor.Editor.songTime - data.colorChange[i].start)/(2);
+					subColorProgress=(VoezEditor.Editor.songTime - data.colorChange[i].start)/(4);
 				}
 
                 float targetRed = ProjectData.colors[(int)data.colorChange[i].to].r;
@@ -254,7 +254,7 @@ public class Track : DrawableObject {
 				float subScaleProgress=(VoezEditor.Editor.songTime - data.scale[i].start)/(data.scale[i].end - data.scale[i].start);
 				if (data.scale[i].ease == ProjectData.Easing.EXIT)
 				{
-					subScaleProgress=(VoezEditor.Editor.songTime - data.scale[i].start)/(2);
+					subScaleProgress=(VoezEditor.Editor.songTime - data.scale[i].start)/(4);
 				}
                 currentWidth = VoezEditor.windowRes.x * TRACK_SCREEN_WIDTH;
                 System.Func<float, float, float, float> easeFunc = data.scale[i].GetEaseFunction();

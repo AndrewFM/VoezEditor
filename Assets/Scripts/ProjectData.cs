@@ -11,11 +11,15 @@ public class ProjectData {
     public List<NoteData> notes;
     public List<TrackData> tracks;
     public string songName = "";
+    public string songId = "";
     public string author = "";
+    public string version = "Voez Editor";
     public string projectFolder;
     public string notesFileName;
+    public string tracksEditorFileName;
     public string tracksFileName;
     public string infoFileName;
+    public string configFileName;
     public string infoString;
     public float songBPM = 120;
     public float easyLevel = -1;
@@ -30,8 +34,10 @@ public class ProjectData {
     {
         this.projectFolder = projectFolder; 
         notesFileName = projectFolder + "/note_" + VoezEditor.editType + ".json";
+        tracksEditorFileName = projectFolder + "/track_editor_" + VoezEditor.editType + ".json";
         tracksFileName = projectFolder + "/track_" + VoezEditor.editType + ".json";
         infoFileName = projectFolder + "/info_song.json";
+        configFileName = projectFolder + "/songconfig.txt";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
@@ -190,10 +196,14 @@ public class ProjectData {
             }
 
             // Tracks Mapping File
-            if (projectFiles[i].Contains("track_" + VoezEditor.editType)) {
+            string useTrackFile = "track_editor_" + VoezEditor.editType;
+            if (!projectFiles[i].Contains(useTrackFile)) {
+                useTrackFile = "track_" + VoezEditor.editType;
+            }
+            if (projectFiles[i].Contains(useTrackFile)) {
                 tracksFileName = projectFiles[i];
                 string tracksString = File.ReadAllText(projectFiles[i]);
-                if (tracksString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no notes
+                if (tracksString.Contains("}")) { // Sanity check to avoid crashing when loading projects that contain no tracks
                     tracksString = tracksString.Substring(1, tracksString.Length - 2);
                     tracksString = Regex.Replace(tracksString, @"\t|\n|\r", "");
                     string[] indTracks = Regex.Split(tracksString, @"\]\},");
@@ -260,8 +270,20 @@ public class ProjectData {
                 author = (string)infoProps["author"];
             if (infoProps.ContainsKey("name"))
                 songName = (string)infoProps["name"];
+            if (infoProps.ContainsKey("id"))
+                songId = (string)infoProps["id"];
+            else {
+                songId = "";
+                for(int i=0; i<24; i+=1) {
+                    songId += UnityEngine.Random.Range(0, 10).ToString();
+                }
+            }
             if (infoProps.ContainsKey("bpm"))
                 songBPM = Util.ParseJSONFloat(infoProps["bpm"]);
+            if (infoProps.ContainsKey("song_version"))
+                version = (string)infoProps["song_version"];
+            else
+                version = "Voez Editor";
         }
 
         // Level JSON
@@ -298,6 +320,12 @@ public class ProjectData {
             transObj.to = Util.ParseJSONFloat(transProperties["To"]);
             transObj.start = Util.ParseJSONFloat(transProperties["Start"]);
             transObj.end = Util.ParseJSONFloat(transProperties["End"]);
+            if (transProperties.ContainsKey("RepeatCount"))
+                transObj.repeatCount = Util.ParseJSONFloat(transProperties["RepeatCount"]);
+            if (transProperties.ContainsKey("Duration"))
+                transObj.duration = Util.ParseJSONFloat(transProperties["Duration"]); ;
+            if (transProperties.ContainsKey("Offset"))
+                transObj.offset = Util.ParseJSONFloat(transProperties["Offset"]); ;
             string easeStyle = (string)transProperties["Ease"];
             if (easeStyle == "easelinear")
                 transObj.ease = Easing.LINEAR;
@@ -353,92 +381,113 @@ public class ProjectData {
     public void ExportActiveProject()
     {
         // Info File
-        string infoString = "{\"info\":{";
-        infoString += "\"version\":\"" + VoezEditor.VERSION + "\",";
-        infoString += "\"author\":\"" + author + "\",";
-        infoString += "\"bpm\":" + songBPM.ToString() + ",";
-        infoString += "\"name\":\"" + songName + "\"";
-        infoString += "},\"level\":{";
-        infoString += "\"easy\":" + Mathf.Max(1, easyLevel).ToString() + ",";
-        infoString += "\"hard\":" + Mathf.Max(1, hardLevel).ToString() + ",";
-        infoString += "\"extra\":" + Mathf.Max(1, extraLevel).ToString() + "}";
+        string infoString = "{" + System.Environment.NewLine;
+        if (songId == "") {
+            for (int i = 0; i < 24; i += 1) {
+                songId += UnityEngine.Random.Range(0, 10).ToString();
+            }
+        }
+        infoString += "\t\"info\":{" + System.Environment.NewLine;
+        infoString += "\t\t\"version\":\"" + VoezEditor.VERSION + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"song_version\":\"" + version + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"id\":\"" + songId + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"author\":\"" + author + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"bpm\":" + songBPM.ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"name\":\"" + songName + "\"" + System.Environment.NewLine;
+        infoString += "\t}," + System.Environment.NewLine;
+        infoString += "\t\"level\":{" + System.Environment.NewLine;
+        infoString += "\t\t\"easy\":" + Mathf.Max(1, easyLevel).ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"hard\":" + Mathf.Max(1, hardLevel).ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"extra\":" + Mathf.Max(1, extraLevel).ToString() + System.Environment.NewLine;
+        infoString += "\t}" + System.Environment.NewLine;
         infoString += "}";
         File.WriteAllText(infoFileName, infoString);
 
+        // Config File
+        string configString = "id=" + songId + System.Environment.NewLine;
+        configString += "name=" + songName + System.Environment.NewLine;
+        configString += "bpm=" + songBPM.ToString() + System.Environment.NewLine;
+        configString += "author=" + author + System.Environment.NewLine;
+        configString += "diff=" + Mathf.Max(1, easyLevel).ToString() + "-" + Mathf.Max(1, hardLevel).ToString() + "-" + Mathf.Max(1, extraLevel).ToString() + System.Environment.NewLine;
+        configString += "version=" + version;
+        File.WriteAllText(configFileName, configString);
+
         // Track Mapping File
-        // WARNING: Order matters here. Track mapping needs to be exported first before notes mapping.
-        tracks.Sort((a, b) => (a.start.CompareTo(b.start))); // Sort tracks ascending by start time.
-        // Track IDs will be changed to match new sorted order. Relink all notes to new track IDs.
-        for (int i=0; i<notes.Count; i+=1) {
-            for(int j=0; j<tracks.Count; j+=1) {
-                if (notes[i].track == tracks[j].id) {
-                    notes[i].track = j;
-                    break;
+        for (int ft = 0; ft < 2; ft += 1) {
+            // WARNING: Order matters here. Track mapping needs to be exported first before notes mapping.
+            tracks.Sort((a, b) => (a.start.CompareTo(b.start))); // Sort tracks ascending by start time.
+                                                                 // Track IDs will be changed to match new sorted order. Relink all notes to new track IDs.
+            for (int i = 0; i < notes.Count; i += 1) {
+                for (int j = 0; j < tracks.Count; j += 1) {
+                    if (notes[i].track == tracks[j].id) {
+                        notes[i].track = j;
+                        break;
+                    }
                 }
             }
-        }
-        // Apply new track IDs
-        for (int i = 0; i < tracks.Count; i += 1)
-            tracks[i].id = i;
-        string tracksString = "[";
-        for (int i = 0; i < tracks.Count; i += 1) {
-            tracksString += "{";
-            tracksString += "\"Id\":" + tracks[i].id.ToString() + ",";
-            tracksString += "\"EntranceOn\":" + (tracks[i].entranceOn ? "true" : "false") + ",";
-            tracksString += "\"PositionLock\":" + (tracks[i].positionLock ? "true" : "false") + ",";
-            tracksString += "\"X\":" + tracks[i].x.ToString() + ",";
-            tracksString += "\"Size\":" + tracks[i].size.ToString() + ",";
-            tracksString += "\"Start\":" + tracks[i].start.ToString() + ",";
-            tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
-            tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
-            tracksString += "\"Move\":[";
-            tracksString += TransformationsListToString(tracks[i].move, false, tracks[i].x);
-            tracksString += "],\"Scale\":[";
-            tracksString += TransformationsListToString(tracks[i].scale, false, tracks[i].size);
-            tracksString += "],\"ColorChange\":[";
-            tracksString += TransformationsListToString(tracks[i].colorChange, true, tracks[i].color);
-            if (i == tracks.Count - 1)
-                tracksString += "]}";
-            else
-                tracksString += "]},";
-        }
-        tracksString += "]";
-        File.WriteAllText(tracksFileName, tracksString);
+            // Apply new track IDs
+            for (int i = 0; i < tracks.Count; i += 1)
+                tracks[i].id = i;
+            string tracksString = "[";
+            for (int i = 0; i < tracks.Count; i += 1) {
+                tracksString += "{";
+                tracksString += "\"Id\":" + tracks[i].id.ToString() + ",";
+                tracksString += "\"EntranceOn\":" + (tracks[i].entranceOn ? "true" : "false") + ",";
+                tracksString += "\"PositionLock\":" + (tracks[i].positionLock ? "true" : "false") + ",";
+                tracksString += "\"X\":" + tracks[i].x.ToString() + ",";
+                tracksString += "\"Size\":" + tracks[i].size.ToString() + ",";
+                tracksString += "\"Start\":" + tracks[i].start.ToString() + ",";
+                tracksString += "\"End\":" + tracks[i].end.ToString() + ",";
+                tracksString += "\"Color\":" + tracks[i].color.ToString() + ",";
+                tracksString += "\"Move\":[";
+                tracksString += TransformationsListToString(ft == 1, tracks[i].move, false, tracks[i].x);
+                tracksString += "],\"Scale\":[";
+                tracksString += TransformationsListToString(ft == 1, tracks[i].scale, false, tracks[i].size);
+                tracksString += "],\"ColorChange\":[";
+                tracksString += TransformationsListToString(ft == 1, tracks[i].colorChange, true, tracks[i].color);
+                if (i == tracks.Count - 1)
+                    tracksString += "]}";
+                else
+                    tracksString += "]},";
+            }
+            tracksString += "]";
+            File.WriteAllText(ft == 0 ? tracksFileName : tracksEditorFileName, tracksString);
 
-        // Notes Mapping File
-        notes.Sort((a, b) => (a.time.CompareTo(b.time))); // Sort notes ascending by time spawned.
-        string notesString = "[";
-        for (int i = 0; i < notes.Count; i += 1) {
-            notesString += "{";
-            notesString += "\"Id\":" + i.ToString() + ",";
-            notesString += "\"Type\":\"";
-            if (notes[i].type == NoteData.NoteType.CLICK)
-                notesString += "click";
-            else if (notes[i].type == NoteData.NoteType.HOLD)
-                notesString += "hold";
-            else if (notes[i].type == NoteData.NoteType.SWIPE)
-                notesString += "swipe";
-            else if (notes[i].type == NoteData.NoteType.SLIDE)
-                notesString += "slide";
-            notesString += "\",\"Track\":" + notes[i].track.ToString() + ",";
-            notesString += "\"Time\":" + notes[i].time.ToString() + ",";
-            if (notes[i].type == NoteData.NoteType.HOLD)
-                notesString += "\"Hold\":" + notes[i].hold.ToString() + ",";
-            else
-                notesString += "\"Hold\":0.0,";
-            notesString += "\"Dir\":" + notes[i].dir.ToString();
-            if (i == notes.Count - 1)
-                notesString += "}";
-            else
-                notesString += "},";
+            // Notes Mapping File
+            notes.Sort((a, b) => (a.time.CompareTo(b.time))); // Sort notes ascending by time spawned.
+            string notesString = "[";
+            for (int i = 0; i < notes.Count; i += 1) {
+                notesString += "{";
+                notesString += "\"Id\":" + i.ToString() + ",";
+                notesString += "\"Type\":\"";
+                if (notes[i].type == NoteData.NoteType.CLICK)
+                    notesString += "click";
+                else if (notes[i].type == NoteData.NoteType.HOLD)
+                    notesString += "hold";
+                else if (notes[i].type == NoteData.NoteType.SWIPE)
+                    notesString += "swipe";
+                else if (notes[i].type == NoteData.NoteType.SLIDE)
+                    notesString += "slide";
+                notesString += "\",\"Track\":" + notes[i].track.ToString() + ",";
+                notesString += "\"Time\":" + notes[i].time.ToString() + ",";
+                if (notes[i].type == NoteData.NoteType.HOLD)
+                    notesString += "\"Hold\":" + notes[i].hold.ToString() + ",";
+                else
+                    notesString += "\"Hold\":0.0,";
+                notesString += "\"Dir\":" + notes[i].dir.ToString();
+                if (i == notes.Count - 1)
+                    notesString += "}";
+                else
+                    notesString += "},";
+            }
+            notesString += "]";
+            File.WriteAllText(notesFileName, notesString);
         }
-        notesString += "]";
-        File.WriteAllText(notesFileName, notesString);
         VoezEditor.Editor.RefreshAllNotes();
         VoezEditor.Editor.RefreshAllTracks();
     }
 
-    private string TransformationsListToString(List<TrackTransformation> transformList, bool intValue, float startingValue)
+    private string TransformationsListToString(bool editorTracksFile, List<TrackTransformation> transformList, bool intValue, float startingValue)
     {
         string retStr = "";
         for (int i = 0; i < transformList.Count; i += 1) {
@@ -453,11 +502,21 @@ public class ProjectData {
 
                 retStr += "\"To\":" + halfTo.ToString() + ",";
                 retStr += "\"Ease\":\"easeinback\",";
+                if (editorTracksFile) {
+                    retStr += "\",\"RepeatCount\":" + transformList[i].repeatCount.ToString() + ",";
+                    retStr += "\",\"Duration\":" + (transformList[i].duration / 2f).ToString() + ",";
+                    retStr += "\",\"Offset\":" + transformList[i].offset.ToString() + ",";
+                }
                 retStr += "\"Start\":" + transformList[i].start.ToString() + ",";
                 retStr += "\"End\":" + halfTime.ToString();
                 retStr += "},{";
                 retStr += "\"To\":" + transformList[i].to.ToString() + ",";
                 retStr += "\"Ease\":\"easeoutback\",";
+                if (editorTracksFile) {
+                    retStr += "\",\"RepeatCount\":" + transformList[i].repeatCount.ToString() + ",";
+                    retStr += "\",\"Duration\":" + (transformList[i].duration / 2f).ToString() + ",";
+                    retStr += "\",\"Offset\":0,";
+                }
                 retStr += "\"Start\":" + halfTime.ToString() + ",";
                 retStr += "\"End\":" + transformList[i].end.ToString();
             } else {
@@ -511,6 +570,11 @@ public class ProjectData {
                     retStr += "easeinoutelastic";
                 else if (transformList[i].ease == Easing.ELASTIC_OUTIN)
                     retStr += "easeoutinelastic";
+                if (editorTracksFile) {
+                    retStr += "\",\"RepeatCount\":" + transformList[i].repeatCount.ToString() + ",";
+                    retStr += "\",\"Duration\":" + transformList[i].duration.ToString() + ",";
+                    retStr += "\",\"Offset\":" + transformList[i].offset.ToString() + ",";
+                }
                 retStr += "\",\"Start\":" + transformList[i].start.ToString() + ",";
                 retStr += "\"End\":" + transformList[i].end.ToString();
             }
@@ -629,6 +693,9 @@ public class ProjectData {
         public float to;
         public float start;
         public float end;
+        public float duration;
+        public float offset;
+        public float repeatCount;
         public Easing ease;
 
         public enum TransformType {
@@ -644,6 +711,9 @@ public class ProjectData {
             copiedTrans.start = start;
             copiedTrans.end = end;
             copiedTrans.ease = ease;
+            copiedTrans.repeatCount = repeatCount;
+            copiedTrans.duration = duration;
+            copiedTrans.offset = offset;
             return copiedTrans;
         }
 
@@ -653,6 +723,9 @@ public class ProjectData {
             start = newStartTime+(newData.start-oldStartTime);
             end = newStartTime+(newData.end-oldStartTime);
             ease = newData.ease;
+            repeatCount = newData.repeatCount;
+            duration = newData.duration;
+            offset = newData.offset;
         }
 
         public System.Func<float, float, float, float> GetEaseFunction()

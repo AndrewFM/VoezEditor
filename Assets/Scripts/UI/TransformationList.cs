@@ -7,6 +7,8 @@ using UnityEngine;
 public class TransformationList : UIElement {
     public TrackEditor parent;
     public List<ProjectData.TrackTransformation> transList;
+    public List<int> itemToTransListInds;
+    public List<TransformationItem.TransformationItemType> itemTypes;
     public TransformationItem[] transUIElems;
     public Button addButton;
     public Button deleteButton;
@@ -15,6 +17,7 @@ public class TransformationList : UIElement {
     public Button copyButton;
     public Button pasteButton;
     public Button mirrorButton;
+    public Button repeatButton;
     public FLabel pageLabel;
     public FLabel titleLabel;
     public RectangleBorder border;
@@ -33,12 +36,15 @@ public class TransformationList : UIElement {
         this.type = type;
         this.pos = pos;
         this.parent = parent;
+        itemToTransListInds = new List<int>();
+        itemTypes = new List<TransformationItem.TransformationItemType>();
         if (type == ProjectData.TrackTransformation.TransformType.MOVE)
             transList = parent.data.move;
         else if (type == ProjectData.TrackTransformation.TransformType.SCALE)
             transList = parent.data.scale;
         else
             transList = parent.data.colorChange;
+        ResortDataList();
         transUIElems = new TransformationItem[TRANS_PER_PAGE];
         transSelected = -1;
         pageLabel = new FLabel("Raleway16", "Page");
@@ -47,7 +53,7 @@ public class TransformationList : UIElement {
 
     public int TotalPages
     {
-        get { return Mathf.FloorToInt((transList.Count - 1) / transUIElems.Length) + 1;  }
+        get { return Mathf.FloorToInt((itemTypes.Count - 1) / transUIElems.Length) + 1;  }
     }
 
     public override void Update()
@@ -62,8 +68,9 @@ public class TransformationList : UIElement {
             nextPageButton = new Button("next", new Vector2(baseX + (buttonSize + spacing) * 1f, baseY), buttonSize, false);
             addButton = new Button("add", new Vector2(baseX + (buttonSize + spacing) * 2f, baseY), buttonSize, false);
             deleteButton = new Button("delete", new Vector2(baseX + (buttonSize + spacing) * 3f, baseY), buttonSize, false);
-            copyButton = new Button("copy", new Vector2(baseX + (buttonSize + spacing) * 4f, baseY), buttonSize, false);
-            pasteButton = new Button("paste", new Vector2(baseX + (buttonSize + spacing) * 5f, baseY), buttonSize, false);
+            repeatButton = new Button("repeat", new Vector2(baseX + (buttonSize + spacing) * 4f, baseY), buttonSize, false);
+            copyButton = new Button("copy", new Vector2(baseX + (buttonSize + spacing) * 5f, baseY), buttonSize, false);
+            pasteButton = new Button("paste", new Vector2(baseX + (buttonSize + spacing) * 6f, baseY), buttonSize, false);
             pageLabel.x = pos.x;
             pageLabel.y = baseY - buttonSize * 0.5f - spacing - pageLabel.textRect.height * 0.5f;
             titleLabel.x = pos.x;
@@ -72,10 +79,11 @@ public class TransformationList : UIElement {
             VoezEditor.Editor.AddObject(nextPageButton);
             VoezEditor.Editor.AddObject(addButton);
             VoezEditor.Editor.AddObject(deleteButton);
+            VoezEditor.Editor.AddObject(repeatButton);
             VoezEditor.Editor.AddObject(copyButton);
             VoezEditor.Editor.AddObject(pasteButton);
             if (type == ProjectData.TrackTransformation.TransformType.MOVE) {
-                mirrorButton = new Button("mirror", new Vector2(baseX + (buttonSize + spacing) * 6f, baseY), buttonSize, false);
+                mirrorButton = new Button("mirror", new Vector2(baseX + (buttonSize + spacing) * 7f, baseY), buttonSize, false);
                 VoezEditor.Editor.AddObject(mirrorButton);
             }
 
@@ -87,6 +95,10 @@ public class TransformationList : UIElement {
         }
 
         // Edit Values
+        int mappedTransSelected = -1;
+        if (transSelected >= 0) {
+            mappedTransSelected = itemToTransListInds[transSelected];
+        }
         if (transSelected >= 0 && transUIElems[transSelected % transUIElems.Length] != null) {
             int delta = 0;
             if (InputManager.UpTick())
@@ -99,17 +111,17 @@ public class TransformationList : UIElement {
                 delta = -5;
             if (delta != 0) {
                 if (Util.CtrlDown() && (itemSelected == 1 || itemSelected == 2)) {
-                    // Shift all keyframes after this one
+                    // Shift all keyframes after this one (TODO FOR REPEATS)
                     float shiftAmount = delta * VoezEditor.Editor.GetBPMTimeIncrement();
                     float endShiftLimit = parent.data.end - transList[transList.Count - 1].end;
                     float startShiftLimit = 0;
                     if (itemSelected == 2)
-                        startShiftLimit = transList[transSelected].start - transList[transSelected].end;
+                        startShiftLimit = transList[mappedTransSelected].start - transList[mappedTransSelected].end;
                     else {
-                        if (transSelected == 0)
-                            startShiftLimit = parent.data.start - transList[transSelected].start;
+                        if (mappedTransSelected == 0)
+                            startShiftLimit = parent.data.start - transList[mappedTransSelected].start;
                         else
-                            startShiftLimit = transList[transSelected-1].end - transList[transSelected].start;
+                            startShiftLimit = transList[mappedTransSelected - 1].end - transList[mappedTransSelected].start;
                     }
                     if (shiftAmount > endShiftLimit)
                         shiftAmount = endShiftLimit;
@@ -117,23 +129,27 @@ public class TransformationList : UIElement {
                         shiftAmount = startShiftLimit;
 
                     if (itemSelected == 1)
-                        transList[transSelected].start += shiftAmount;
-                    transList[transSelected].end += shiftAmount;
-                    for(int i=transSelected+1; i<transList.Count; i+=1) {
+                        transList[mappedTransSelected].start += shiftAmount;
+                    transList[mappedTransSelected].end += shiftAmount;
+                    for (int i = mappedTransSelected + 1; i < transList.Count; i += 1) {
                         transList[i].start += shiftAmount;
                         transList[i].end += shiftAmount;
                     }
                     if (itemSelected == 1)
-                        VoezEditor.Editor.JumpToTime(transList[transSelected].start);
+                        VoezEditor.Editor.JumpToTime(transList[mappedTransSelected].start);
                     else
-                        VoezEditor.Editor.JumpToTime(transList[transSelected].end);
-                    for (int i=0; i<transUIElems.Length; i+=1) {
+                        VoezEditor.Editor.JumpToTime(transList[mappedTransSelected].end);
+                    for (int i = 0; i < transUIElems.Length; i += 1) {
                         if (transUIElems[i] != null)
                             transUIElems[i].RefreshLabelValues();
                     }
                 }
-                else
-                    transUIElems[transSelected % transUIElems.Length].UpdateValue(itemSelected, delta);
+                else {
+                    transUIElems[itemSelected % transUIElems.Length].UpdateValue(itemSelected, delta);
+                    if (itemTypes[itemSelected] != TransformationItem.TransformationItemType.NONE) {
+                        UpdateTimesAfterRepeat(itemSelected);
+                    }
+                }
             }
         }
 
@@ -171,12 +187,12 @@ public class TransformationList : UIElement {
         if (prevPageButton.clicked) {
             if (page > 0) {
                 if (transSelected >= 0)
-                    transSelected = Mathf.Clamp(transSelected - transUIElems.Length, 0, transList.Count-1);
+                    transSelected = Mathf.Clamp(transSelected - transUIElems.Length, 0, itemTypes.Count-1);
                 else
                     page -= 1;
                 RefreshPages();
-            } else if (transList.Count > 0) {
-                transSelected = transList.Count-1;
+            } else if (itemTypes.Count > 0) {
+                transSelected = itemTypes.Count-1;
                 RefreshPages();
             }
             prevPageButton.clicked = false;
@@ -184,11 +200,11 @@ public class TransformationList : UIElement {
         if (nextPageButton.clicked) {
             if (page < TotalPages - 1) {
                 if (transSelected >= 0)
-                    transSelected = Mathf.Clamp(transSelected + transUIElems.Length, 0, transList.Count - 1);
+                    transSelected = Mathf.Clamp(transSelected + transUIElems.Length, 0, itemTypes.Count - 1);
                 else
                     page += 1;
                 RefreshPages();
-            } else if (transList.Count > 0) {
+            } else if (itemTypes.Count > 0) {
                 transSelected = 0;
                 RefreshPages();
             }
@@ -196,46 +212,59 @@ public class TransformationList : UIElement {
         }
 
         // Add and Delete Transformations
-        if (addButton.clicked) {
+        mappedTransSelected = -1;
+        if (transSelected >= 0) {
+            mappedTransSelected = itemToTransListInds[transSelected];
+        }
+        if (addButton.clicked || repeatButton.clicked) {
             ProjectData.TrackTransformation transformation = new ProjectData.TrackTransformation();
             // Default Values
             if (type == ProjectData.TrackTransformation.TransformType.SCALE)
                 transformation.to = 1.0f;
             if (type == ProjectData.TrackTransformation.TransformType.MOVE)
                 transformation.to = 0.5f;
-            if (transSelected < 0)
-                transSelected = transList.Count - 1; // If no item selected, default to adding at end of trans list.
-            if (transList.Count == 0) {
+            if (mappedTransSelected < 0)
+                mappedTransSelected = transList.Count - 1; // If no item selected, default to adding at end of trans list.
+            if (repeatButton.clicked) {
+                transformation.repeatCount = 1;
+            }
+            if (itemTypes.Count != 0 && transList[mappedTransSelected].repeatCount != 0) {
+                transformation.repeatCount = transList[mappedTransSelected].repeatCount;
+            }
+            if (itemTypes.Count == 0) {
                 transformation.start = parent.data.start;
                 transformation.end = parent.data.end;
             }
             else if (Util.ShiftDown()) {
                 // Add Before selection
-                transformation.end = transList[transSelected].start;
-                if (transSelected == 0)
+                transformation.end = transList[mappedTransSelected].start;
+                if (mappedTransSelected == 0)
                     transformation.start = Mathf.Max(transformation.end - VoezEditor.Editor.GetBPMTimeIncrement() * 5, parent.data.start);
-                else
-                    transformation.start = Mathf.Max(transformation.end - VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[transSelected - 1].end);
+                else {
+                    transformation.start = Mathf.Max(transformation.end - VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[mappedTransSelected - 1].end);
+                }
             }
             else {
                 // Add After Selection
-                transformation.start = transList[transSelected].end;
-                if (transSelected == transList.Count - 1)
+                transformation.start = transList[mappedTransSelected].end;
+                if (mappedTransSelected == transList.Count - 1)
                     transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, parent.data.end);
                 else
-                    transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[transSelected + 1].start);
+                    transformation.end = Mathf.Min(transformation.start + VoezEditor.Editor.GetBPMTimeIncrement() * 5, transList[mappedTransSelected + 1].start);
             }
+            transformation.duration = transformation.end - transformation.start;
             if (transformation.end >= transformation.start) {
                 transList.Add(transformation);
-                transSelected = Mathf.Clamp(transSelected + 1, 0, transList.Count - 1);
+                mappedTransSelected = Mathf.Clamp(mappedTransSelected + 1, 0, transList.Count - 1);
                 ResortDataList();
                 RefreshPages();
             }
             addButton.clicked = false;
+            repeatButton.clicked = false;
         }
         if (deleteButton.clicked) {
-            if (transList.Count > 0 && transSelected >= 0) {
-                transList.RemoveAt(transSelected);
+            if (transList.Count > 0 && mappedTransSelected >= 0) {
+                transList.RemoveAt(mappedTransSelected);
                 transSelected -= 1;
                 RefreshPages();
             }
@@ -261,6 +290,7 @@ public class TransformationList : UIElement {
                 }
                 page = 0;
                 transSelected = -1;
+                mappedTransSelected = -1;
                 RefreshPages();
             }
             pasteButton.clicked = false;
@@ -269,8 +299,8 @@ public class TransformationList : UIElement {
         // Mirror X
         if (mirrorButton != null && mirrorButton.clicked) {
             if (Util.ShiftDown()) {
-                if (transSelected != -1)
-                    transList[transSelected].to = 1f - transList[transSelected].to;
+                if (mappedTransSelected != -1)
+                    transList[mappedTransSelected].to = 1f - transList[mappedTransSelected].to;
                 else
                     parent.data.x = 1f - parent.data.x;
             } else {
@@ -283,7 +313,7 @@ public class TransformationList : UIElement {
             mirrorButton.clicked = false;
         }
 
-        if (transSelected != -1)
+        if (mappedTransSelected != -1)
             parent.selectedLine = -1;
 
         base.Update();
@@ -295,6 +325,37 @@ public class TransformationList : UIElement {
     public int Spr_SmallHover { get { return 1; } }
     public int Spr_DividerLines { get { return 4;  } }
     public int TotalSprites { get { return Spr_DividerLines + (TRANS_PER_PAGE - 1); } }
+
+    public void UpdateTimesAfterRepeat(int startItemIndex) {
+        // Find first item in this repeat group.
+        float repeatStartTime = 0;
+        int repeatStartIndex = 0;
+        for(int i=startItemIndex; i>=0; i-=1) {
+            if (itemTypes[i] == TransformationItem.TransformationItemType.REPEAT_START) {
+                repeatStartTime = transList[itemToTransListInds[i]].start;
+                repeatStartIndex = i;
+                break;
+            }
+        }
+        // Count up time occupied by full execution of everything in this repeat group.
+        float repeatTotalTime = 0;
+        float repeatEndTime = 0;
+        int repeatEndIndex = 0;
+        for(int i=repeatStartIndex; i<itemTypes.Count; i+=1) {
+            if (itemTypes[i] == TransformationItem.TransformationItemType.REPEAT_ITEM) {
+                repeatTotalTime += transList[itemToTransListInds[i]].offset;
+                repeatTotalTime += transList[itemToTransListInds[i]].duration;
+            }
+            if (itemTypes[i] == TransformationItem.TransformationItemType.REPEAT_END) {
+                repeatTotalTime *= transList[itemToTransListInds[repeatStartIndex]].repeatCount;
+                transList[itemToTransListInds[i]].end = repeatStartTime + repeatTotalTime;
+                repeatEndTime = transList[itemToTransListInds[i]].end;
+                repeatEndIndex = i;
+                break;
+            }
+        }
+        // TODO: How to handle the new end time exceeding the start time of the element(s) after the repeat?
+    }
 
     // The earliest the given keyframe is allowed to start at, so it doesn't overlap with its neighboring keyframe.
     public float StartTimeBound(ProjectData.TrackTransformation item)
@@ -438,6 +499,28 @@ public class TransformationList : UIElement {
     public void ResortDataList()
     {
         transList.Sort((a, b) => (TransListSortMethod(a,b)));
+        itemToTransListInds = new List<int>();
+        itemTypes = new List<TransformationItem.TransformationItemType>();
+        bool repeatStarted = false;
+        for(int i=0; i<transList.Count; i+=1) {
+            if (transList[i].repeatCount == 0) {
+                itemToTransListInds.Add(i);
+                itemTypes.Add(TransformationItem.TransformationItemType.NONE);
+            } else {
+                if (!repeatStarted) {
+                    itemToTransListInds.Add(i);
+                    itemTypes.Add(TransformationItem.TransformationItemType.REPEAT_START);
+                    repeatStarted = true;
+                }
+                itemToTransListInds.Add(i);
+                itemTypes.Add(TransformationItem.TransformationItemType.REPEAT_ITEM);
+                if (i == transList.Count - 1 || transList[i+1].repeatCount == 0) {
+                    itemToTransListInds.Add(i);
+                    itemTypes.Add(TransformationItem.TransformationItemType.REPEAT_END);
+                    repeatStarted = false;
+                }
+            }
+        }
     }
 
     private int TransListSortMethod(ProjectData.TrackTransformation a, ProjectData.TrackTransformation b)
@@ -467,8 +550,8 @@ public class TransformationList : UIElement {
         // Add TransUIElems for this page
         int added = 0;
         int pageItemStart = page * transUIElems.Length;
-        for (int i= pageItemStart; i<Mathf.Min(pageItemStart+transUIElems.Length, transList.Count); i+=1) {
-            transUIElems[added] = new TransformationItem(this, transList[i], new Vector2(pos.x, pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * (added * 4)));
+        for (int i= pageItemStart; i<Mathf.Min(pageItemStart+transUIElems.Length, itemTypes.Count); i+=1) {
+            transUIElems[added] = new TransformationItem(this, transList[itemToTransListInds[i]], new Vector2(pos.x, pos.y + HEIGHT * 0.5f - LINES_START - LINE_HEIGHT * (added * 4)), itemTypes[i]);
             VoezEditor.Editor.AddObject(transUIElems[added]);
             added += 1;
         }
@@ -480,6 +563,7 @@ public class TransformationList : UIElement {
         base.Destroy();
         addButton.Destroy();
         deleteButton.Destroy();
+        repeatButton.Destroy();
         nextPageButton.Destroy();
         prevPageButton.Destroy();
         copyButton.Destroy();
@@ -499,17 +583,45 @@ public class TransformationList : UIElement {
         public ProjectData.TrackTransformation data;
         TransformationList parent;
         public FLabel[] labels;
+        public TransformationItemType type;
+        public enum TransformationItemType
+        {
+            NONE,
+            REPEAT_START,
+            REPEAT_END,
+            REPEAT_ITEM
+        }
 
-        public TransformationItem(TransformationList parent, ProjectData.TrackTransformation data, Vector2 pos)
+        public TransformationItem(TransformationList parent, ProjectData.TrackTransformation data, Vector2 pos, TransformationItemType itemType)
         {
             this.data = data;
             this.parent = parent;
             this.pos = pos;
-            labels = new FLabel[4];
-            labels[0] = new FLabel("Raleway16", "Value:");
-            labels[1] = new FLabel("Raleway16", "Start:");
-            labels[2] = new FLabel("Raleway16", "End:");
-            labels[3] = new FLabel("Raleway16", "Easing:");
+            type = itemType;
+            if (itemType == TransformationItemType.NONE) {
+                labels = new FLabel[4];
+                labels[0] = new FLabel("Raleway16", "Value:");
+                labels[1] = new FLabel("Raleway16", "Start:");
+                labels[2] = new FLabel("Raleway16", "End:");
+                labels[3] = new FLabel("Raleway16", "Easing:");
+            }
+            else if (itemType == TransformationItemType.REPEAT_ITEM) {
+                labels = new FLabel[4];
+                labels[0] = new FLabel("Raleway16", "Value:");
+                labels[1] = new FLabel("Raleway16", "Offset:");
+                labels[2] = new FLabel("Raleway16", "Duration:");
+                labels[3] = new FLabel("Raleway16", "Easing:");
+            }
+            else if (itemType == TransformationItemType.REPEAT_START) {
+                labels = new FLabel[3];
+                labels[0] = new FLabel("Raleway16", "[REPEAT BLOCK START]");
+                labels[1] = new FLabel("Raleway16", "Start:");
+                labels[2] = new FLabel("Raleway16", "Repeat Count:");
+            }
+            else if (itemType == TransformationItemType.REPEAT_END) {
+                labels = new FLabel[1];
+                labels[0] = new FLabel("Raleway16", "[REPEAT BLOCK END]");
+            }
             RefreshLabelValues();
         }
 
@@ -518,19 +630,32 @@ public class TransformationList : UIElement {
             base.Update();
         }
 
-        public void RefreshLabelValues()
-        {
-            if (parent.type == ProjectData.TrackTransformation.TransformType.COLOR) {
-                labels[0].text = "Color: " + ProjectData.colorNames[(int)data.to];
-                labels[0].color = ProjectData.colors[(int)data.to];
-            } else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                labels[0].text = "Position: " + (data.to * 100f).ToString("0.###") + "%";
-            else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
-                labels[0].text = "Scale: " + data.to.ToString("0.00") + "x";
+        public void RefreshLabelValues() {
+            if (type == TransformationItemType.NONE || type == TransformationItemType.REPEAT_ITEM) {
+                if (parent.type == ProjectData.TrackTransformation.TransformType.COLOR) {
+                    labels[0].text = "Color: " + ProjectData.colorNames[(int)data.to];
+                    labels[0].color = ProjectData.colors[(int)data.to];
+                }
+                else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
+                    labels[0].text = "Position: " + (data.to * 100f).ToString("0.###") + "%";
+                else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
+                    labels[0].text = "Scale: " + data.to.ToString("0.00") + "x";
+            }
+            if (type == TransformationItemType.NONE) { 
+                labels[1].text = "Offset: " + VoezEditor.Editor.BeatTimeStamp(data.offset);
+                labels[2].text = "Duration: " + VoezEditor.Editor.BeatTimeStamp(data.duration);
+                labels[3].text = "Ease: " + Enum.GetName(typeof(ProjectData.Easing), data.ease);
+            }
+            if (type == TransformationItemType.REPEAT_ITEM) {
+                labels[1].text = "Start: " + VoezEditor.Editor.BeatTimeStamp(data.start);
+                labels[2].text = "End: " + VoezEditor.Editor.BeatTimeStamp(data.end);
+                labels[3].text = "Ease: " + Enum.GetName(typeof(ProjectData.Easing), data.ease);
+            }
+            if (type == TransformationItemType.REPEAT_START) {
+                labels[1].text = "Start: " + VoezEditor.Editor.BeatTimeStamp(data.start);
+                labels[2].text = "Repeat Count: " + data.repeatCount.ToString();
+            }
 
-            labels[1].text = "Start: " + VoezEditor.Editor.BeatTimeStamp(data.start);
-            labels[2].text = "End: " + VoezEditor.Editor.BeatTimeStamp(data.end);
-            labels[3].text = "Ease: " + Enum.GetName(typeof(ProjectData.Easing), data.ease);
             for (int i = 0; i < labels.Length; i += 1) {
                 labels[i].x = pos.x - WIDTH * 0.5f + 10f + labels[i].textRect.width * 0.5f;
                 labels[i].y = pos.y - LINE_HEIGHT * (0.5f + i);
@@ -539,25 +664,39 @@ public class TransformationList : UIElement {
 
         public void UpdateValue(int valueID, int delta)
         {
-            if (valueID == 0) {
+            if (valueID == 0 && (type == TransformationItemType.NONE || type == TransformationItemType.REPEAT_ITEM)) {
                 if (parent.type == ProjectData.TrackTransformation.TransformType.COLOR) {
                     data.to += Mathf.Sign(delta);
                     if (data.to < 0)
                         data.to = ProjectData.colors.Length - 1;
                     if (data.to > ProjectData.colors.Length - 1)
                         data.to = 0;
-                } else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
+                }
+                else if (parent.type == ProjectData.TrackTransformation.TransformType.SCALE)
                     data.to = Mathf.Clamp(data.to + 0.1f * delta, 0f, 10f);
                 else if (parent.type == ProjectData.TrackTransformation.TransformType.MOVE)
-                    data.to = Mathf.RoundToInt(Mathf.Clamp(data.to + 0.01f * delta, -0.5f, 1.5f)*100f)/100f;
-            } else if (valueID == 1) {
+                    data.to = Mathf.RoundToInt(Mathf.Clamp(data.to + 0.01f * delta, -0.5f, 1.5f) * 100f) / 100f;
+            }
+            else if (valueID == 1 && (type == TransformationItemType.NONE || type == TransformationItemType.REPEAT_START)) {
                 data.start = Mathf.Clamp(data.start + delta * VoezEditor.Editor.GetBPMTimeIncrement(), parent.StartTimeBound(data), data.end);
                 VoezEditor.Editor.JumpToTime(data.start);
-            } else if (valueID == 2) {
+            }
+            else if (valueID == 1 && type == TransformationItemType.REPEAT_ITEM) {
+                data.offset = Mathf.Max(data.offset + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0);
+            }
+            else if (valueID == 2 && type == TransformationItemType.NONE) {
                 data.end = Mathf.Clamp(data.end + delta * VoezEditor.Editor.GetBPMTimeIncrement(), data.start, parent.EndTimeBound(data));
                 VoezEditor.Editor.JumpToTime(data.end);
-            } else if (valueID == 3)
+            }
+            else if (valueID == 2 && type == TransformationItemType.REPEAT_ITEM) {
+                data.duration = Mathf.Max(data.duration + delta * VoezEditor.Editor.GetBPMTimeIncrement(), 0);
+            }
+            else if (valueID == 2 && type == TransformationItemType.REPEAT_START) {
+                data.repeatCount = Mathf.Max(data.repeatCount + delta, 1);
+            }
+            else if (valueID == 3 && type == TransformationItemType.NONE) {
                 data.ease = CycleEasing(delta > 0);
+            }
             RefreshLabelValues();
         }
 

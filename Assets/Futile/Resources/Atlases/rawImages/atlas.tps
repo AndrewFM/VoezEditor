@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>4</int>
         <key>texturePackerVersion</key>
-        <string>4.8.2</string>
+        <string>5.1.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -422,6 +422,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">repeat.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,10,17,19</rect>
+                <key>scale9Paddings</key>
+                <rect>8,10,17,19</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">save.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -534,6 +547,7 @@
             <filename>scroll.png</filename>
             <filename>back.png</filename>
             <filename>quantization.png</filename>
+            <filename>repeat.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

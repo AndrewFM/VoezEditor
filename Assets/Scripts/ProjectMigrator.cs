@@ -18,7 +18,7 @@ public class ProjectMigrator {
         for(int i=0; i<projectFolders.Length; i++) {
             string[] projectFiles = Directory.GetFiles(projectFolders[i], "*.*", SearchOption.TopDirectoryOnly);
             for(int j=0; j<projectFiles.Length; j++) {
-                if (projectFiles[j].EndsWith(".txt")) {
+                if (projectFiles[j].EndsWith(".txt") && !projectFiles[j].Contains("songconfig")) {
                     File.Move(projectFiles[j], projectFiles[j].Substring(0, projectFiles[j].Length - 4) + ".json");
                 }
             }

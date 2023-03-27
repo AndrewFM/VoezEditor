@@ -24,6 +24,7 @@ public class InputManager {
     public static bool xPushed;
     public static bool cPushed;
     public static bool vPushed;
+    public static bool yPushed;
     public static bool delPushed;
     public static bool spacePushed;
     public static bool returnPushed;
@@ -60,6 +61,7 @@ public class InputManager {
         UpdateKeyPushTracker(KeyCode.X, ref xLastDown, ref xNowDown, ref xPushed);
         UpdateKeyPushTracker(KeyCode.C, ref cLastDown, ref cNowDown, ref cPushed);
         UpdateKeyPushTracker(KeyCode.V, ref vLastDown, ref vNowDown, ref vPushed);
+        UpdateKeyPushTracker(KeyCode.Y, ref yLastDown, ref yNowDown, ref yPushed);
         UpdateKeyPushTracker(KeyCode.Delete, ref delLastDown, ref delNowDown, ref delPushed);
         UpdateKeyPushTracker(KeyCode.Space, ref spaceLastDown, ref spaceNowDown, ref spacePushed);
         UpdateKeyPushTracker(KeyCode.Return, ref returnLastDown, ref returnNowDown, ref returnPushed);
@@ -187,6 +189,8 @@ public class InputManager {
     private bool cLastDown;
     private bool vNowDown;
     private bool vLastDown;
+    private bool yNowDown;
+    private bool yLastDown;
 
     private bool delNowDown;
     private bool delLastDown;

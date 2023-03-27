@@ -11,11 +11,14 @@ public class ProjectData {
     public List<NoteData> notes;
     public List<TrackData> tracks;
     public string songName = "";
+    public string songId = "";
     public string author = "";
+    public string version = "Voez Editor";
     public string projectFolder;
     public string notesFileName;
     public string tracksFileName;
     public string infoFileName;
+    public string configFileName;
     public string infoString;
     public float songBPM = 120;
     public float easyLevel = -1;
@@ -32,6 +35,7 @@ public class ProjectData {
         notesFileName = projectFolder + "/note_" + VoezEditor.editType + ".json";
         tracksFileName = projectFolder + "/track_" + VoezEditor.editType + ".json";
         infoFileName = projectFolder + "/info_song.json";
+        configFileName = projectFolder + "/songconfig.txt";
         notes = new List<NoteData>();
         tracks = new List<TrackData>();
     }
@@ -260,8 +264,20 @@ public class ProjectData {
                 author = (string)infoProps["author"];
             if (infoProps.ContainsKey("name"))
                 songName = (string)infoProps["name"];
+            if (infoProps.ContainsKey("id"))
+                songId = (string)infoProps["id"];
+            else {
+                songId = "";
+                for(int i=0; i<24; i+=1) {
+                    songId += UnityEngine.Random.Range(0, 10).ToString();
+                }
+            }
             if (infoProps.ContainsKey("bpm"))
                 songBPM = Util.ParseJSONFloat(infoProps["bpm"]);
+            if (infoProps.ContainsKey("song_version"))
+                version = (string)infoProps["song_version"];
+            else
+                version = "Voez Editor";
         }
 
         // Level JSON
@@ -353,17 +369,36 @@ public class ProjectData {
     public void ExportActiveProject()
     {
         // Info File
-        string infoString = "{\"info\":{";
-        infoString += "\"version\":\"" + VoezEditor.VERSION + "\",";
-        infoString += "\"author\":\"" + author + "\",";
-        infoString += "\"bpm\":" + songBPM.ToString() + ",";
-        infoString += "\"name\":\"" + songName + "\"";
-        infoString += "},\"level\":{";
-        infoString += "\"easy\":" + Mathf.Max(1, easyLevel).ToString() + ",";
-        infoString += "\"hard\":" + Mathf.Max(1, hardLevel).ToString() + ",";
-        infoString += "\"extra\":" + Mathf.Max(1, extraLevel).ToString() + "}";
+        string infoString = "{" + System.Environment.NewLine;
+        if (songId == "") {
+            for (int i = 0; i < 24; i += 1) {
+                songId += UnityEngine.Random.Range(0, 10).ToString();
+            }
+        }
+        infoString += "\t\"info\":{" + System.Environment.NewLine;
+        infoString += "\t\t\"version\":\"" + VoezEditor.VERSION + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"song_version\":\"" + version + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"id\":\"" + songId + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"author\":\"" + author + "\"," + System.Environment.NewLine;
+        infoString += "\t\t\"bpm\":" + songBPM.ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"name\":\"" + songName + "\"" + System.Environment.NewLine;
+        infoString += "\t}," + System.Environment.NewLine;
+        infoString += "\t\"level\":{" + System.Environment.NewLine;
+        infoString += "\t\t\"easy\":" + Mathf.Max(1, easyLevel).ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"hard\":" + Mathf.Max(1, hardLevel).ToString() + "," + System.Environment.NewLine;
+        infoString += "\t\t\"extra\":" + Mathf.Max(1, extraLevel).ToString() + System.Environment.NewLine;
+        infoString += "\t}" + System.Environment.NewLine;
         infoString += "}";
         File.WriteAllText(infoFileName, infoString);
+        
+        // Config File
+        string configString = "id=" + songId + System.Environment.NewLine;
+        configString += "name=" + songName + System.Environment.NewLine;
+        configString += "bpm=" + songBPM.ToString() + System.Environment.NewLine;
+        configString += "author=" + author + System.Environment.NewLine;
+        configString += "diff=" + Mathf.Max(1, easyLevel).ToString() + "-" + Mathf.Max(1, hardLevel).ToString() + "-" + Mathf.Max(1, extraLevel).ToString() + System.Environment.NewLine;
+        configString += "version=" + version;
+        File.WriteAllText(configFileName, configString);
 
         // Track Mapping File
         // WARNING: Order matters here. Track mapping needs to be exported first before notes mapping.
